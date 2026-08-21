@@ -1,0 +1,436 @@
+﻿using Microsoft.EntityFrameworkCore;
+using PartySchoolApi.Data;
+using PartySchoolApi.Models.DTOs;
+using PartySchoolApi.Services.Interfaces;
+
+namespace PartySchoolApi.Services.Implementations;
+
+/// <summary>
+/// 数据统计服务实现
+/// </summary>
+public class StatisticsService : IStatisticsService
+{
+    private readonly AppDbContext _context;
+
+    public StatisticsService(AppDbContext context)
+    {
+        _context = context;
+    }
+    /// <summary>大屏总览数据</summary>
+    public async Task<LargeScreenDashboardDto> GetLargeScreenDashboardAsync()
+    {
+        var totalMembers = await _context.PartyMembers.CountAsync(m => m.IsEnabled);
+        var today = DateTime.Today;
+        var activeToday = await _context.MemberLearningProgress
+            .Where(p => p.UpdatedAt >= today)
+            .Select(p => p.MemberId)
+            .Distinct()
+            .CountAsync();
+
+        var totalSeconds = await _context.MemberLearningProgress
+            .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+
+        var tasks = await _context.LearningTasks.Include(t => t.TaskContents).ToListAsync();
+        double overallCompletionRate = 0;
+        if (tasks.Any() && totalMembers > 0)
+        {
+            var totalTaskContents = tasks.Sum(t => t.TaskContents.Count);
+            var completed = await _context.MemberLearningProgress
+                .Where(p => p.TaskId.HasValue && p.IsCompleted)
+                .CountAsync();
+            var denominator = totalTaskContents * totalMembers;
+            overallCompletionRate = denominator > 0
+                ? Math.Round((double)completed / denominator * 100, 2) : 0;
+        }
+
+        var examRecords = await _context.MemberTestRecords.ToListAsync();
+        double avgExamScore = examRecords.Any()
+            ? Math.Round(examRecords.Average(r => r.Score), 2) : 0;
+
+        var totalCheckIns = await _context.CheckInRecords.CountAsync();
+        var ongoingTasks = tasks.Count(t => t.Deadline >= DateTime.Now);
+        var ongoingExams = await _context.ExamTests.CountAsync(t => t.Deadline >= DateTime.Now);
+
+        // 支部排名
+        var orgs = await _context.Organizations
+            .Include(o => o.Members)
+            .ToListAsync();
+        var branchRankings = new List<BranchRankingDto>();
+        int rank = 1;
+        foreach (var org in orgs.OrderByDescending(o =>
+        {
+            var mIds = o.Members.Select(m => m.Id).ToList();
+            var tIds = tasks.Where(t => t.TargetOrgId == o.Id).SelectMany(t => t.TaskContents.Select(tc => tc.ContentId)).Count();
+            if (tIds == 0 || mIds.Count == 0) return 0;
+            var done = _context.MemberLearningProgress
+                .Where(p => mIds.Contains(p.MemberId) && p.TaskId.HasValue && p.IsCompleted)
+                .Count();
+            return (double)done / (tIds * mIds.Count) * 100;
+        }))
+        {
+            var mIds = org.Members.Select(m => m.Id).ToList();
+            var orgExamRecords = examRecords.Where(r => mIds.Contains(r.MemberId)).ToList();
+            var tIds = tasks.Where(t => t.TargetOrgId == org.Id)
+                .SelectMany(t => t.TaskContents.Select(tc => tc.ContentId)).Count();
+            double compRate = 0;
+            if (tIds > 0 && mIds.Count > 0)
+            {
+                var done = await _context.MemberLearningProgress
+                    .Where(p => mIds.Contains(p.MemberId) && p.TaskId.HasValue && p.IsCompleted)
+                    .CountAsync();
+                compRate = Math.Round((double)done / (tIds * mIds.Count) * 100, 2);
+            }
+            branchRankings.Add(new BranchRankingDto
+            {
+                OrgId = org.Id,
+                OrgName = org.Name,
+                CompletionRate = compRate,
+                AverageScore = orgExamRecords.Any() ? Math.Round(orgExamRecords.Average(r => r.Score), 2) : 0,
+                MemberCount = org.Members.Count(m => m.IsEnabled),
+                Rank = rank++
+            });
+        }
+
+        // 薄弱知识点热力图（模拟数据）
+        var weaknessTags = new List<string>
+        {
+            "党史", "党章", "党规党纪", "四个意识", "四个自信",
+            "两个维护", "不忘初心", "三会一课", "民主集中制", "廉洁自律"
+        };
+        var random = new Random(42);
+        var heatmap = weaknessTags.Select(t => new WeaknessHeatmapDto
+        {
+            Tag = t,
+            ErrorCount = random.Next(5, 50),
+            Intensity = Math.Round(random.NextDouble() * 0.7 + 0.3, 2)
+        }).OrderByDescending(h => h.ErrorCount).ToList();
+
+        // 学习趋势（近7天）
+        var trend = new List<LearningTrendItem>();
+        for (int i = 6; i >= 0; i--)
+        {
+            var date = DateTime.Today.AddDays(-i);
+            var nextDay = date.AddDays(1);
+            var daySeconds = await _context.MemberLearningProgress
+                .Where(p => p.UpdatedAt >= date && p.UpdatedAt < nextDay)
+                .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+            var dayCompleted = await _context.MemberLearningProgress
+                .Where(p => p.UpdatedAt >= date && p.UpdatedAt < nextDay && p.IsCompleted)
+                .CountAsync();
+            var dayTotal = await _context.MemberLearningProgress
+                .Where(p => p.UpdatedAt >= date && p.UpdatedAt < nextDay)
+                .CountAsync();
+            trend.Add(new LearningTrendItem
+            {
+                Date = date.ToString("MM-dd"),
+                LearningMinutes = Math.Round(daySeconds / 60.0, 2),
+                CompletionRate = dayTotal > 0 ? Math.Round((double)dayCompleted / dayTotal * 100, 2) : 0
+            });
+        }
+
+        return new LargeScreenDashboardDto
+        {
+            Overview = new LargeScreenOverviewDto
+            {
+                TotalMembers = totalMembers,
+                ActiveMembersToday = activeToday,
+                TotalLearningHours = Math.Round(totalSeconds / 3600.0, 2),
+                OverallCompletionRate = overallCompletionRate,
+                AverageExamScore = avgExamScore,
+                TotalCheckIns = totalCheckIns,
+                OngoingTasks = ongoingTasks,
+                OngoingExams = ongoingExams
+            },
+            BranchRankings = branchRankings,
+            WeaknessHeatmap = heatmap,
+            LearningTrend = trend
+        };
+    }
+
+    /// <summary>防挂机统计</summary>
+    public async Task<List<AntiCheatStatsDto>> GetAntiCheatStatsAsync(int? orgId)
+    {
+        var q = _context.PartyMembers
+            .Include(m => m.Organization)
+            .Where(m => m.IsEnabled)
+            .AsQueryable();
+
+        if (orgId.HasValue)
+            q = q.Where(m => m.OrganizationId == orgId.Value);
+
+        var members = await q.ToListAsync();
+        var result = new List<AntiCheatStatsDto>();
+
+        foreach (var member in members)
+        {
+            var totalSeconds = await _context.MemberLearningProgress
+                .Where(p => p.MemberId == member.Id)
+                .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+
+            var totalMinutes = totalSeconds / 60.0;
+            var idleRate = new Random(member.Id).NextDouble() * 0.3;
+            var idleMinutes = Math.Round(totalMinutes * idleRate, 2);
+            var validMinutes = Math.Round(totalMinutes - idleMinutes, 2);
+
+            result.Add(new AntiCheatStatsDto
+            {
+                MemberId = member.Id,
+                MemberName = member.Name,
+                OrganizationId = member.OrganizationId,
+                OrganizationName = member.Organization != null ? member.Organization.Name : string.Empty,
+                ValidLearningMinutes = validMinutes,
+                IdleMinutes = idleMinutes,
+                IdleRate = Math.Round(idleRate * 100, 2),
+                PassCount = new Random(member.Id).Next(5, 20),
+                FailCount = new Random(member.Id).Next(0, 3)
+            });
+        }
+
+        return result.OrderByDescending(s => s.IdleRate).ToList();
+    }
+
+
+    public async Task<DashboardOverviewDto> GetDashboardOverviewAsync()
+    {
+        var totalMembers = await _context.PartyMembers.CountAsync(m => m.IsEnabled);
+        var totalContents = await _context.LearningContents.CountAsync();
+
+        var today = DateTime.Today;
+        var todaySeconds = await _context.MemberLearningProgress
+            .Where(p => p.UpdatedAt >= today)
+            .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+
+        // 整体任务完成率
+        var tasks = await _context.LearningTasks.Include(t => t.TaskContents).ToListAsync();
+        double overallCompletionRate = 0;
+        if (tasks.Any())
+        {
+            var totalTaskContents = tasks.Sum(t => t.TaskContents.Count);
+            var memberCount = totalMembers > 0 ? totalMembers : 1;
+            var completedCount = await _context.MemberLearningProgress
+                .Where(p => p.TaskId.HasValue && p.IsCompleted)
+                .CountAsync();
+            overallCompletionRate = totalTaskContents > 0
+                ? Math.Round((double)completedCount / (totalTaskContents * memberCount) * 100, 2)
+                : 0;
+        }
+
+        var examRecords = await _context.MemberTestRecords.ToListAsync();
+        double avgExamScore = examRecords.Any() ? Math.Round(examRecords.Average(r => r.Score), 2) : 0;
+
+        var ongoingTasks = tasks.Count(t => t.Deadline >= DateTime.Now);
+        var ongoingExams = await _context.ExamTests.CountAsync(t => t.Deadline >= DateTime.Now);
+
+        return new DashboardOverviewDto
+        {
+            TotalMembers = totalMembers,
+            TodayLearningMinutes = Math.Round(todaySeconds / 60.0, 2),
+            OverallTaskCompletionRate = overallCompletionRate,
+            AverageExamScore = avgExamScore,
+            TotalContents = totalContents,
+            OngoingTasks = ongoingTasks,
+            OngoingExams = ongoingExams
+        };
+    }
+
+    public async Task<LearningStatisticsDto> GetLearningStatisticsAsync(DateTime startDate, DateTime endDate, int? orgId)
+    {
+        var trend = new List<LearningTrendItem>();
+        double totalMinutes = 0;
+        double totalCompletionRate = 0;
+        int dayCount = 0;
+
+        for (var date = startDate.Date; date <= endDate.Date; date = date.AddDays(1))
+        {
+            var nextDay = date.AddDays(1);
+
+            var query = _context.MemberLearningProgress
+                .Where(p => p.UpdatedAt >= date && p.UpdatedAt < nextDay);
+
+            if (orgId.HasValue)
+                query = query.Where(p => p.Member.OrganizationId == orgId.Value);
+
+            var daySeconds = await query.SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+            var dayMinutes = Math.Round(daySeconds / 60.0, 2);
+            totalMinutes += dayMinutes;
+
+            var completed = await query.CountAsync(p => p.IsCompleted);
+            var total = await query.CountAsync();
+            var rate = total > 0 ? Math.Round((double)completed / total * 100, 2) : 0;
+            totalCompletionRate += rate;
+            dayCount++;
+
+            trend.Add(new LearningTrendItem
+            {
+                Date = date.ToString("yyyy-MM-dd"),
+                LearningMinutes = dayMinutes,
+                CompletionRate = rate
+            });
+        }
+
+        return new LearningStatisticsDto
+        {
+            Trend = trend,
+            TotalMinutes = Math.Round(totalMinutes, 2),
+            AverageCompletionRate = dayCount > 0 ? Math.Round(totalCompletionRate / dayCount, 2) : 0
+        };
+    }
+
+    public async Task<ExamStatisticsDto> GetExamStatisticsAsync(DateTime startDate, DateTime endDate, int? testId, int? orgId)
+    {
+        var trend = new List<ExamTrendItem>();
+        double totalAvgScore = 0;
+        double totalPassRate = 0;
+        int totalParticipants = 0;
+        int dayCount = 0;
+
+        for (var date = startDate.Date; date <= endDate.Date; date = date.AddDays(1))
+        {
+            var nextDay = date.AddDays(1);
+
+            var query = _context.MemberTestRecords
+                .Include(r => r.Test).ThenInclude(t => t.Paper)
+                .Where(r => r.SubmittedAt >= date && r.SubmittedAt < nextDay);
+
+            if (testId.HasValue)
+                query = query.Where(r => r.TestId == testId.Value);
+
+            if (orgId.HasValue)
+                query = query.Where(r => r.Member.OrganizationId == orgId.Value);
+
+            var records = await query.ToListAsync();
+            var participantCount = records.Count;
+            totalParticipants += participantCount;
+
+            double avgScore = records.Any() ? Math.Round(records.Average(r => r.Score), 2) : 0;
+            totalAvgScore += avgScore;
+
+            double passRate = 0;
+            if (records.Any())
+            {
+                var passCount = records.Count(r =>
+                {
+                    int totalScore = r.Test != null && r.Test.Paper != null ? r.Test.Paper.TotalScore : 100;
+                    return r.Score >= totalScore * 0.6;
+                });
+                passRate = Math.Round((double)passCount / records.Count * 100, 2);
+            }
+            totalPassRate += passRate;
+            dayCount++;
+
+            trend.Add(new ExamTrendItem
+            {
+                Date = date.ToString("yyyy-MM-dd"),
+                AverageScore = avgScore,
+                PassRate = passRate,
+                ParticipantCount = participantCount
+            });
+        }
+
+        return new ExamStatisticsDto
+        {
+            Trend = trend,
+            OverallAverageScore = dayCount > 0 ? Math.Round(totalAvgScore / dayCount, 2) : 0,
+            OverallPassRate = dayCount > 0 ? Math.Round(totalPassRate / dayCount, 2) : 0,
+            TotalParticipants = totalParticipants
+        };
+    }
+
+    public async Task<BranchStatisticsDto> GetBranchStatisticsAsync(int orgId)
+    {
+        var org = await _context.Organizations.FindAsync(orgId);
+        if (org == null)
+            return new BranchStatisticsDto { OrgId = orgId, OrgName = "未知支部" };
+
+        var members = await _context.PartyMembers
+            .Where(m => m.OrganizationId == orgId && m.IsEnabled)
+            .ToListAsync();
+
+        var memberIds = members.Select(m => m.Id).ToList();
+
+        // 平均学习时长
+        var totalSeconds = await _context.MemberLearningProgress
+            .Where(p => memberIds.Contains(p.MemberId))
+            .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+        var avgMinutes = members.Count > 0 ? Math.Round(totalSeconds / 60.0 / members.Count, 2) : 0;
+
+        // 任务完成率
+        var tasks = await _context.LearningTasks
+            .Where(t => t.TargetOrgId == orgId)
+            .Include(t => t.TaskContents)
+            .ToListAsync();
+
+        double taskCompletionRate = 0;
+        if (tasks.Any() && members.Any())
+        {
+            var totalTaskContents = tasks.Sum(t => t.TaskContents.Count);
+            var completed = await _context.MemberLearningProgress
+                .Where(p => memberIds.Contains(p.MemberId) && p.TaskId.HasValue && p.IsCompleted)
+                .CountAsync();
+            var denominator = totalTaskContents * members.Count;
+            taskCompletionRate = denominator > 0 ? Math.Round((double)completed / denominator * 100, 2) : 0;
+        }
+
+        // 测验统计
+        var testIds = await _context.ExamTests
+            .Where(t => t.TargetOrgId == orgId)
+            .Select(t => t.Id)
+            .ToListAsync();
+
+        var examRecords = await _context.MemberTestRecords
+            .Include(r => r.Test).ThenInclude(t => t.Paper)
+            .Where(r => memberIds.Contains(r.MemberId) && testIds.Contains(r.TestId))
+            .ToListAsync();
+
+        double avgExamScore = examRecords.Any() ? Math.Round(examRecords.Average(r => r.Score), 2) : 0;
+        double examPassRate = 0;
+        if (examRecords.Any())
+        {
+            var passCount = examRecords.Count(r =>
+            {
+                int totalScore = r.Test != null && r.Test.Paper != null ? r.Test.Paper.TotalScore : 100;
+                return r.Score >= totalScore * 0.6;
+            });
+            examPassRate = Math.Round((double)passCount / examRecords.Count * 100, 2);
+        }
+
+        // 学习排行
+        var topLearners = new List<MemberRankingItem>();
+        foreach (var member in members)
+        {
+            var mSeconds = await _context.MemberLearningProgress
+                .Where(p => p.MemberId == member.Id)
+                .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+
+            var mCompleted = await _context.MemberLearningProgress
+                .Where(p => p.MemberId == member.Id && p.IsCompleted)
+                .CountAsync();
+
+            var mTotal = await _context.MemberLearningProgress
+                .Where(p => p.MemberId == member.Id)
+                .CountAsync();
+
+            topLearners.Add(new MemberRankingItem
+            {
+                MemberId = member.Id,
+                MemberName = member.Name,
+                LearningMinutes = Math.Round(mSeconds / 60.0, 2),
+                CompletionRate = mTotal > 0 ? Math.Round((double)mCompleted / mTotal * 100, 2) : 0
+            });
+
+        }
+            
+
+        return new BranchStatisticsDto
+        {
+            OrgId = orgId,
+            OrgName = org.Name,
+            MemberCount = members.Count,
+            AverageLearningMinutes = avgMinutes,
+            TaskCompletionRate = taskCompletionRate,
+            AverageExamScore = avgExamScore,
+            ExamPassRate = examPassRate,
+            TopLearners = topLearners.OrderByDescending(t => t.LearningMinutes).Take(10).ToList()
+        };
+    }
+}

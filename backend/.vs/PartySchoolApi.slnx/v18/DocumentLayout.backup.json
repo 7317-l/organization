@@ -1,0 +1,2031 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\date\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:date\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\nl2sqlcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\nl2sqlcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\inl2sqlservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\inl2sqlservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\nl2sqlservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\nl2sqlservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\statisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\statisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\aiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\aiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\istatisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\istatisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\helpers\\mappingprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:helpers\\mappingprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\kmeanscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\kmeanscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\anticheatcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\anticheatcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\aicontentgenerationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\aicontentgenerationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\aiknowledgecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\aiknowledgecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\notificationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\notificationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\pointcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\pointcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\checkincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\checkincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\meetingactivitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\meetingactivitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\partydevelopmentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\partydevelopmentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\kmeansservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\kmeansservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\anticheatservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\anticheatservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\aicontentgenerationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\aicontentgenerationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\aiknowledgeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\aiknowledgeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\pointservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\pointservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\checkinservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\checkinservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\meetingactivityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\meetingactivityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\partydevelopmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\partydevelopmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\ikmeansservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\ikmeansservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\ianticheatservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\ianticheatservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\iaicontentgenerationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\iaicontentgenerationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\iaiknowledgeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\iaiknowledgeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\inotificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\inotificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\ipointservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\ipointservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\icheckinservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\icheckinservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\imeetingactivityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\imeetingactivityservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\ipartydevelopmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\ipartydevelopmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\ipartymemberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\ipartymemberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\aiassessmentenhanceddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\aiassessmentenhanceddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\statisticsextendeddtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\statisticsextendeddtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\kmeansdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\kmeansdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\anticheatdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\anticheatdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\aicontentgenerationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\aicontentgenerationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\nl2sqldtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\nl2sqldtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\aiknowledgedtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\aiknowledgedtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\notificationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\notificationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\pointdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\pointdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\checkindtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\checkindtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\meetingactivitydtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\meetingactivitydtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\partydevelopmentdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\partydevelopmentdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\examtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\examtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\learningcontent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\learningcontent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\partymember.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\partymember.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\pairhelprecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\pairhelprecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\battlerecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\battlerecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\activityheart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\activityheart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\messagenotification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\messagenotification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\learningpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\learningpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\checkinrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\checkinrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\meetingactivity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\meetingactivity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\partydevelopmentprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\partydevelopmentprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\organizationquarterlyreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\organizationquarterlyreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\memberlearningreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\memberlearningreport.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\membertestrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\membertestrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\memberlearningprogress.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\memberlearningprogress.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\common\\enums.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\common\\enums.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\examservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\examservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\questionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\questionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\iquestionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\iquestionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\aicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\aicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\statisticscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\statisticscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\mobilecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\mobilecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\examtestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\examtestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\exampaperscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\exampaperscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\questionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\questionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\learningtaskscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\learningtaskscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\learningcontentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\learningcontentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\partymemberscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\partymemberscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\organizationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\organizationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\mobileservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\mobileservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\learningtaskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\learningtaskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\learningcontentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\learningcontentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\partymemberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\partymemberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\organizationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\organizationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\implementations\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\implementations\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\iaiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\iaiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\imobileservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\imobileservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\iexamservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\iexamservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\ilearningtaskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\ilearningtaskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\ilearningcontentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\ilearningcontentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\iorganizationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\iorganizationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\services\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:services\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\middleware\\exceptionmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:middleware\\exceptionmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\helpers\\excelhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:helpers\\excelhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\helpers\\currentuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:helpers\\currentuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\helpers\\jwthelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:helpers\\jwthelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\helpers\\passwordhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:helpers\\passwordhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\aidtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\aidtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\statisticsdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\statisticsdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\mobiledtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\mobiledtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\examdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\examdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\learningtaskdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\learningtaskdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\questiondtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\questiondtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\learningcontentdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\learningcontentdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\partymemberdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\partymemberdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\organizationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\organizationdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\exampaper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\exampaper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\question.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\question.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\questioncategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\questioncategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\taskcontent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\taskcontent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\learningtask.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\learningtask.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\contenttag.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\contenttag.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\tag.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\tag.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\contentcategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\contentcategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\entities\\organization.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\entities\\organization.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\models\\common\\apiresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:models\\common\\apiresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|c:\\users\\kee\\desktop\\partyschoolapi\\partyschoolapi\\partyschoolapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{BF84D4E2-44DF-A305-6929-0BC91D02C597}|PartySchoolApi.csproj|solutionrelative:partyschoolapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Nl2SqlController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\Nl2SqlController.cs",
+              "RelativeDocumentMoniker": "Controllers\\Nl2SqlController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\Nl2SqlController.cs",
+              "RelativeToolTip": "Controllers\\Nl2SqlController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:08:16.415Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Date\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Date\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Date\\AppDbContext.cs",
+              "RelativeToolTip": "Date\\AppDbContext.cs",
+              "ViewState": "AgIAABMBAAAAAAAAAAAgwBwBAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:17:05.004Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "INl2SqlService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\INl2SqlService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\INl2SqlService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\INl2SqlService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\INl2SqlService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:59:23.069Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Nl2SqlService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\Nl2SqlService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\Nl2SqlService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\Nl2SqlService.cs",
+              "RelativeToolTip": "Services\\Implementations\\Nl2SqlService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHsAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:03:20.391Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "StatisticsService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\StatisticsService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\StatisticsService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\StatisticsService.cs",
+              "RelativeToolTip": "Services\\Implementations\\StatisticsService.cs",
+              "ViewState": "AgIAAK0AAAAAAAAAAAAQwL4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:26:31.287Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AiService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AiService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\AiService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AiService.cs",
+              "RelativeToolTip": "Services\\Implementations\\AiService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsBAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:26:50.816Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "IStatisticsService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IStatisticsService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IStatisticsService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IStatisticsService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IStatisticsService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T05:53:29.935Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAgwG0AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:30:20.738Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "MappingProfile.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\MappingProfile.cs",
+              "RelativeDocumentMoniker": "Helpers\\MappingProfile.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\MappingProfile.cs",
+              "RelativeToolTip": "Helpers\\MappingProfile.cs",
+              "ViewState": "AgIAACQAAAAAAAAAAAAYwEQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:19:14.272Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "KMeansController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\KMeansController.cs",
+              "RelativeDocumentMoniker": "Controllers\\KMeansController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\KMeansController.cs",
+              "RelativeToolTip": "Controllers\\KMeansController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:09:25.739Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "AntiCheatController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AntiCheatController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AntiCheatController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AntiCheatController.cs",
+              "RelativeToolTip": "Controllers\\AntiCheatController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAiwCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:09:02.049Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "AiContentGenerationController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AiContentGenerationController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AiContentGenerationController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AiContentGenerationController.cs",
+              "RelativeToolTip": "Controllers\\AiContentGenerationController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:08:42.23Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "AiKnowledgeController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AiKnowledgeController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AiKnowledgeController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AiKnowledgeController.cs",
+              "RelativeToolTip": "Controllers\\AiKnowledgeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:07:59.059Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "NotificationController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\NotificationController.cs",
+              "RelativeDocumentMoniker": "Controllers\\NotificationController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\NotificationController.cs",
+              "RelativeToolTip": "Controllers\\NotificationController.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAgwEEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:07:42.579Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "PointController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\PointController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PointController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\PointController.cs",
+              "RelativeToolTip": "Controllers\\PointController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:07:25.05Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "CheckInController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\CheckInController.cs",
+              "RelativeDocumentMoniker": "Controllers\\CheckInController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\CheckInController.cs",
+              "RelativeToolTip": "Controllers\\CheckInController.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAA3wDYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:07:06.141Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "MeetingActivityController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\MeetingActivityController.cs",
+              "RelativeDocumentMoniker": "Controllers\\MeetingActivityController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\MeetingActivityController.cs",
+              "RelativeToolTip": "Controllers\\MeetingActivityController.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAQwEYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:06:47.906Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "PartyDevelopmentController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\PartyDevelopmentController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PartyDevelopmentController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\PartyDevelopmentController.cs",
+              "RelativeToolTip": "Controllers\\PartyDevelopmentController.cs",
+              "ViewState": "AgIAADQAAAAAAAAAAAA3wFcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:06:13.122Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "KMeansService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\KMeansService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\KMeansService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\KMeansService.cs",
+              "RelativeToolTip": "Services\\Implementations\\KMeansService.cs",
+              "ViewState": "AgIAAEMAAAAAAAAAAAAgwE4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:04:25.401Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "AntiCheatService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AntiCheatService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\AntiCheatService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AntiCheatService.cs",
+              "RelativeToolTip": "Services\\Implementations\\AntiCheatService.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAgwHEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:04:07.895Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "AiContentGenerationService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AiContentGenerationService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\AiContentGenerationService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AiContentGenerationService.cs",
+              "RelativeToolTip": "Services\\Implementations\\AiContentGenerationService.cs",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAgwFAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:03:47.834Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "AiKnowledgeService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AiKnowledgeService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\AiKnowledgeService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AiKnowledgeService.cs",
+              "RelativeToolTip": "Services\\Implementations\\AiKnowledgeService.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwDYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:03:02.057Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "NotificationService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\NotificationService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\NotificationService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\NotificationService.cs",
+              "RelativeToolTip": "Services\\Implementations\\NotificationService.cs",
+              "ViewState": "AgIAAEgAAAAAAAAAAAA3wGsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:02:41.414Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "PointService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\PointService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\PointService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\PointService.cs",
+              "RelativeToolTip": "Services\\Implementations\\PointService.cs",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAgwGIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:02:22.517Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "CheckInService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\CheckInService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\CheckInService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\CheckInService.cs",
+              "RelativeToolTip": "Services\\Implementations\\CheckInService.cs",
+              "ViewState": "AgIAAE8AAAAAAAAAAAAcwHEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:01:59.603Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "MeetingActivityService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\MeetingActivityService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\MeetingActivityService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\MeetingActivityService.cs",
+              "RelativeToolTip": "Services\\Implementations\\MeetingActivityService.cs",
+              "ViewState": "AgIAAKEAAAAAAAAAAAAgwMQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:01:34.138Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "PartyDevelopmentService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\PartyDevelopmentService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\PartyDevelopmentService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\PartyDevelopmentService.cs",
+              "RelativeToolTip": "Services\\Implementations\\PartyDevelopmentService.cs",
+              "ViewState": "AgIAAKAAAAAAAAAAAAAgwMMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:01:02.114Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "IKMeansService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IKMeansService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IKMeansService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IKMeansService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IKMeansService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:00:37.003Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "IAntiCheatService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAntiCheatService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IAntiCheatService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAntiCheatService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IAntiCheatService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T07:00:16.743Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "IAiContentGenerationService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAiContentGenerationService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IAiContentGenerationService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAiContentGenerationService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IAiContentGenerationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:59:55.875Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "IAiKnowledgeService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAiKnowledgeService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IAiKnowledgeService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAiKnowledgeService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IAiKnowledgeService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:59:00.214Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "INotificationService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\INotificationService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\INotificationService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\INotificationService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\INotificationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:58:44.8Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "IPointService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IPointService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IPointService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IPointService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IPointService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:58:29.685Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "ICheckInService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\ICheckInService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\ICheckInService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\ICheckInService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\ICheckInService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:57:29.007Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "IMeetingActivityService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IMeetingActivityService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IMeetingActivityService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IMeetingActivityService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IMeetingActivityService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:57:11.247Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "IPartyDevelopmentService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IPartyDevelopmentService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IPartyDevelopmentService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IPartyDevelopmentService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IPartyDevelopmentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:56:39.446Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "AiAssessmentEnhancedDto.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AiAssessmentEnhancedDto.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\AiAssessmentEnhancedDto.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AiAssessmentEnhancedDto.cs",
+              "RelativeToolTip": "Models\\DTOs\\AiAssessmentEnhancedDto.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAA3wCkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:51:44.124Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "StatisticsExtendedDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\StatisticsExtendedDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\StatisticsExtendedDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\StatisticsExtendedDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\StatisticsExtendedDtos.cs",
+              "ViewState": "AgIAAAQAAAAAAAAAAAAgwCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:51:21.955Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "IPartyMemberService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IPartyMemberService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IPartyMemberService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IPartyMemberService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IPartyMemberService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:21:02.826Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "KMeansDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\KMeansDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\KMeansDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\KMeansDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\KMeansDtos.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:50:56.094Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "AntiCheatDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AntiCheatDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\AntiCheatDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AntiCheatDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\AntiCheatDtos.cs",
+              "ViewState": "AgIAAAQAAAAAAAAAAAA3wCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:50:38.429Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "AiContentGenerationDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AiContentGenerationDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\AiContentGenerationDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AiContentGenerationDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\AiContentGenerationDtos.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAgwCsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:50:20.32Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "Nl2SqlDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\Nl2SqlDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\Nl2SqlDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\Nl2SqlDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\Nl2SqlDtos.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:50:01.043Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "AiKnowledgeDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AiKnowledgeDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\AiKnowledgeDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AiKnowledgeDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\AiKnowledgeDtos.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:49:44.129Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 44,
+              "Title": "NotificationDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\NotificationDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\NotificationDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\NotificationDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\NotificationDtos.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAswB8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:49:13.933Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 45,
+              "Title": "PointDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\PointDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\PointDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\PointDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\PointDtos.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:48:55.078Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 46,
+              "Title": "CheckInDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\CheckInDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\CheckInDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\CheckInDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\CheckInDtos.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:48:36.792Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 47,
+              "Title": "MeetingActivityDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\MeetingActivityDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\MeetingActivityDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\MeetingActivityDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\MeetingActivityDtos.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAA3wEgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:48:17.058Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 48,
+              "Title": "PartyDevelopmentDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\PartyDevelopmentDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\PartyDevelopmentDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\PartyDevelopmentDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\PartyDevelopmentDtos.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAA3wEIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:47:55.936Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 51,
+              "Title": "PartyMember.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\PartyMember.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\PartyMember.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\PartyMember.cs",
+              "RelativeToolTip": "Models\\Entities\\PartyMember.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAgwCoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:16:53.811Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 50,
+              "Title": "LearningContent.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\LearningContent.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\LearningContent.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\LearningContent.cs",
+              "RelativeToolTip": "Models\\Entities\\LearningContent.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAywCoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:19:20.803Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 49,
+              "Title": "ExamTest.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ExamTest.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\ExamTest.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ExamTest.cs",
+              "RelativeToolTip": "Models\\Entities\\ExamTest.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAgwCUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:22:25.441Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 52,
+              "Title": "PairHelpRecord.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\PairHelpRecord.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\PairHelpRecord.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\PairHelpRecord.cs",
+              "RelativeToolTip": "Models\\Entities\\PairHelpRecord.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:45:46.123Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 53,
+              "Title": "BattleRecord.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\BattleRecord.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\BattleRecord.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\BattleRecord.cs",
+              "RelativeToolTip": "Models\\Entities\\BattleRecord.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:45:27.154Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 55,
+              "Title": "MessageNotification.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MessageNotification.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\MessageNotification.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MessageNotification.cs",
+              "RelativeToolTip": "Models\\Entities\\MessageNotification.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAIwBoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:44:43.211Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 56,
+              "Title": "LearningPoint.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\LearningPoint.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\LearningPoint.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\LearningPoint.cs",
+              "RelativeToolTip": "Models\\Entities\\LearningPoint.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:44:05.756Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 57,
+              "Title": "CheckInRecord.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\CheckInRecord.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\CheckInRecord.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\CheckInRecord.cs",
+              "RelativeToolTip": "Models\\Entities\\CheckInRecord.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:43:49.129Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 54,
+              "Title": "ActivityHeart.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ActivityHeart.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\ActivityHeart.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ActivityHeart.cs",
+              "RelativeToolTip": "Models\\Entities\\ActivityHeart.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:43:21.693Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 58,
+              "Title": "MeetingActivity.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MeetingActivity.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\MeetingActivity.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MeetingActivity.cs",
+              "RelativeToolTip": "Models\\Entities\\MeetingActivity.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAowCQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:43:03.974Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 59,
+              "Title": "PartyDevelopmentProcess.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\PartyDevelopmentProcess.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\PartyDevelopmentProcess.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\PartyDevelopmentProcess.cs",
+              "RelativeToolTip": "Models\\Entities\\PartyDevelopmentProcess.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAowA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:41:52.389Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 60,
+              "Title": "OrganizationQuarterlyReport.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\OrganizationQuarterlyReport.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\OrganizationQuarterlyReport.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\OrganizationQuarterlyReport.cs",
+              "RelativeToolTip": "Models\\Entities\\OrganizationQuarterlyReport.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:41:34.745Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 61,
+              "Title": "MemberLearningReport.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MemberLearningReport.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\MemberLearningReport.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MemberLearningReport.cs",
+              "RelativeToolTip": "Models\\Entities\\MemberLearningReport.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T06:41:17.937Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 65,
+              "Title": "ExamService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\ExamService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\ExamService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\ExamService.cs",
+              "RelativeToolTip": "Services\\Implementations\\ExamService.cs",
+              "ViewState": "AgIAAOUAAAAAAAAAAAAcwOkAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:24:50.235Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 64,
+              "Title": "Enums.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Common\\Enums.cs",
+              "RelativeDocumentMoniker": "Models\\Common\\Enums.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Common\\Enums.cs",
+              "RelativeToolTip": "Models\\Common\\Enums.cs",
+              "ViewState": "AgIAADYAAAAAAAAAAAAuwEoAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:15:47.717Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 63,
+              "Title": "MemberLearningProgress.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MemberLearningProgress.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\MemberLearningProgress.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MemberLearningProgress.cs",
+              "RelativeToolTip": "Models\\Entities\\MemberLearningProgress.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAswC8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:20:23.364Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 62,
+              "Title": "MemberTestRecord.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MemberTestRecord.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\MemberTestRecord.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\MemberTestRecord.cs",
+              "RelativeToolTip": "Models\\Entities\\MemberTestRecord.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAswCUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:22:52.508Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 66,
+              "Title": "QuestionService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\QuestionService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\QuestionService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\QuestionService.cs",
+              "RelativeToolTip": "Services\\Implementations\\QuestionService.cs",
+              "ViewState": "AgIAAKsAAAAAAAAAAAAuwMYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:24:32.245Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 68,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAABYAAAAAAAAAAAAwwBcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-08-11T12:26:17.403Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 67,
+              "Title": "IQuestionService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IQuestionService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IQuestionService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IQuestionService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IQuestionService.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAADwvx0AAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:21:51.045Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 69,
+              "Title": "AiController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AiController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AiController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AiController.cs",
+              "RelativeToolTip": "Controllers\\AiController.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAswDQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:30:08.51Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 70,
+              "Title": "StatisticsController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\StatisticsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\StatisticsController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\StatisticsController.cs",
+              "RelativeToolTip": "Controllers\\StatisticsController.cs",
+              "ViewState": "AgIAACgAAAAAAAAAAAAswD8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:29:55.033Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 71,
+              "Title": "MobileController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\MobileController.cs",
+              "RelativeDocumentMoniker": "Controllers\\MobileController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\MobileController.cs",
+              "RelativeToolTip": "Controllers\\MobileController.cs",
+              "ViewState": "AgIAAFsAAAAAAAAAAAAswHIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:29:39.917Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 72,
+              "Title": "ExamTestsController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\ExamTestsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ExamTestsController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\ExamTestsController.cs",
+              "RelativeToolTip": "Controllers\\ExamTestsController.cs",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAswEQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:29:23Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 73,
+              "Title": "ExamPapersController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\ExamPapersController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ExamPapersController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\ExamPapersController.cs",
+              "RelativeToolTip": "Controllers\\ExamPapersController.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAA9wEAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:29:05.965Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 74,
+              "Title": "QuestionsController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\QuestionsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\QuestionsController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\QuestionsController.cs",
+              "RelativeToolTip": "Controllers\\QuestionsController.cs",
+              "ViewState": "AgIAAGEAAAAAAAAAAAAuwG0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:28:45.429Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 75,
+              "Title": "LearningTasksController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\LearningTasksController.cs",
+              "RelativeDocumentMoniker": "Controllers\\LearningTasksController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\LearningTasksController.cs",
+              "RelativeToolTip": "Controllers\\LearningTasksController.cs",
+              "ViewState": "AgIAADMAAAAAAAAAAAAswEoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:28:31.65Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 76,
+              "Title": "LearningContentsController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\LearningContentsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\LearningContentsController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\LearningContentsController.cs",
+              "RelativeToolTip": "Controllers\\LearningContentsController.cs",
+              "ViewState": "AgIAAGkAAAAAAAAAAAAswIAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:28:15.673Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 77,
+              "Title": "PartyMembersController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\PartyMembersController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PartyMembersController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\PartyMembersController.cs",
+              "RelativeToolTip": "Controllers\\PartyMembersController.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAswGAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:27:58.477Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 78,
+              "Title": "OrganizationsController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\OrganizationsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\OrganizationsController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\OrganizationsController.cs",
+              "RelativeToolTip": "Controllers\\OrganizationsController.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAA9wDUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:27:40.808Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 79,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "Controllers\\AuthController.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAswD4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:27:23.911Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 80,
+              "Title": "MobileService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\MobileService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\MobileService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\MobileService.cs",
+              "RelativeToolTip": "Services\\Implementations\\MobileService.cs",
+              "ViewState": "AgIAAJ8BAAAAAAAAAAAswLYBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:25:10.626Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 81,
+              "Title": "LearningTaskService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\LearningTaskService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\LearningTaskService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\LearningTaskService.cs",
+              "RelativeToolTip": "Services\\Implementations\\LearningTaskService.cs",
+              "ViewState": "AgIAAI8AAAAAAAAAAAAswKYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:24:12.768Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 82,
+              "Title": "LearningContentService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\LearningContentService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\LearningContentService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\LearningContentService.cs",
+              "RelativeToolTip": "Services\\Implementations\\LearningContentService.cs",
+              "ViewState": "AgIAALcAAAAAAAAAAAAowMwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:23:48.686Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 83,
+              "Title": "PartyMemberService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\PartyMemberService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\PartyMemberService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\PartyMemberService.cs",
+              "RelativeToolTip": "Services\\Implementations\\PartyMemberService.cs",
+              "ViewState": "AgIAALsAAAAAAAAAAAAswNIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:23:29.115Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 84,
+              "Title": "OrganizationService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\OrganizationService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\OrganizationService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\OrganizationService.cs",
+              "RelativeToolTip": "Services\\Implementations\\OrganizationService.cs",
+              "ViewState": "AgIAAHUAAAAAAAAAAAAswIwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:23:09.786Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 85,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AuthService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementations\\AuthService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Implementations\\AuthService.cs",
+              "RelativeToolTip": "Services\\Implementations\\AuthService.cs",
+              "ViewState": "AgIAAFMAAAAAAAAAAAAswGoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:22:51.738Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 86,
+              "Title": "IAiService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAiService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IAiService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAiService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IAiService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:22:33.776Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 87,
+              "Title": "IMobileService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IMobileService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IMobileService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IMobileService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IMobileService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:22:19.664Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 88,
+              "Title": "IExamService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IExamService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IExamService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IExamService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IExamService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:22:03.813Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 89,
+              "Title": "ILearningTaskService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\ILearningTaskService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\ILearningTaskService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\ILearningTaskService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\ILearningTaskService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:21:35.722Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 90,
+              "Title": "ILearningContentService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\ILearningContentService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\ILearningContentService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\ILearningContentService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\ILearningContentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAswBgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:21:20.522Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 91,
+              "Title": "IOrganizationService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IOrganizationService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IOrganizationService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IOrganizationService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IOrganizationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:20:46.835Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 92,
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAuthService.cs",
+              "RelativeDocumentMoniker": "Services\\Interfaces\\IAuthService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Services\\Interfaces\\IAuthService.cs",
+              "RelativeToolTip": "Services\\Interfaces\\IAuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:20:30.236Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 93,
+              "Title": "ExceptionMiddleware.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Middleware\\ExceptionMiddleware.cs",
+              "RelativeDocumentMoniker": "Middleware\\ExceptionMiddleware.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Middleware\\ExceptionMiddleware.cs",
+              "RelativeToolTip": "Middleware\\ExceptionMiddleware.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAswEAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:20:00.512Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 94,
+              "Title": "ExcelHelper.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\ExcelHelper.cs",
+              "RelativeDocumentMoniker": "Helpers\\ExcelHelper.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\ExcelHelper.cs",
+              "RelativeToolTip": "Helpers\\ExcelHelper.cs",
+              "ViewState": "AgIAAG8AAAAAAAAAAAAswIYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:19:29.747Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 95,
+              "Title": "CurrentUserService.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\CurrentUserService.cs",
+              "RelativeDocumentMoniker": "Helpers\\CurrentUserService.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\CurrentUserService.cs",
+              "RelativeToolTip": "Helpers\\CurrentUserService.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAswD0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:18:55.908Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 96,
+              "Title": "JwtHelper.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\JwtHelper.cs",
+              "RelativeDocumentMoniker": "Helpers\\JwtHelper.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\JwtHelper.cs",
+              "RelativeToolTip": "Helpers\\JwtHelper.cs",
+              "ViewState": "AgIAAEMAAAAAAAAAAAAswFoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:17:48.848Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 97,
+              "Title": "PasswordHelper.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\PasswordHelper.cs",
+              "RelativeDocumentMoniker": "Helpers\\PasswordHelper.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Helpers\\PasswordHelper.cs",
+              "RelativeToolTip": "Helpers\\PasswordHelper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAswBcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:17:30.093Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 98,
+              "Title": "AiDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AiDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\AiDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AiDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\AiDtos.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAswCkAAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:16:44.204Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 99,
+              "Title": "StatisticsDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\StatisticsDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\StatisticsDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\StatisticsDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\StatisticsDtos.cs",
+              "ViewState": "AgIAAC4AAAAAAAAAAAAswEUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:16:28.982Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 100,
+              "Title": "MobileDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\MobileDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\MobileDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\MobileDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\MobileDtos.cs",
+              "ViewState": "AgIAAF4AAAAAAAAAAAAswHUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:16:11.502Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 101,
+              "Title": "ExamDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\ExamDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\ExamDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\ExamDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\ExamDtos.cs",
+              "ViewState": "AgIAAE8AAAAAAAAAAAA9wGYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T03:15:54.619Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 103,
+              "Title": "QuestionDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\QuestionDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\QuestionDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\QuestionDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\QuestionDtos.cs",
+              "ViewState": "AgIAADYAAAAAAAAAAAAswE0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:25:13.499Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 102,
+              "Title": "LearningTaskDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\LearningTaskDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\LearningTaskDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\LearningTaskDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\LearningTaskDtos.cs",
+              "ViewState": "AgIAADIAAAAAAAAAAAAswDcAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:24:54.338Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 104,
+              "Title": "LearningContentDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\LearningContentDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\LearningContentDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\LearningContentDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\LearningContentDtos.cs",
+              "ViewState": "AgIAAFEAAAAAAAAAAAAswGgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:24:34.478Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 105,
+              "Title": "PartyMemberDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\PartyMemberDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\PartyMemberDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\PartyMemberDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\PartyMemberDtos.cs",
+              "ViewState": "AgIAADoAAAAAAAAAAAAswFEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:24:14.189Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 106,
+              "Title": "OrganizationDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\OrganizationDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\OrganizationDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\OrganizationDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\OrganizationDtos.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAswCsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:23:40.865Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 107,
+              "Title": "AuthDtos.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AuthDtos.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\AuthDtos.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\DTOs\\AuthDtos.cs",
+              "RelativeToolTip": "Models\\DTOs\\AuthDtos.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAA9wDQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:23:16.807Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 108,
+              "Title": "ExamPaper.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ExamPaper.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\ExamPaper.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ExamPaper.cs",
+              "RelativeToolTip": "Models\\Entities\\ExamPaper.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAswCMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:21:59.44Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 109,
+              "Title": "Question.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\Question.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\Question.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\Question.cs",
+              "RelativeToolTip": "Models\\Entities\\Question.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAswC4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:21:06.894Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 110,
+              "Title": "QuestionCategory.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\QuestionCategory.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\QuestionCategory.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\QuestionCategory.cs",
+              "RelativeToolTip": "Models\\Entities\\QuestionCategory.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAswBkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:20:44.931Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 111,
+              "Title": "TaskContent.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\TaskContent.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\TaskContent.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\TaskContent.cs",
+              "RelativeToolTip": "Models\\Entities\\TaskContent.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:20:05.719Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 112,
+              "Title": "LearningTask.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\LearningTask.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\LearningTask.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\LearningTask.cs",
+              "RelativeToolTip": "Models\\Entities\\LearningTask.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAswCIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:19:49.869Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 113,
+              "Title": "ContentTag.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ContentTag.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\ContentTag.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ContentTag.cs",
+              "RelativeToolTip": "Models\\Entities\\ContentTag.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAswBYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:19:05.882Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 114,
+              "Title": "Tag.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\Tag.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\Tag.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\Tag.cs",
+              "RelativeToolTip": "Models\\Entities\\Tag.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAswBkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:17:28.262Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 115,
+              "Title": "ContentCategory.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ContentCategory.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\ContentCategory.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\ContentCategory.cs",
+              "RelativeToolTip": "Models\\Entities\\ContentCategory.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAswCEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:17:11.663Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 116,
+              "Title": "Organization.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\Organization.cs",
+              "RelativeDocumentMoniker": "Models\\Entities\\Organization.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Entities\\Organization.cs",
+              "RelativeToolTip": "Models\\Entities\\Organization.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAswCMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:16:36.644Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 117,
+              "Title": "ApiResponse.cs",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Common\\ApiResponse.cs",
+              "RelativeDocumentMoniker": "Models\\Common\\ApiResponse.cs",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\Models\\Common\\ApiResponse.cs",
+              "RelativeToolTip": "Models\\Common\\ApiResponse.cs",
+              "ViewState": "AgIAACgAAAAAAAAAAAAswD8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-11T13:16:13.773Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 118,
+              "Title": "PartySchoolApi.csproj",
+              "DocumentMoniker": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\PartySchoolApi.csproj",
+              "RelativeDocumentMoniker": "PartySchoolApi.csproj",
+              "ToolTip": "C:\\Users\\Kee\\Desktop\\PartySchoolApi\\PartySchoolApi\\PartySchoolApi.csproj",
+              "RelativeToolTip": "PartySchoolApi.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-08-11T13:13:57.782Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
