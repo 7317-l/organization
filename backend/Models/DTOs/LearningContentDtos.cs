@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Models.Common;
 
 namespace PartySchoolApi.Models.DTOs;
@@ -6,10 +7,33 @@ namespace PartySchoolApi.Models.DTOs;
 /// <summary>内容分页查询参数</summary>
 public class ContentQueryParams : PagedQueryParams
 {
+    /// <summary>标题关键词（兼容前端 keyword）</summary>
     public string? Title { get; set; }
+
+    /// <summary>关键词搜索别名（前端传 keyword）</summary>
+    [FromQuery(Name = "keyword")]
+    public string? Keyword
+    {
+        get => Title;
+        set => Title = value;
+    }
+
+    /// <summary>内容类型</summary>
     public ContentType? ContentType { get; set; }
+
+    /// <summary>内容类型别名（前端传 type）</summary>
+    [FromQuery(Name = "type")]
+    public ContentType? Type
+    {
+        get => ContentType;
+        set => ContentType = value;
+    }
+
     public int? CategoryId { get; set; }
     public bool? IsPublic { get; set; }
+
+    /// <summary>标签ID筛选</summary>
+    public int? TagId { get; set; }
 }
 
 /// <summary>内容列表项</summary>

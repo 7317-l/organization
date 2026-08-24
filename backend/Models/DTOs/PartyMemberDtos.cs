@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Models.Common;
 
 namespace PartySchoolApi.Models.DTOs;
@@ -7,7 +8,18 @@ namespace PartySchoolApi.Models.DTOs;
 public class MemberQueryParams : PagedQueryParams
 {
     public string? Name { get; set; }
+
+    /// <summary>所属组织ID（兼容前端 camelCase: orgId）</summary>
     public int? OrganizationId { get; set; }
+
+    /// <summary>所属组织ID别名（前端传 orgId 时绑定到此）</summary>
+    [FromQuery(Name = "orgId")]
+    public int? OrgId
+    {
+        get => OrganizationId;
+        set => OrganizationId = value;
+    }
+
     public UserRole? Role { get; set; }
     public bool? IsEnabled { get; set; }
 }

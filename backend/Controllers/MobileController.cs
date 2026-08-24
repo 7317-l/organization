@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Helpers;
 using PartySchoolApi.Models.Common;
@@ -24,12 +24,16 @@ public class MobileController : ControllerBase
         _currentUser = currentUser;
     }
 
-    /// <summary>获取本人可学内容列表</summary>
+    /// <summary>获取本人可学内容列表（公共+任务内容，含个人进度）</summary>
     [HttpGet("contents")]
-    public async Task<ApiResponse> GetMyContents()
+    public async Task<PagedResponse> GetMyContents(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 20,
+        [FromQuery] string? type = null,
+        [FromQuery] string? keyword = null,
+        [FromQuery] string? sort = null)
     {
-        var contents = await _service.GetMyContentsAsync(_currentUser.UserId, _currentUser.OrganizationId);
-        return ApiResponse.Success(contents);
+        return await _service.GetMyContentsAsync(_currentUser.UserId, _currentUser.OrganizationId, page, size, type, keyword, sort);
     }
 
     /// <summary>查看内容详情</summary>
@@ -72,12 +76,14 @@ public class MobileController : ControllerBase
         return ApiResponse.Success(null, "已标记完成");
     }
 
-    /// <summary>获取待参加测验列表</summary>
+    /// <summary>获取本人测验列表（待考+历史，支持 status 筛选）</summary>
     [HttpGet("exams")]
-    public async Task<ApiResponse> GetMyExams()
+    public async Task<PagedResponse> GetMyExams(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 20,
+        [FromQuery] string? status = null)
     {
-        var exams = await _service.GetMyExamsAsync(_currentUser.UserId, _currentUser.OrganizationId);
-        return ApiResponse.Success(exams);
+        return await _service.GetMyExamsAsync(_currentUser.UserId, _currentUser.OrganizationId, page, size, status);
     }
 
     /// <summary>开始测验（获取题目不含答案）</summary>

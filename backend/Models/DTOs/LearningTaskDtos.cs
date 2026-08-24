@@ -1,5 +1,6 @@
-﻿using PartySchoolApi.Models.Common;
+using PartySchoolApi.Models.Common;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace PartySchoolApi.Models.DTOs;
 
@@ -7,7 +8,17 @@ namespace PartySchoolApi.Models.DTOs;
 public class TaskQueryParams : PagedQueryParams
 {
     public string? TaskName { get; set; }
+
+    /// <summary>目标组织ID</summary>
     public int? TargetOrgId { get; set; }
+
+    /// <summary>目标组织ID别名（前端传 orgId）</summary>
+    [FromQuery(Name = "orgId")]
+    public int? OrgId
+    {
+        get => TargetOrgId;
+        set => TargetOrgId = value;
+    }
 }
 
 /// <summary>任务列表项</summary>

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Models.DTOs;
 using PartySchoolApi.Services.Interfaces;
@@ -55,18 +55,26 @@ public class StatisticsService : IStatisticsService
         var orgs = await _context.Organizations
             .Include(o => o.Members)
             .ToListAsync();
+        // 支部排名：先在内存中计算每个支部的完成率，再排序（避免在 OrderBy lambda 中同步查询数据库导致 N+1）
         var branchRankings = new List<BranchRankingDto>();
-        int rank = 1;
-        foreach (var org in orgs.OrderByDescending(o =>
+        var orgCompletionRates = new Dictionary<int, double>();
+        foreach (var org in orgs)
         {
-            var mIds = o.Members.Select(m => m.Id).ToList();
-            var tIds = tasks.Where(t => t.TargetOrgId == o.Id).SelectMany(t => t.TaskContents.Select(tc => tc.ContentId)).Count();
-            if (tIds == 0 || mIds.Count == 0) return 0;
-            var done = _context.MemberLearningProgress
+            var mIds = org.Members.Select(m => m.Id).ToList();
+            var tIds = tasks.Where(t => t.TargetOrgId == org.Id).SelectMany(t => t.TaskContents.Select(tc => tc.ContentId)).Count();
+            if (tIds == 0 || mIds.Count == 0)
+            {
+                orgCompletionRates[org.Id] = 0;
+                continue;
+            }
+            var done = await _context.MemberLearningProgress
                 .Where(p => mIds.Contains(p.MemberId) && p.TaskId.HasValue && p.IsCompleted)
-                .Count();
-            return (double)done / (tIds * mIds.Count) * 100;
-        }))
+                .CountAsync();
+            orgCompletionRates[org.Id] = (double)done / (tIds * mIds.Count) * 100;
+        }
+
+        int rank = 1;
+        foreach (var org in orgs.OrderByDescending(o => orgCompletionRates.GetValueOrDefault(o.Id, 0)))
         {
             var mIds = org.Members.Select(m => m.Id).ToList();
             var orgExamRecords = examRecords.Where(r => mIds.Contains(r.MemberId)).ToList();

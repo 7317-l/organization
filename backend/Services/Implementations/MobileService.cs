@@ -1,7 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Middleware;
+using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
 using PartySchoolApi.Models.Entities;
 using PartySchoolApi.Services.Interfaces;
@@ -20,16 +21,14 @@ public class MobileService : IMobileService
         _mapper = mapper;
     }
 
-    public async Task<List<ContentListItemDto>> GetMyContentsAsync(int memberId, int orgId)
+    public async Task<PagedResponse> GetMyContentsAsync(int memberId, int orgId, int page, int size, string? type, string? keyword, string? sort)
     {
         // 公共内容
-        var publicContents = await _context.LearningContents
+        var publicQuery = _context.LearningContents
             .Include(c => c.Category)
             .Include(c => c.ContentTags).ThenInclude(ct => ct.Tag)
             .Where(c => c.IsPublic)
-            .OrderByDescending(c => c.CreatedAt)
-            .Take(50)
-            .ToListAsync();
+            .AsQueryable();
 
         // 所属支部任务中的内容
         var taskContentIds = await _context.LearningTasks
@@ -38,20 +37,82 @@ public class MobileService : IMobileService
             .Distinct()
             .ToListAsync();
 
-        var taskContents = await _context.LearningContents
+        var taskQuery = _context.LearningContents
             .Include(c => c.Category)
             .Include(c => c.ContentTags).ThenInclude(ct => ct.Tag)
             .Where(c => taskContentIds.Contains(c.Id))
-            .ToListAsync();
+            .AsQueryable();
 
-        // 合并去重
+        // 分别物化两个查询，避免在 IQueryable 上做 Concat+GroupBy 导致 EF Core 无法翻译集合导航属性投影
+        var publicContents = await publicQuery.ToListAsync();
+        var taskContents = await taskQuery.ToListAsync();
+
+        // 在内存中合并去重（按 Id）
         var allContents = publicContents
             .Concat(taskContents)
             .GroupBy(c => c.Id)
             .Select(g => g.First())
             .ToList();
 
-        return _mapper.Map<List<ContentListItemDto>>(allContents);
+        // 筛选
+        if (!string.IsNullOrWhiteSpace(type))
+        {
+            // type 可能是 "video"/"doc" 或枚举值
+            if (Enum.TryParse<ContentType>(type, true, out var contentType))
+                allContents = allContents.Where(c => c.ContentType == contentType).ToList();
+        }
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            allContents = allContents.Where(c =>
+                c.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // 排序
+        allContents = sort?.ToLower() switch
+        {
+            "hot" => allContents.OrderByDescending(c => c.CreatedAt).ToList(), // 简化：用创建时间代替热度
+            _ => allContents.OrderByDescending(c => c.CreatedAt).ToList()
+        };
+
+        var total = allContents.Count;
+
+        // 获取本人所有进度记录
+        var myProgresses = await _context.MemberLearningProgress
+            .Where(p => p.MemberId == memberId)
+            .ToListAsync();
+
+        var pagedContents = allContents
+            .Skip((page - 1) * size)
+            .Take(size)
+            .ToList();
+
+        var items = pagedContents.Select(c =>
+        {
+            var progress = myProgresses.FirstOrDefault(p => p.ContentId == c.Id);
+            var isCompleted = progress?.IsCompleted ?? false;
+            var durationSeconds = progress?.DurationSeconds ?? 0;
+            // 简化进度计算：已完成=100，有学习记录但未完成=50，无记录=0
+            var progressPercent = isCompleted ? 100 : (durationSeconds > 0 ? 50 : 0);
+            var status = isCompleted ? "done" : (durationSeconds > 0 ? "learning" : "new");
+
+            return new MobileContentListItemDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                ContentType = (int)c.ContentType,
+                ContentTypeName = c.ContentType.ToString(),
+                CategoryName = c.Category?.Name,
+                Tags = c.ContentTags.Select(ct => ct.Tag?.Name ?? string.Empty).Where(t => !string.IsNullOrEmpty(t)).ToList(),
+                CreatedAt = c.CreatedAt,
+                Progress = progressPercent,
+                Status = status,
+                DurationSeconds = durationSeconds,
+                IsCompleted = isCompleted
+            };
+        }).ToList();
+
+        return PagedResponse.Ok(items, page, size, total);
     }
 
     public async Task<ContentDetailDto> GetContentDetailAsync(int contentId)
@@ -177,36 +238,61 @@ public class MobileService : IMobileService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<MobileExamTestDto>> GetMyExamsAsync(int memberId, int orgId)
+    public async Task<PagedResponse> GetMyExamsAsync(int memberId, int orgId, int page, int size, string? status)
     {
+        // 获取所有目标为本支部的测验（包括已截止的历史测验）
         var tests = await _context.ExamTests
             .Include(t => t.Paper)
-            .Where(t => t.TargetOrgId == orgId && t.Deadline >= DateTime.Now)
-            .OrderBy(t => t.Deadline)
+            .Where(t => t.TargetOrgId == orgId)
+            .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
 
         var myRecords = await _context.MemberTestRecords
             .Where(r => r.MemberId == memberId)
             .ToListAsync();
 
-        var result = new List<MobileExamTestDto>();
+        var allExams = new List<MobileExamTestDto>();
 
         foreach (var test in tests)
         {
             var record = myRecords.FirstOrDefault(r => r.TestId == test.Id);
-            result.Add(new MobileExamTestDto
+            var isSubmitted = record != null;
+            var isExpired = test.Deadline < DateTime.Now;
+
+            string examStatus;
+            if (isSubmitted)
+                examStatus = "completed";
+            else if (isExpired)
+                examStatus = "expired";
+            else
+                examStatus = "pending";
+
+            allExams.Add(new MobileExamTestDto
             {
                 Id = test.Id,
                 PaperName = test.Paper?.Name ?? string.Empty,
                 TimeLimitMinutes = test.TimeLimitMinutes,
                 Deadline = test.Deadline,
-                IsSubmitted = record != null,
+                IsSubmitted = isSubmitted,
                 MyScore = record?.Score,
-                TotalScore = test.Paper?.TotalScore ?? 0
+                TotalScore = test.Paper?.TotalScore ?? 0,
+                Status = examStatus
             });
         }
 
-        return result;
+        // 按 status 筛选
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            allExams = allExams.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        var total = allExams.Count;
+        var items = allExams
+            .Skip((page - 1) * size)
+            .Take(size)
+            .ToList();
+
+        return PagedResponse.Ok(items, page, size, total);
     }
 
     public async Task<StartExamResponse> StartExamAsync(int testId)
@@ -267,6 +353,9 @@ public class MobileService : IMobileService
             .Where(q => questionIds.Contains(q.Id))
             .ToDictionaryAsync(q => q.Id);
 
+        // 将前端提交的答案列表转为字典便于判题
+        var answerDict = request.Answers.ToDictionary(a => a.QuestionId, a => a.Answer);
+
         int totalScore = 0;
         int earnedScore = 0;
 
@@ -275,7 +364,7 @@ public class MobileService : IMobileService
             if (!questions.TryGetValue(qid, out var question)) continue;
             totalScore += question.Score;
 
-            var userAnswer = request.Answers.ContainsKey(qid.ToString()) ? request.Answers[qid.ToString()] : string.Empty;
+            var userAnswer = answerDict.ContainsKey(qid) ? answerDict[qid] : string.Empty;
 
             if (CheckAnswer(question, userAnswer))
                 earnedScore += question.Score;
@@ -342,7 +431,29 @@ public class MobileService : IMobileService
         if (record == null)
             throw new BusinessException("未找到考试记录", 404);
 
-        var answers = JsonSerializer.Deserialize<Dictionary<string, string>>(record.Answers) ?? new Dictionary<string, string>();
+        // 兼容两种答案存储格式：新格式 List<SubmitAnswerItem> 和旧格式 Dictionary<string,string>
+        var answerDict = new Dictionary<int, string>();
+        try
+        {
+            var answerList = JsonSerializer.Deserialize<List<SubmitAnswerItem>>(record.Answers);
+            if (answerList != null)
+            {
+                answerDict = answerList.ToDictionary(a => a.QuestionId, a => a.Answer);
+            }
+        }
+        catch
+        {
+            try
+            {
+                var oldDict = JsonSerializer.Deserialize<Dictionary<string, string>>(record.Answers);
+                if (oldDict != null)
+                {
+                    answerDict = oldDict.ToDictionary(kv => int.Parse(kv.Key), kv => kv.Value);
+                }
+            }
+            catch { /* 忽略无法解析的答案 */ }
+        }
+
         var questionIds = JsonSerializer.Deserialize<List<int>>(record.Test.Paper?.QuestionIds ?? "[]") ?? new List<int>();
         var questions = await _context.Questions
             .Where(q => questionIds.Contains(q.Id))
@@ -356,7 +467,7 @@ public class MobileService : IMobileService
             if (!questions.TryGetValue(qid, out var question)) continue;
             totalScore += question.Score;
 
-            var userAnswer = answers.ContainsKey(qid.ToString()) ? answers[qid.ToString()] : string.Empty;
+            var userAnswer = answerDict.ContainsKey(qid) ? answerDict[qid] : string.Empty;
             var isCorrect = CheckAnswer(question, userAnswer);
 
             questionAnswers.Add(new QuestionAnswerDto
@@ -405,6 +516,7 @@ public class MobileService : IMobileService
             .ToListAsync();
 
         int completedTaskCount = 0;
+        int pendingTaskCount = 0;
         foreach (var task in tasks)
         {
             var total = task.TaskContents.Count;
@@ -412,6 +524,8 @@ public class MobileService : IMobileService
                 .CountAsync(p => p.MemberId == memberId && p.TaskId == task.Id && p.IsCompleted);
             if (total > 0 && completed >= total)
                 completedTaskCount++;
+            else
+                pendingTaskCount++;
         }
 
         var examRecords = await _context.MemberTestRecords
@@ -424,6 +538,14 @@ public class MobileService : IMobileService
             ? Math.Round((double)completedTaskCount / tasks.Count * 100, 2)
             : 0;
 
+        // 计算整体学习进度：已完成内容数 / 可学内容总数（简化估算）
+        var totalLearnableContents = await _context.LearningContents
+            .CountAsync(c => c.IsPublic)
+            + tasks.SelectMany(t => t.TaskContents).Select(tc => tc.ContentId).Distinct().Count();
+        double learningProgress = totalLearnableContents > 0
+            ? Math.Round((double)completedContentCount / totalLearnableContents * 100, 2)
+            : 0;
+
         return new PersonalLearningOverviewDto
         {
             TotalLearningMinutes = totalSeconds / 60,
@@ -432,8 +554,10 @@ public class MobileService : IMobileService
             TotalTaskCount = tasks.Count,
             CompletedExamCount = examRecords.Count,
             AverageExamScore = avgScore,
-            TaskCompletionRate = taskCompletionRate
+            TaskCompletionRate = taskCompletionRate,
+            PendingCount = pendingTaskCount,
+            LearningProgress = learningProgress,
+            TotalPoints = member.PointTotal
         };
     }
 }
-

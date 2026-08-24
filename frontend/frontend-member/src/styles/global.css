@@ -1,0 +1,247 @@
+/* ========== 设计变量 ========== */
+:root {
+  --red: #C8161D;
+  --red-d: #9B1010;
+  --red-10: rgba(200, 22, 29, 0.1);
+  --red-50: rgba(200, 22, 29, 0.5);
+  --gold: #D4A843;
+  --gold-50: rgba(212, 168, 67, 0.1);
+  --gold-l: #F0D27A;
+  --bg: #F5F6FA;
+  --card: #FFFFFF;
+  --t1: #1A1A1A;
+  --t2: #555555;
+  --t3: #999999;
+  --bd: #E8E8EC;
+  --blue: #1E64C8;
+  --green: #2E8B57;
+  --orange: #E67E22;
+  --r10: 10px;
+  --r14: 14px;
+  --r20: 20px;
+  --sh: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --sh-hover: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  /* Element Plus 主题色覆盖 */
+  --el-color-primary: #C8161D;
+  --el-color-primary-light-3: #D4454B;
+  --el-color-primary-light-5: #DE7378;
+  --el-color-primary-light-7: #E8A1A4;
+  --el-color-primary-light-8: #EEB8BA;
+  --el-color-primary-light-9: #F4D0D1;
+  --el-color-primary-dark-2: #A01217;
+}
+
+/* ========== 重置 ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  font-size: 14px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ========== 通用组件样式 ========== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--r10);
+  padding: 20px;
+  box-shadow: var(--sh);
+}
+
+.card-hover {
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card-hover:hover {
+  box-shadow: var(--sh-hover);
+  transform: translateY(-1px);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tag-r {
+  background: var(--red-10);
+  color: var(--red);
+}
+
+.tag-b {
+  background: rgba(30, 100, 200, 0.1);
+  color: var(--blue);
+}
+
+.tag-g {
+  background: rgba(46, 139, 87, 0.1);
+  color: var(--green);
+}
+
+.tag-o {
+  background: rgba(230, 126, 34, 0.1);
+  color: var(--orange);
+}
+
+.tag-gray {
+  background: var(--bg);
+  color: var(--t2);
+}
+
+.progress {
+  height: 6px;
+  background: var(--bd);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red), #D42B31);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: var(--t3);
+  margin-top: 4px;
+  text-align: right;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--t2);
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: color 0.15s;
+}
+
+.back-link:hover {
+  color: var(--red);
+}
+
+/* ========== 滚动条 ========== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bd);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--t3);
+}
+
+/* ========== Element Plus 覆盖 ========== */
+.el-menu {
+  border-right: none !important;
+}
+
+.el-menu-item.is-active {
+  background-color: var(--red-10) !important;
+  color: var(--red) !important;
+  font-weight: 600;
+}
+
+.el-menu-item:hover {
+  background-color: var(--bg) !important;
+}
+
+.el-tabs__item.is-active {
+  color: var(--red) !important;
+}
+
+.el-tabs__active-bar {
+  background-color: var(--red) !important;
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled).is-active {
+  background-color: var(--red) !important;
+}
+
+.el-button--primary {
+  --el-button-bg-color: var(--red);
+  --el-button-border-color: var(--red);
+  --el-button-hover-bg-color: var(--red-d);
+  --el-button-hover-border-color: var(--red-d);
+  --el-button-active-bg-color: var(--red-d);
+  --el-button-active-border-color: var(--red-d);
+}
+
+.el-dialog__header {
+  padding-bottom: 12px;
+}
+
+.el-table th.el-table__cell {
+  background-color: #FAFAFA !important;
+}
+
+.el-tag--danger {
+  --el-tag-bg-color: var(--red-10);
+  --el-tag-text-color: var(--red);
+  --el-tag-border-color: transparent;
+}

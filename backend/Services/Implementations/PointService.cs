@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Models.Common;
@@ -56,7 +56,7 @@ public class PointService : IPointService
     {
         var q = _context.PartyMembers
             .Include(m => m.Organization)
-            .Where(m => m.IsEnabled)
+            .Where(m => m.IsEnabled && m.Role != UserRole.SystemAdmin) // 排除系统管理员
             .AsQueryable();
 
         if (orgId.HasValue)

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Models.Common;
 
 namespace PartySchoolApi.Models.DTOs;
@@ -6,7 +7,17 @@ namespace PartySchoolApi.Models.DTOs;
 /// <summary>题目分页查询参数</summary>
 public class QuestionQueryParams : PagedQueryParams
 {
+    /// <summary>题目类型</summary>
     public QuestionType? QuestionType { get; set; }
+
+    /// <summary>题目类型别名（前端传 type）</summary>
+    [FromQuery(Name = "type")]
+    public QuestionType? Type
+    {
+        get => QuestionType;
+        set => QuestionType = value;
+    }
+
     public int? CategoryId { get; set; }
     public string? Keyword { get; set; }
 }
