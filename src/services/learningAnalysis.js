@@ -1,177 +1,176 @@
-// frontend/src/services/learningAnalysis.js
-
-import {
-  getLearningRecords,
-  getLearningSummary
-} from "./learningData.js";
-
-/**
- * 请求后端 AI
- */
-async function requestAI(messages) {
-  const response = await fetch(
-    "http://localhost:3000/api/ai/chat",
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        messages
-      })
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `AI服务请求失败：${response.status}`
-    );
+const calculateRate = (correct, total) => {
+  if (!total || total <= 0) {
+    return 0
   }
 
-  const result =
-    await response.json();
-
-  if (
-    !result.success ||
-    !result.data
-  ) {
-    throw new Error(
-      result.message ||
-      "AI服务返回异常"
-    );
-  }
-
-  return result.data.content;
+  return Number(
+    ((correct / total) * 100).toFixed(2)
+  )
 }
 
-/**
- * 生成 AI 学习分析
- */
-export async function generateLearningAnalysis() {
-  const records =
-    getLearningRecords();
+export const analyzeQuestion = ({
+  question,
+  options = [],
+  userAnswer,
+  correctAnswer,
+  knowledgePoint,
+  knowledgePointId
+}) => {
+  const isCorrect =
+    userAnswer === correctAnswer
 
-  const summary =
-    getLearningSummary();
-
-  if (records.length === 0) {
-    return {
-      success: false,
-      message:
-        "目前还没有足够的答题数据，请先完成一些题目。"
-    };
+  return {
+    question,
+    options,
+    userAnswer,
+    correctAnswer,
+    knowledgePoint,
+    knowledgePointId,
+    isCorrect,
+    needHelp: !isCorrect
   }
+}
 
-  const knowledgeData =
-    summary.knowledgePoints
-      .map((item) => {
+export const analyzeLearningData = ({
+  totalQuestions = 0,
+  correctQuestions = 0,
+  knowledgePoints = [],
+  wrongQuestions = []
+}) => {
+  const wrongQuestionsCount =
+    Math.max(
+      totalQuestions -
+        correctQuestions,
+      0
+    )
+
+  const overallAccuracy =
+    calculateRate(
+      correctQuestions,
+      totalQuestions
+    )
+
+  const knowledgeAnalysis =
+    knowledgePoints
+      .map(item => {
+        const total =
+          Number(item.total) || 0
+
+        const correct =
+          Number(item.correct) || 0
+
+        const wrong =
+          Number(item.wrong) ||
+          Math.max(
+            total - correct,
+            0
+          )
+
+        const accuracy =
+          calculateRate(
+            correct,
+            total
+          )
+
         return {
-          knowledgePoint:
-            item.knowledgePoint,
+          name: item.name,
+          total,
+          correct,
+          wrong,
+          accuracy,
+          level:
+            accuracy >= 85
+              ? "优秀"
+              : accuracy >= 70
+              ? "良好"
+              : accuracy >= 60
+              ? "一般"
+              : "薄弱"
+        }
+      })
+      .sort(
+        (a, b) =>
+          a.accuracy -
+          b.accuracy
+      )
 
-          total: item.total,
+  const weakKnowledgePoints =
+    knowledgeAnalysis
+      .filter(
+        item =>
+          item.accuracy < 70
+      )
+      .slice(0, 5)
 
-          correct: item.correct,
+  const repeatedWrongQuestions =
+    [...wrongQuestions]
+      .sort(
+        (a, b) =>
+          (Number(b.wrongCount) || 0) -
+          (Number(a.wrongCount) || 0)
+      )
+      .slice(0, 10)
 
-          wrong: item.wrong,
+  return {
+    totalQuestions,
+    correctQuestions,
+    wrongQuestions:
+      wrongQuestionsCount,
+    overallAccuracy,
+    knowledgeAnalysis,
+    weakKnowledgePoints,
+    repeatedWrongQuestions
+  }
+}
 
-          accuracy:
-            item.accuracy
-        };
-      });
+export const buildLearningPrompt = (
+  analysis
+) => {
+  const weakPoints =
+    analysis.weakKnowledgePoints
+      .map(
+        item =>
+          `${item.name}：正确率${item.accuracy}%`
+      )
+      .join("\n")
 
-  const prompt = `
-你现在是“数智党校AI学习分析助手”。
+  const repeatedWrong =
+    analysis.repeatedWrongQuestions
+      .map(
+        item =>
+          `${item.knowledgePoint || "未知知识点"}：错误${item.wrongCount}次`
+      )
+      .join("\n")
 
-请根据党员的历史答题数据，对党员的学习情况进行分析。
-
-【总体数据】
+  return `
+请根据以下党员学习数据进行学习情况分析。
 
 总答题数：
-${summary.total}
+${analysis.totalQuestions}
 
 正确题数：
-${summary.correct}
+${analysis.correctQuestions}
 
 错误题数：
-${summary.wrong}
+${analysis.wrongQuestions}
 
-总体正确率：
-${summary.accuracy}%
+综合正确率：
+${analysis.overallAccuracy}%
 
-【知识点数据】
+薄弱知识点：
+${weakPoints || "暂无"}
 
-${JSON.stringify(
-  knowledgeData,
-  null,
-  2
-)}
+高频错误知识点：
+${repeatedWrong || "暂无"}
 
-请完成以下任务：
+请输出以下内容：
 
-1. 判断党员目前整体学习情况。
+1. 总体学习情况
+2. 当前最需要强化的知识点
+3. 高频错误原因分析
+4. 建议优先学习的内容
+5. 下一阶段学习建议
 
-2. 找出最薄弱的3个知识点。
-
-3. 找出掌握较好的知识点。
-
-4. 分析党员可能存在的学习问题。
-
-5. 给出具体的学习建议。
-
-6. 给出下一阶段建议重点学习的知识点。
-
-要求：
-
-- 必须严格根据提供的数据分析。
-- 不要编造不存在的答题数据。
-- 不要虚构党员没有出现过的知识点。
-- 语言简洁、清晰、适合党员学习。
-- 不需要输出复杂表格。
-- 使用中文。
-- 分成“总体情况”“薄弱知识点”“掌握较好”“学习问题”“AI学习建议”五部分。
-`;
-
-  try {
-    const answer =
-      await requestAI([
-        {
-          role: "system",
-
-          content:
-            "你是一个严谨、专业、负责的党员学习分析助手。"
-        },
-
-        {
-          role: "user",
-
-          content: prompt
-        }
-      ]);
-
-    return {
-      success: true,
-
-      answer,
-
-      summary,
-
-      records
-    };
-  } catch (error) {
-    console.error(
-      "AI学习分析失败：",
-      error
-    );
-
-    return {
-      success: false,
-
-      message:
-        error.message ||
-        "AI学习分析失败"
-    };
-  }
+回答应当清晰、具体、具有针对性，不要编造不存在的数据。
+`
 }
