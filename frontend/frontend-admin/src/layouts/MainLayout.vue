@@ -63,6 +63,10 @@
         <router-view />
       </el-main>
     </el-container>
+    </el-container>
+
+    <!-- 管理端 AI 悬浮助手 -->
+    <AdminAIPanel />
   </el-container>
 </template>
 
@@ -70,6 +74,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import AdminAIPanel from '@/components/AdminAIPanel.vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
 const route = useRoute()

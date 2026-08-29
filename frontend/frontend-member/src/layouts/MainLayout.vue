@@ -59,20 +59,34 @@
         </router-view>
       </el-main>
     </el-container>
+
+    <!-- AI 悬浮球 + 完整 AI 面板（接入 ai-module） -->
+    <AIFloatingButton @click="aiVisible = true" />
+    <AIChatPanel
+      v-if="aiVisible"
+      :question-data="aiDataStore.currentQuestion"
+      :answer-history="aiDataStore.answerHistory"
+      @close="aiVisible = false"
+    />
   </el-container>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { House, Reading, Document, User } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { getAvatarChar } from '@/utils/format'
+import { useAiDataStore } from '@/stores/aiData'
+import AIFloatingButton from '@/components/AIFloatingButton.vue'
+import AIChatPanel from '@/components/AIChatPanel.vue'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const aiDataStore = useAiDataStore()
+const aiVisible = ref(false)
 
 const activeMenu = computed(() => {
   const path = route.path
