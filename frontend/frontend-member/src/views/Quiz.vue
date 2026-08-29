@@ -206,15 +206,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Loading, Clock, Trophy } from '@element-plus/icons-vue'
 import { startExam, submitExam, getExamResult } from '@/api/exam'
 import { formatTime, questionTypeMap } from '@/utils/format'
+import { useAiDataStore } from '@/stores/aiData'
 
 const route = useRoute()
 const router = useRouter()
+const aiDataStore = useAiDataStore()
 
 const testId = computed(() => route.params.testId)
 
@@ -233,6 +235,39 @@ let startTime = null
 
 const currentQuestion = computed(() => questions.value[currentIndex.value] || {})
 const currentAnswer = computed(() => answers.value[currentIndex.value])
+
+// 将当前题目同步到 AI 面板
+watch(
+  [currentQuestion, currentAnswer, currentIndex],
+  () => {
+    const q = currentQuestion.value
+    if (!q || !q.question && !q.title) {
+      aiDataStore.setCurrentQuestion(null)
+      return
+    }
+    const ans = currentAnswer.value
+    let userAnswerLetter = ''
+    if (q.type === 'judge') {
+      userAnswerLetter = ans === true || ans === 'true' || ans === '正确' ? '正确' : ans === false || ans === 'false' || ans === '错误' ? '错误' : ''
+    } else if (q.type === 'multiple') {
+      userAnswerLetter = Array.isArray(ans) ? ans.map(i => String.fromCharCode(65 + i)).join('') : ''
+    } else {
+      userAnswerLetter = typeof ans === 'number' ? String.fromCharCode(65 + ans) : (ans || '')
+    }
+
+    aiDataStore.setCurrentQuestion({
+      question: q.question || q.title,
+      options: q.options || [],
+      userAnswer: userAnswerLetter,
+      correctAnswer: q.correctAnswer || q.answer || '',
+      knowledgePoint: q.knowledgePoint || q.category || '',
+      questionNumber: currentIndex.value + 1,
+      submitted: false,
+      correct: null
+    })
+  },
+  { immediate: true, deep: true }
+)
 
 function getQuestionTypeLabel(type) {
   return questionTypeMap[type] || type || '未知'
@@ -311,19 +346,49 @@ function formatAnswer(answer) {
 function buildSubmitAnswers() {
   return questions.value.map((q, idx) => {
     const answer = answers.value[idx]
-    let formattedAnswer
+    let formattedAnswer = ''
     if (q.type === 'judge') {
-      formattedAnswer = answer === true || answer === 'true' ? '正确' : answer === false || answer === 'false' ? '错误' : answer
+      // 判断题：后端期望 "true" / "false"
+      formattedAnswer = (answer === true || answer === 'true') ? 'true' : (answer === false || answer === 'false') ? 'false' : ''
     } else if (q.type === 'multiple') {
-      formattedAnswer = Array.isArray(answer) ? answer.map(a => getOptionLabel(a)) : []
+      // 多选题：后端期望 JSON 字符串 "[0,2]"
+      formattedAnswer = Array.isArray(answer) && answer.length > 0 ? JSON.stringify(answer) : '[]'
     } else {
-      formattedAnswer = typeof answer === 'number' ? getOptionLabel(answer) : answer
+      // 单选题：后端期望索引字符串 "0" / "1"
+      formattedAnswer = typeof answer === 'number' ? String(answer) : (answer !== null && answer !== undefined ? String(answer) : '')
     }
     return {
       questionId: q.id || q.questionId,
       answer: formattedAnswer
     }
   })
+}
+
+// 把后端返回的索引答案转成前端显示用的字母/文字
+function formatAnswerForDisplay(answer, type) {
+  if (answer === null || answer === undefined || answer === '') return '-'
+  const str = String(answer).trim()
+  if (type === 'judge') {
+    if (str === 'true' || str === '正确') return '正确'
+    if (str === 'false' || str === '错误') return '错误'
+    return str
+  }
+  if (type === 'multiple') {
+    try {
+      const arr = JSON.parse(str)
+      if (Array.isArray(arr)) {
+        return arr.map(i => typeof i === 'number' ? String.fromCharCode(65 + i) : String(i)).join('、')
+      }
+    } catch { /* 不是JSON，按普通字符串处理 */ }
+    // 可能已经是字母格式
+    if (/^[A-Z,，、\s]+$/.test(str)) return str.replace(/[,，]/g, '、')
+    return str
+  }
+  // 单选题：索引数字 → 字母
+  if (/^\d+$/.test(str)) {
+    return String.fromCharCode(65 + parseInt(str, 10))
+  }
+  return str
 }
 
 async function handleSubmit() {
@@ -357,9 +422,63 @@ async function handleSubmit() {
     }
     await submitExam(submitData)
 
-    // 获取结果
-    examResult.value = await getExamResult(testId.value)
+    // 获取结果并转换后端格式为前端格式
+    const rawResult = await getExamResult(testId.value)
+    const rawQuestions = rawResult?.questionAnswers || rawResult?.questions || []
+    const convertedQuestions = rawQuestions.map(q => {
+      const qid = q.questionId || q.id
+      const origQ = questions.value.find(item => (item.id || item.questionId) === qid) || {}
+      return {
+        id: qid,
+        question: q.question || q.title || q.stem || origQ.question || '',
+        options: origQ.options || [],
+        type: origQ.type || 'single',
+        userAnswer: formatAnswerForDisplay(q.userAnswer, origQ.type),
+        correctAnswer: formatAnswerForDisplay(q.correctAnswer, origQ.type),
+        isCorrect: q.isCorrect === true,
+        score: q.score || 0,
+        knowledgePoint: origQ.knowledgePoint || q.category || ''
+      }
+    })
+    const correctCount = convertedQuestions.filter(q => q.isCorrect).length
+    const wrongCount = convertedQuestions.length - correctCount
+    examResult.value = {
+      ...rawResult,
+      questions: convertedQuestions,
+      correctCount,
+      wrongCount,
+      correctRate: convertedQuestions.length > 0 ? Math.round((correctCount / convertedQuestions.length) * 100) : 0
+    }
     submitted.value = true
+
+    // 将答题记录同步到 AI 面板
+    const history = convertedQuestions.map((q, idx) => ({
+      id: q.id || idx,
+      question: q.question,
+      options: q.options,
+      userAnswer: q.userAnswer,
+      correctAnswer: q.correctAnswer,
+      correct: q.isCorrect,
+      knowledgePoint: q.knowledgePoint
+    }))
+    aiDataStore.setAnswerHistory(history)
+
+    // 更新当前题目为已提交状态
+    const curQ = currentQuestion.value
+    if (curQ) {
+      const curResult = convertedQuestions[currentIndex.value]
+      aiDataStore.setCurrentQuestion({
+        question: curQ.question || curQ.title,
+        options: curQ.options || [],
+        userAnswer: curResult?.userAnswer || '',
+        correctAnswer: curResult?.correctAnswer || curQ.correctAnswer || '',
+        knowledgePoint: curQ.knowledgePoint || curQ.category || '',
+        questionNumber: currentIndex.value + 1,
+        submitted: true,
+        correct: curResult?.isCorrect === true
+      })
+    }
+
     ElMessage.success('试卷提交成功')
   } catch {
     // 错误已由拦截器处理
@@ -409,7 +528,18 @@ async function loadQuiz() {
   try {
     const data = await startExam(testId.value)
     quizData.value = data
-    questions.value = data?.questions || data?.items || []
+    const rawQuestions = data?.questions || data?.items || []
+    // 后端字段转换：stem→question, questionType(int)→type(string), 保留 options/id
+    const typeMap = { 0: 'single', 1: 'multiple', 2: 'judge' }
+    questions.value = rawQuestions.map(q => ({
+      id: q.id || q.questionId,
+      question: q.question || q.title || q.stem || '',
+      type: q.type || typeMap[q.questionType] || 'single',
+      options: Array.isArray(q.options) ? q.options : [],
+      correctAnswer: q.correctAnswer || q.answer || '',
+      knowledgePoint: q.knowledgePoint || q.category || '',
+      score: q.score || 5
+    }))
     if (questions.value.length === 0) {
       ElMessage.warning('该试卷暂无题目')
     }
@@ -418,8 +548,8 @@ async function loadQuiz() {
       answers.value[idx] = questions.value[idx].type === 'multiple' ? [] : null
     })
     // 启动计时器
-    if (data?.duration) {
-      startTimer(data.duration)
+    if (data?.duration || data?.timeLimitMinutes) {
+      startTimer((data?.duration || data?.timeLimitMinutes) * 60)
     }
     startTime = Date.now()
   } catch {

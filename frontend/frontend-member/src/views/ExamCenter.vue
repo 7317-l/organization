@@ -45,7 +45,7 @@
       <el-tab-pane label="历史试卷" name="history">
         <div class="material-list" v-loading="historyLoading">
           <template v-if="historyExams.length > 0">
-            <div v-for="item in historyExams" :key="item.id || item.testId" class="material-card">
+            <div v-for="item in historyExams" :key="item.id || item.testId" class="material-card" style="cursor:pointer" @click="viewResult(item.id || item.testId)">
               <div class="material-icon d">
                 <el-icon :size="28"><DataAnalysis /></el-icon>
               </div>
@@ -267,8 +267,8 @@
           </div>
         </div>
         <el-divider />
-        <div class="result-questions">
-          <div v-for="(q, idx) in (examResult.questionAnswers || examResult.questions || [])" :key="idx" class="result-question">
+        <div class="result-questions" v-if="examResult">
+          <div v-for="(q, idx) in (examResult?.questionAnswers || examResult?.questions || [])" :key="idx" class="result-question">
             <div class="rq-title">{{ idx + 1 }}. {{ q.stem || q.question || q.title }}</div>
             <div class="rq-answer">
               <span :class="q.isCorrect ? 'correct' : 'wrong'">
@@ -489,7 +489,16 @@ async function viewResult(testId) {
   resultDialogVisible.value = true
   resultLoading.value = true
   try {
-    examResult.value = await getExamResult(testId)
+    const data = await getExamResult(testId)
+    // 计算正确数和总数
+    const questions = data?.questionAnswers || data?.questions || []
+    const correctCount = questions.filter(q => q.isCorrect === true).length
+    examResult.value = {
+      ...data,
+      correctCount,
+      totalCount: questions.length,
+      correctRate: questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0
+    }
   } catch {
     // 错误已由拦截器处理
   } finally {
