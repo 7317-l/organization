@@ -22,6 +22,10 @@ public class AiQueryRequest
 public class AiQueryResponse
 {
     public string AnswerText { get; set; } = string.Empty;
+
+    /// <summary>兼容前端 res.answer 读取（与 AnswerText 同值）</summary>
+    public string Answer => AnswerText;
+
     public object? ChartData { get; set; }
     public string Intent { get; set; } = string.Empty;
 }
@@ -50,4 +54,24 @@ public class AiDimensionDto
     public string Name { get; set; } = string.Empty;
     public double Score { get; set; }
     public string Comment { get; set; } = string.Empty;
+}
+
+/// <summary>支部考核报告请求</summary>
+public class OrganizationReportRequest
+{
+    [Required(ErrorMessage = "请选择组织")]
+    public int OrganizationId { get; set; }
+
+    /// <summary>季度标识，如 2026Q3</summary>
+    public string? Quarter { get; set; }
+}
+
+/// <summary>支部考核报告响应</summary>
+public class OrganizationReportResponse
+{
+    public int OrganizationId { get; set; }
+    public string OrganizationName { get; set; } = string.Empty;
+    public string Quarter { get; set; } = string.Empty;
+    public string Report { get; set; } = string.Empty;
+    public Dictionary<string, double> Metrics { get; set; } = new();
 }

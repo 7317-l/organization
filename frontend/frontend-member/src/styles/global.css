@@ -44,9 +44,15 @@ body {
   height: 100%;
 }
 
+/* 党建红色背景：置于 html 画布层，滚动时始终铺满视口，不出现空白背景 */
+html {
+  background:
+    linear-gradient(rgba(192, 32, 42, 0.50), rgba(160, 14, 22, 0.62)),
+    url('/party-bg.jpg') center / cover no-repeat fixed;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: var(--bg);
   color: var(--t1);
   font-size: 14px;
 }

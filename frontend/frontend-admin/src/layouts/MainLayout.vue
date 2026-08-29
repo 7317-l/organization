@@ -29,7 +29,6 @@
           :default-active="activeMenu"
           router
           class="side-menu"
-          background-color="#ffffff"
           text-color="#333333"
           active-text-color="#C8161D"
         >
@@ -110,6 +109,13 @@ async function handleCommand(cmd) {
 <style scoped>
 .main-layout {
   height: 100vh;
+  overflow: hidden;
+}
+/* 内层容器占满剩余高度并允许内容区内部滚动，侧边栏保持固定 */
+.main-layout > .el-container {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 .app-header {
   background: linear-gradient(90deg, #C8161D 0%, #A01016 100%);
@@ -146,21 +152,39 @@ async function handleCommand(cmd) {
   font-size: 14px;
 }
 .app-aside {
-  background: #fff;
-  border-right: 1px solid #e8e8e8;
-  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.04);
+  background: transparent;
+  border-right: none;
+  box-shadow: none;
 }
 .side-menu {
   border-right: none;
   height: calc(100vh - 60px);
+  padding: 16px 10px;
+  background: transparent;
 }
+.side-menu :deep(.el-menu-item) {
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+}
+/* 选中项：白底 + 深红加粗文字 + 左侧红条，保证文字清晰可读 */
 .side-menu :deep(.el-menu-item.is-active) {
-  background: rgba(200, 22, 29, 0.08);
-  border-right: 3px solid #C8161D;
+  background-color: #ffffff !important;
+  color: #C8161D !important;
+  font-weight: 700;
+  border-right: none;
+  border-left: 3px solid #C8161D;
+  box-shadow: 0 2px 10px rgba(200, 22, 29, 0.25);
+}
+.side-menu :deep(.el-menu-item:hover) {
+  background-color: #ffffff !important;
+  color: #C8161D;
 }
 .app-main {
-  background: #f5f6f8;
   padding: 20px;
   overflow-y: auto;
+  height: 100%;
 }
 </style>

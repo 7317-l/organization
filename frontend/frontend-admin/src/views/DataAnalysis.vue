@@ -123,7 +123,7 @@
 import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
-import { aiQuery } from '@/api/ai'
+import { aiQuery, generateOrganizationReport } from '@/api/ai'
 import { getDashboardLargeScreen } from '@/api/statistics'
 import { getOrganizationTree } from '@/api/organization'
 import { formatDate } from '@/utils/format'
@@ -358,13 +358,12 @@ async function generateReport() {
   reportLoading.value = true
   try {
     const orgName = orgFlatList.value.find((o) => o.id === reportOrgId.value)?.name || ''
-    const res = await aiQuery({
-      question: `生成${orgName}在${reportQuarter.value}的党建工作考核报告，包括党员学习情况、测验成绩、组织生活参与度、任务完成率、存在问题及改进建议`,
-      context: '支部考核报告'
-    })
-    reportContent.value = res.answer || res.content || res.result || res.report || JSON.stringify(res, null, 2)
+    const res = await generateOrganizationReport({ organizationId: reportOrgId.value, quarter: reportQuarter.value })
+    reportContent.value = res?.report || res?.answer || res?.content || JSON.stringify(res, null, 2)
     ElMessage.success('报告生成成功')
-  } catch (e) { /* */ }
+  } catch (e) {
+    ElMessage.error('报告生成失败')
+  }
   finally { reportLoading.value = false }
 }
 

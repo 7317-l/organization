@@ -51,9 +51,9 @@ export const questionTypeMap = {
   single: '单选题',
   multiple: '多选题',
   judge: '判断题',
-  1: '单选题',
-  2: '多选题',
-  3: '判断题'
+  0: '单选题',
+  1: '多选题',
+  2: '判断题'
 }
 
 /** 任务状态映射 */

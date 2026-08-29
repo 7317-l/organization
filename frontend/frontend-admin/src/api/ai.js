@@ -5,6 +5,11 @@ export function aiQuery(data) {
   return request.post('/ai/query', data)
 }
 
+// 生成组织（含下级）季度考核报告
+export function generateOrganizationReport(data) {
+  return request.post('/ai/organization-report', data)
+}
+
 // AI 素材生成
 export function aiContentGenerate(data) {
   return request.post('/ai-content/generate', data)

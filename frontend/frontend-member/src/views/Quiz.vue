@@ -238,6 +238,13 @@ function getQuestionTypeLabel(type) {
   return questionTypeMap[type] || type || '未知'
 }
 
+// 后端返回数字枚举，映射为页面使用的 single/multiple/judge
+function mapQuestionType(t) {
+  if (t === 'single' || t === 'multiple' || t === 'judge') return t
+  const map = { 0: 'single', 1: 'multiple', 2: 'judge' }
+  return map[t] || 'single'
+}
+
 function getOptionLabel(idx) {
   return String.fromCharCode(65 + idx)
 }
@@ -315,7 +322,7 @@ function buildSubmitAnswers() {
     if (q.type === 'judge') {
       formattedAnswer = answer === true || answer === 'true' ? '正确' : answer === false || answer === 'false' ? '错误' : answer
     } else if (q.type === 'multiple') {
-      formattedAnswer = Array.isArray(answer) ? answer.map(a => getOptionLabel(a)) : []
+      formattedAnswer = Array.isArray(answer) ? JSON.stringify(answer.map(a => getOptionLabel(a))) : '[]'
     } else {
       formattedAnswer = typeof answer === 'number' ? getOptionLabel(answer) : answer
     }
@@ -357,8 +364,22 @@ async function handleSubmit() {
     }
     await submitExam(submitData)
 
-    // 获取结果
-    examResult.value = await getExamResult(testId.value)
+    // 获取结果（后端返回 questionAnswers，映射为页面展示结构）
+    const rawResult = await getExamResult(testId.value)
+    const qas = rawResult?.questionAnswers || rawResult?.questions || []
+    const correctCount = qas.filter((a) => a.isCorrect).length
+    examResult.value = {
+      ...rawResult,
+      questions: qas.map((a) => ({
+        question: a.stem || a.question,
+        userAnswer: a.userAnswer,
+        correctAnswer: a.correctAnswer,
+        isCorrect: a.isCorrect,
+        analysis: a.analysis
+      })),
+      correctCount,
+      wrongCount: Math.max(0, qas.length - correctCount)
+    }
     submitted.value = true
     ElMessage.success('试卷提交成功')
   } catch {
@@ -408,8 +429,23 @@ async function loadQuiz() {
   loading.value = true
   try {
     const data = await startExam(testId.value)
-    quizData.value = data
-    questions.value = data?.questions || data?.items || []
+    // 后端字段：paperName / timeLimitMinutes / questions[{id, questionType, stem, options}]
+    quizData.value = {
+      title: data?.paperName || data?.title || data?.name || '测验',
+      duration: data?.timeLimitMinutes || data?.duration
+    }
+    const rawQuestions = data?.questions || data?.items || []
+    questions.value = rawQuestions.map((q, i) => ({
+      id: q.id || q.questionId,
+      type: mapQuestionType(q.questionType),
+      question: q.stem || q.question || q.title,
+      category: q.category || q.knowledgePoint,
+      options: Array.isArray(q.options) ? q.options.map((o, oi) => ({
+        label: String.fromCharCode(65 + oi),
+        text: typeof o === 'string' ? o : (o.text || o.content || String(o))
+      })) : [],
+      score: q.score
+    }))
     if (questions.value.length === 0) {
       ElMessage.warning('该试卷暂无题目')
     }
@@ -418,8 +454,8 @@ async function loadQuiz() {
       answers.value[idx] = questions.value[idx].type === 'multiple' ? [] : null
     })
     // 启动计时器
-    if (data?.duration) {
-      startTimer(data.duration)
+    if (quizData.value.duration) {
+      startTimer(quizData.value.duration)
     }
     startTime = Date.now()
   } catch {

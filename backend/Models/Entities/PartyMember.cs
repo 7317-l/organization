@@ -36,6 +36,10 @@ public class PartyMember
     /// <summary>总积分</summary>
     public int PointTotal { get; set; } = 0;
 
+    /// <summary>党员身份：正式党员 / 预备党员</summary>
+    [MaxLength(20)]
+    public string MemberType { get; set; } = "正式党员";
+
     // 导航属性
     public List<MemberLearningProgress> LearningProgresses { get; set; } = new();
     public List<MemberTestRecord> TestRecords { get; set; } = new();

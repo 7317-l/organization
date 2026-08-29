@@ -37,16 +37,16 @@
         <!-- Tab2 党员管理 -->
         <el-tab-pane label="党员管理" name="member">
           <div class="tab-toolbar">
-            <el-input v-model="memberQuery.name" placeholder="姓名" clearable style="width:160px" @clear="loadMembers" @keyup.enter="loadMembers" />
-            <el-select v-model="memberQuery.orgId" placeholder="所属组织" clearable style="width:180px" @change="loadMembers">
+            <el-input v-model="memberQuery.name" placeholder="姓名" clearable style="width:160px" @clear="searchMembers" @keyup.enter="searchMembers" />
+            <el-select v-model="memberQuery.orgId" placeholder="所属组织" clearable style="width:180px" @change="searchMembers">
               <el-option v-for="o in orgFlatList" :key="o.id" :label="o.name" :value="o.id" />
             </el-select>
-            <el-select v-model="memberQuery.role" placeholder="角色" clearable style="width:140px" @change="loadMembers">
-              <el-option label="党员" value="member" />
-              <el-option label="支部书记" value="secretary" />
-              <el-option label="管理员" value="admin" />
+            <el-select v-model="memberQuery.role" placeholder="角色" clearable style="width:140px" @change="searchMembers">
+              <el-option label="党员" :value="0" />
+              <el-option label="支部书记" :value="1" />
+              <el-option label="管理员" :value="2" />
             </el-select>
-            <el-button type="primary" @click="loadMembers"><el-icon><Search /></el-icon>查询</el-button>
+            <el-button type="primary" @click="searchMembers"><el-icon><Search /></el-icon>查询</el-button>
             <el-button type="success" @click="openMemberDialog(null)"><el-icon><Plus /></el-icon>新增</el-button>
             <el-upload :show-file-list="false" :before-upload="handleImport" accept=".xlsx,.xls">
               <el-button><el-icon><Upload /></el-icon>批量导入</el-button>
@@ -66,8 +66,8 @@
             <el-table-column prop="organizationName" label="所属组织" />
             <el-table-column label="状态" width="100">
               <template #default="{ row }">
-                <el-tag :type="row.status === 0 || row.status === 'disabled' ? 'info' : 'success'" size="small">
-                  {{ row.status === 0 || row.status === 'disabled' ? '禁用' : '启用' }}
+                <el-tag :type="row.isEnabled === false ? 'info' : 'success'" size="small">
+                  {{ row.isEnabled === false ? '禁用' : '启用' }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -147,11 +147,10 @@
         <el-tab-pane label="发展流程" name="development">
           <div class="tab-toolbar">
             <el-select v-model="devQuery.stage" placeholder="全部阶段" clearable style="width:160px" @change="loadDevelopments">
-              <el-option label="入党申请人" value="applicant" />
-              <el-option label="积极分子" value="activist" />
-              <el-option label="发展对象" value="candidate" />
-              <el-option label="预备党员" value="probationary" />
-              <el-option label="正式党员" value="full_member" />
+              <el-option label="积极分子" :value="0" />
+              <el-option label="发展对象" :value="1" />
+              <el-option label="预备党员" :value="2" />
+              <el-option label="正式党员" :value="3" />
             </el-select>
             <el-input v-model="devQuery.name" placeholder="搜索姓名" clearable style="width:160px" @clear="loadDevelopments" @keyup.enter="loadDevelopments" />
             <el-button type="primary" @click="loadDevelopments"><el-icon><Search /></el-icon>查询</el-button>
@@ -233,9 +232,9 @@
         </el-form-item>
         <el-form-item label="角色">
           <el-select v-model="memberForm.role" placeholder="请选择角色" style="width:100%">
-            <el-option label="党员" value="member" />
-            <el-option label="支部书记" value="secretary" />
-            <el-option label="管理员" value="admin" />
+            <el-option label="党员" :value="0" />
+            <el-option label="支部书记" :value="1" />
+            <el-option label="管理员" :value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="所属组织">
@@ -264,9 +263,9 @@
         </el-form-item>
         <el-form-item label="角色">
           <el-select v-model="roleForm.role" placeholder="请选择角色" style="width:100%">
-            <el-option label="党员" value="member" />
-            <el-option label="支部书记" value="secretary" />
-            <el-option label="管理员" value="admin" />
+            <el-option label="党员" :value="0" />
+            <el-option label="支部书记" :value="1" />
+            <el-option label="管理员" :value="2" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -434,7 +433,13 @@ const memberTotal = ref(0)
 const memberQuery = reactive({ page: 1, size: 10, name: '', orgId: '', role: '' })
 const memberDialogVisible = ref(false)
 const memberSubmitting = ref(false)
-const memberForm = reactive({ id: null, name: '', phone: '', password: '', role: 'member', organizationId: null })
+const memberForm = reactive({ id: null, name: '', phone: '', password: '', role: 0, organizationId: null })
+
+/** 筛选查询：先重置到第 1 页，避免翻页后筛选结果为空 */
+function searchMembers() {
+  memberQuery.page = 1
+  loadMembers()
+}
 
 async function loadMembers() {
   memberLoading.value = true
@@ -480,7 +485,7 @@ function openMemberDialog(row) {
     memberForm.name = ''
     memberForm.phone = ''
     memberForm.password = ''
-    memberForm.role = 'member'
+    memberForm.role = 0
     memberForm.organizationId = null
   }
   memberDialogVisible.value = true
@@ -554,7 +559,7 @@ async function handleExport() {
 const roleDialogVisible = ref(false)
 const roleSubmitting = ref(false)
 const roleTarget = ref(null)
-const roleForm = reactive({ role: 'member' })
+const roleForm = reactive({ role: 0 })
 
 function openRoleDialog(row) {
   roleTarget.value = row
@@ -637,6 +642,10 @@ const devDetail = ref(null)
 const devDetailTimeline = ref([])
 
 const STAGE_MAP = {
+  0: { text: '积极分子', progress: 30, tag: 'warning' },
+  1: { text: '发展对象', progress: 55, tag: '' },
+  2: { text: '预备党员', progress: 80, tag: 'danger' },
+  3: { text: '正式党员', progress: 100, tag: 'success' },
   applicant: { text: '入党申请人', progress: 10, tag: 'info' },
   activist: { text: '积极分子', progress: 30, tag: 'warning' },
   candidate: { text: '发展对象', progress: 55, tag: '' },
@@ -666,7 +675,11 @@ function statusText(status) {
     need_material: '需补充材料',
     converting: '转正中',
     completed: '已完成',
-    done: '已完成'
+    done: '已完成',
+    0: '待提交',
+    1: '审核中',
+    2: '已通过',
+    3: '已驳回'
   }
   return map[status] || status || '审核中'
 }
@@ -681,7 +694,11 @@ function statusTagType(status) {
     need_material: 'danger',
     converting: '',
     completed: 'info',
-    done: 'info'
+    done: 'info',
+    0: 'warning',
+    1: 'warning',
+    2: 'success',
+    3: 'danger'
   }
   return map[status] || 'warning'
 }

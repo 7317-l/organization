@@ -18,10 +18,8 @@
               @change="loadContents"
             />
             <el-select v-model="contentQuery.contentType" placeholder="类型" clearable style="width:120px" @change="loadContents">
-              <el-option label="文章" value="article" />
-              <el-option label="视频" value="video" />
-              <el-option label="音频" value="audio" />
-              <el-option label="文档" value="document" />
+              <el-option label="文章" :value="0" />
+              <el-option label="视频" :value="1" />
             </el-select>
             <el-button type="primary" @click="loadContents"><el-icon><Search /></el-icon>查询</el-button>
             <el-button type="success" @click="openContentDialog(null)"><el-icon><Plus /></el-icon>发布内容</el-button>
@@ -32,7 +30,7 @@
             <el-table-column prop="title" label="标题" min-width="220" show-overflow-tooltip />
             <el-table-column label="类型" width="100">
               <template #default="{ row }">
-                <el-tag :type="row.contentType === 'video' ? 'danger' : row.contentType === 'article' ? '' : 'info'" size="small">
+                <el-tag :type="row.contentType === 1 ? 'danger' : row.contentType === 0 ? '' : 'info'" size="small">
                   {{ contentTypeText(row.contentType) }}
                 </el-tag>
               </template>
@@ -146,13 +144,9 @@
             <div class="ai-card-desc">上传党建文档 / 报告原文 / 会议纪要，AI自动抽取知识点，生成配套题库、学习卡片、摘要导图</div>
           </div>
           <el-form :model="aiForm" label-width="100px" class="ai-form">
-            <el-form-item label="素材类型">
-              <el-radio-group v-model="aiForm.type">
-                <el-radio value="article">文章</el-radio>
-                <el-radio value="video">视频脚本</el-radio>
-                <el-radio value="audio">音频稿</el-radio>
-                <el-radio value="document">文档</el-radio>
-              </el-radio-group>
+            <el-form-item label="生成说明">
+              <el-alert type="info" :closable="false" show-icon
+                title="将基于主题内容生成：5道单选题、3道多选题、2道判断题及学习卡片（示例数据，建议审核后使用）" />
             </el-form-item>
             <el-form-item label="主题内容">
               <el-input
@@ -196,16 +190,14 @@
         </el-form-item>
         <el-form-item label="内容类型">
           <el-select v-model="contentForm.contentType" placeholder="请选择" style="width:100%">
-            <el-option label="文章" value="article" />
-            <el-option label="视频" value="video" />
-            <el-option label="音频" value="audio" />
-            <el-option label="文档" value="document" />
+            <el-option label="文章" :value="0" />
+            <el-option label="视频" :value="1" />
           </el-select>
         </el-form-item>
         <el-form-item label="正文">
           <el-input v-model="contentForm.body" type="textarea" :rows="5" placeholder="请输入正文内容" />
         </el-form-item>
-        <el-form-item label="视频链接" v-if="contentForm.contentType === 'video'">
+        <el-form-item label="视频链接" v-if="contentForm.contentType === 1">
           <el-input v-model="contentForm.videoUrl" placeholder="请输入视频URL" />
         </el-form-item>
         <el-form-item label="分类">
@@ -323,7 +315,7 @@ const contentQuery = reactive({ page: 1, size: 10, keyword: '', categoryId: '', 
 const contentDialogVisible = ref(false)
 const contentSubmitting = ref(false)
 const contentForm = reactive({
-  id: null, title: '', body: '', videoUrl: '', contentType: 'article',
+  id: null, title: '', body: '', videoUrl: '', contentType: 0,
   categoryId: null, isPublic: true, tagIds: []
 })
 const categoryTree = ref([])
@@ -374,7 +366,7 @@ function openContentDialog(row) {
     })
   } else {
     Object.assign(contentForm, {
-      id: null, title: '', body: '', videoUrl: '', contentType: 'article',
+      id: null, title: '', body: '', videoUrl: '', contentType: 0,
       categoryId: null, isPublic: true, tagIds: []
     })
   }
@@ -556,7 +548,7 @@ async function viewTaskCompletion(row) {
 }
 
 // ========== AI素材生成 ==========
-const aiForm = reactive({ type: 'article', content: '', fileName: '' })
+const aiForm = reactive({ content: '', fileName: '' })
 const aiGenerating = ref(false)
 const aiResult = ref('')
 
@@ -569,8 +561,29 @@ async function generateAiContent() {
   if (!aiForm.content.trim()) return ElMessage.warning('请输入主题内容')
   aiGenerating.value = true
   try {
-    const res = await aiContentGenerate({ content: aiForm.content, type: aiForm.type })
-    aiResult.value = res.content || res.result || res.generatedContent || JSON.stringify(res)
+    const res = await aiContentGenerate({
+      sourceText: aiForm.content,
+      singleChoiceCount: 5,
+      multiChoiceCount: 3,
+      trueFalseCount: 2,
+      generateFlashCards: true
+    })
+    const data = res && res.data ? res.data : res
+    const lines = []
+    if (data?.summary) lines.push(data.summary)
+    if (Array.isArray(data?.questions) && data.questions.length > 0) {
+      lines.push('', '【生成题目】')
+      data.questions.forEach((q, i) => {
+        lines.push(`${i + 1}. ${q.questionTypeName || ''}：${q.stem}`)
+        if (Array.isArray(q.options)) q.options.forEach((o) => lines.push(`   ${o}`))
+        lines.push(`   答案：${q.correctAnswer}`)
+      })
+    }
+    if (Array.isArray(data?.flashCards) && data.flashCards.length > 0) {
+      lines.push('', '【学习卡片】')
+      data.flashCards.forEach((c, i) => lines.push(`${i + 1}. ${c.front} —— ${c.back}`))
+    }
+    aiResult.value = lines.join('\n') || '生成完成'
     ElMessage.success('生成成功')
   } catch (e) { /* */ }
   finally { aiGenerating.value = false }

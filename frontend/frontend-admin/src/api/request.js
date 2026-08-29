@@ -28,6 +28,11 @@ request.interceptors.response.use(
     // 兼容直接返回数据 / { code, data, message } 两种结构
     if (res && typeof res === 'object' && 'code' in res) {
       if (res.code === 200 || res.code === 0) {
+        // 分页响应（PagedResponse：{ code, data:[...], page, size, total }）保留外层结构，
+        // 供各视图取 res.data（数组）与 res.total（总数），避免解包成裸数组后列表为空
+        if (res.total !== undefined && (res.page !== undefined || res.size !== undefined)) {
+          return res
+        }
         return res.data !== undefined ? res.data : res
       }
       ElMessage.error(res.message || res.msg || '请求失败')

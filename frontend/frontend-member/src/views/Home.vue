@@ -19,7 +19,7 @@
           <div class="stat-value">{{ overview.pendingCount || 0 }}<span class="unit">项</span></div>
         </div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card clickable" @click="goReport" title="查看学习报告">
         <div class="stat-icon b">
           <el-icon :size="24"><Clock /></el-icon>
         </div>
@@ -295,6 +295,11 @@ function goProfile() {
   router.push('/profile')
 }
 
+// 学习进度卡片 → AI学习报告（含学习进度详情）
+function goReport() {
+  router.push('/report')
+}
+
 onMounted(() => {
   if (!userStore.userInfo) {
     userStore.fetchUserInfo().catch(() => {})
@@ -346,6 +351,16 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.stat-card.clickable {
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.stat-card.clickable:hover {
+  box-shadow: var(--sh-hover);
+  transform: translateY(-2px);
 }
 
 .stat-icon {

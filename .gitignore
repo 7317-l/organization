@@ -1,3 +1,11 @@
 node_modules/
 .env
 npm-debug.log*
+
+# 构建产物
+dist/
+backend/bin/
+backend/obj/
+frontend/*/dist/
+frontend/*/public/
+*.log

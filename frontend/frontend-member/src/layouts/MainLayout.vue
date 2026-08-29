@@ -212,28 +212,46 @@ onMounted(() => {
 
 /* 侧边栏 */
 .sidebar {
-  background: var(--card);
-  border-right: 1px solid var(--bd);
+  background: transparent;
+  border-right: none;
   position: fixed;
   top: 56px;
   bottom: 0;
   left: 0;
   overflow-y: auto;
-  padding: 16px 0;
+  padding: 16px 12px;
 }
 
 .sidebar-menu {
   border-right: none;
-  padding: 0 12px;
+  padding: 0;
+  background: transparent;
 }
 
 .sidebar-menu :deep(.el-menu-item) {
   height: 48px;
   line-height: 48px;
-  border-radius: var(--r10);
-  margin-bottom: 4px;
+  border-radius: 10px;
+  margin-bottom: 10px;
   font-size: 14px;
   font-weight: 500;
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+}
+
+/* 选中项：白底 + 深红加粗文字 + 左侧红条，保证文字清晰可读 */
+.sidebar-menu :deep(.el-menu-item.is-active) {
+  background-color: #ffffff !important;
+  color: var(--red) !important;
+  font-weight: 700;
+  border-left: 3px solid var(--red);
+  box-shadow: 0 2px 10px rgba(200, 22, 29, 0.25);
+}
+
+.sidebar-menu :deep(.el-menu-item:hover) {
+  background-color: #ffffff !important;
+  color: var(--red);
 }
 
 /* 内容区 */
@@ -242,7 +260,6 @@ onMounted(() => {
   padding: 24px 32px;
   min-height: calc(100vh - 56px);
   overflow-y: auto;
-  background: var(--bg);
 }
 
 /* 过渡动画 */

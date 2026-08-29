@@ -392,7 +392,7 @@ public class MobileService : IMobileService
     }
 
     /// <summary>
-    /// 判题逻辑
+    /// 判题逻辑（兼容前端「字母 / 索引」与题库「选项文本 / JSON」两种答案格式）
     /// </summary>
     private bool CheckAnswer(Question question, string userAnswer)
     {
@@ -402,23 +402,92 @@ public class MobileService : IMobileService
         {
             case Models.Common.QuestionType.SingleChoice:
             case Models.Common.QuestionType.TrueFalse:
-                return userAnswer.Trim() == question.CorrectAnswer.Trim();
+                var u = NormalizeSingleAnswer(question, userAnswer);
+                var c = NormalizeSingleAnswer(question, question.CorrectAnswer);
+                return string.Equals(u, c, StringComparison.OrdinalIgnoreCase);
 
             case Models.Common.QuestionType.MultiChoice:
-                try
-                {
-                    var userSet = JsonSerializer.Deserialize<List<int>>(userAnswer)?.OrderBy(x => x).ToList();
-                    var correctSet = JsonSerializer.Deserialize<List<int>>(question.CorrectAnswer)?.OrderBy(x => x).ToList();
-                    if (userSet == null || correctSet == null) return false;
-                    return userSet.SequenceEqual(correctSet);
-                }
-                catch
-                {
-                    return false;
-                }
+                var userSet = ParseMultiAnswer(question, userAnswer);
+                var correctSet = ParseMultiAnswer(question, question.CorrectAnswer);
+                if (userSet == null || correctSet == null || userSet.Count == 0) return false;
+                return userSet.SetEquals(correctSet);
 
             default:
                 return false;
+        }
+    }
+
+    /// <summary>把「字母 / 索引 / 选项文本 / 对错词」统一归一化为选项文本</summary>
+    private string NormalizeSingleAnswer(Question question, string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
+        var text = raw.Trim();
+        var options = GetQuestionOptions(question);
+
+        // 已是完整选项文本
+        if (options.Contains(text, StringComparer.OrdinalIgnoreCase)) return text;
+
+        // 字母：A / B / C ...
+        if (text.Length == 1 && char.IsLetter(text[0]))
+        {
+            var idx = char.ToUpper(text[0]) - 'A';
+            if (idx >= 0 && idx < options.Count) return options[idx];
+        }
+
+        // 数字索引
+        if (int.TryParse(text, out var num) && num >= 0 && num < options.Count) return options[num];
+
+        // 判断题 true/false/对/错 → 正确/错误
+        if (string.Equals(text, "true", StringComparison.OrdinalIgnoreCase) || text == "对") return "正确";
+        if (string.Equals(text, "false", StringComparison.OrdinalIgnoreCase) || text == "错") return "错误";
+
+        return text;
+    }
+
+    /// <summary>把「JSON字符串数组 / JSON索引数组 / 逗号分隔文本」解析为归一化选项文本集合</summary>
+    private HashSet<string>? ParseMultiAnswer(Question question, string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var options = GetQuestionOptions(question);
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var tokens = new List<string>();
+
+        try
+        {
+            var strArr = JsonSerializer.Deserialize<List<string>>(raw);
+            if (strArr != null) tokens.AddRange(strArr);
+        }
+        catch
+        {
+            try
+            {
+                var intArr = JsonSerializer.Deserialize<List<int>>(raw);
+                if (intArr != null) tokens.AddRange(intArr.Select(i => i.ToString()));
+            }
+            catch
+            {
+                tokens.AddRange(raw.Split(new[] { ',', '，', ';', '；', ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            }
+        }
+
+        foreach (var t in tokens)
+        {
+            var norm = NormalizeSingleAnswer(question, t);
+            if (!string.IsNullOrEmpty(norm)) set.Add(norm);
+        }
+
+        return set;
+    }
+
+    private List<string> GetQuestionOptions(Question question)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<List<string>>(question.Options) ?? new List<string>();
+        }
+        catch
+        {
+            return new List<string>();
         }
     }
 

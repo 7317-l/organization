@@ -24,7 +24,7 @@
           <div class="profile-stat-value gold">{{ overview.totalPoints || 0 }}</div>
           <div class="profile-stat-label">总积分（分）</div>
         </div>
-        <div class="profile-stat">
+        <div class="profile-stat clickable" @click="goReport" title="查看完整 AI 学习报告">
           <div class="profile-stat-value red">{{ overview.learningProgress || 0 }}%</div>
           <div class="profile-stat-label">学习进度</div>
           <div class="profile-progress">
@@ -406,6 +406,7 @@ onMounted(() => {
   margin-left: auto;
 }
 
+.profile-stat.clickable { cursor: pointer; }
 .profile-stat {
   text-align: center;
 }

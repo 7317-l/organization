@@ -40,7 +40,13 @@ public class PartyMemberService : IPartyMemberService
             queryable = queryable.Where(m => m.Name.Contains(query.Name));
 
         if (query.OrganizationId.HasValue)
-            queryable = queryable.Where(m => m.OrganizationId == query.OrganizationId.Value);
+        {
+            // 支持按「组织及其全部下级组织」查询，避免只选党总支等父级组织时查不到党员
+            var orgId = query.OrganizationId.Value;
+            var scopeOrgIds = await GetSubtreeOrgIdsAsync(orgId);
+            scopeOrgIds.Add(orgId);
+            queryable = queryable.Where(m => scopeOrgIds.Contains(m.OrganizationId));
+        }
 
         if (query.Role.HasValue)
             queryable = queryable.Where(m => m.Role == query.Role.Value);
@@ -56,6 +62,30 @@ public class PartyMemberService : IPartyMemberService
             .ToListAsync();
 
         return PagedResponse.Ok(_mapper.Map<List<MemberListItemDto>>(items), query.Page, query.Size, total);
+    }
+
+    /// <summary>获取某组织下的全部下级组织 Id（不含自身）</summary>
+    private async Task<List<int>> GetSubtreeOrgIdsAsync(int orgId)
+    {
+        var allOrgs = await _context.Organizations
+            .Select(o => new { o.Id, o.ParentId })
+            .ToListAsync();
+
+        var result = new List<int>();
+        var queue = new Queue<int>();
+        queue.Enqueue(orgId);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            foreach (var child in allOrgs.Where(o => o.ParentId == current))
+            {
+                result.Add(child.Id);
+                queue.Enqueue(child.Id);
+            }
+        }
+
+        return result;
     }
 
     public async Task<MemberListItemDto> GetByIdAsync(int id)

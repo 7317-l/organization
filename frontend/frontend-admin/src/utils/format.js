@@ -66,7 +66,9 @@ export function contentTypeText(type) {
     article: '文章',
     video: '视频',
     audio: '音频',
-    document: '文档'
+    document: '文档',
+    0: '文章',
+    1: '视频'
   }
   return map[type] || type || '-'
 }
@@ -77,7 +79,10 @@ export function questionTypeText(type) {
     multiple: '多选题',
     judge: '判断题',
     fill: '填空题',
-    essay: '简答题'
+    essay: '简答题',
+    0: '单选题',
+    1: '多选题',
+    2: '判断题'
   }
   return map[type] || type || '-'
 }
@@ -87,7 +92,12 @@ export function meetingTypeText(type) {
     branch_meeting: '支部党员大会',
     committee_meeting: '支部委员会',
     group_meeting: '党小组会',
-    party_class: '党课'
+    party_class: '党课',
+    0: '支部党员大会',
+    1: '支部委员会',
+    2: '党小组会',
+    3: '党课',
+    4: '主题党日'
   }
   return map[type] || type || '-'
 }

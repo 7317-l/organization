@@ -49,4 +49,13 @@ public class AiController : ControllerBase
         var result = await _aiService.GenerateAssessmentAsync(memberId);
         return ApiResponse.Success(result);
     }
+
+    /// <summary>生成组织（含下级）季度考核报告</summary>
+    [HttpPost("ai/organization-report")]
+    [Authorize(Roles = "SystemAdmin,BranchSecretary")]
+    public async Task<ApiResponse> GenerateOrganizationReport([FromBody] OrganizationReportRequest request)
+    {
+        var result = await _aiService.GenerateOrganizationReportAsync(request.OrganizationId, request.Quarter);
+        return ApiResponse.Success(result);
+    }
 }

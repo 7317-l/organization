@@ -7,11 +7,9 @@
           <div class="tab-toolbar">
             <el-input v-model="questionQuery.keyword" placeholder="搜索题目内容" clearable style="width:220px" @clear="loadQuestions" @keyup.enter="loadQuestions" />
             <el-select v-model="questionQuery.type" placeholder="题目类型" clearable style="width:140px" @change="loadQuestions">
-              <el-option label="单选题" value="single" />
-              <el-option label="多选题" value="multiple" />
-              <el-option label="判断题" value="judge" />
-              <el-option label="填空题" value="fill" />
-              <el-option label="简答题" value="essay" />
+              <el-option label="单选题" :value="0" />
+              <el-option label="多选题" :value="1" />
+              <el-option label="判断题" :value="2" />
             </el-select>
             <el-select v-model="questionQuery.categoryId" placeholder="分类" clearable style="width:160px" @change="loadQuestions">
               <el-option v-for="c in questionCategories" :key="c.id" :label="c.name" :value="c.id" />
@@ -29,7 +27,7 @@
             <el-table-column prop="stem" label="题目内容" min-width="320" show-overflow-tooltip />
             <el-table-column label="类型" width="100">
               <template #default="{ row }">
-                <el-tag :type="row.questionType === 'multiple' ? 'danger' : row.questionType === 'judge' ? 'success' : ''" size="small">
+                <el-tag :type="row.questionType === 1 ? 'danger' : row.questionType === 2 ? 'success' : ''" size="small">
                   {{ questionTypeText(row.questionType) }}
                 </el-tag>
               </template>
@@ -169,11 +167,9 @@
       <el-form :model="questionForm" label-width="90px">
         <el-form-item label="题目类型">
           <el-select v-model="questionForm.questionType" placeholder="请选择" style="width:100%">
-            <el-option label="单选题" value="single" />
-            <el-option label="多选题" value="multiple" />
-            <el-option label="判断题" value="judge" />
-            <el-option label="填空题" value="fill" />
-            <el-option label="简答题" value="essay" />
+            <el-option label="单选题" :value="0" />
+            <el-option label="多选题" :value="1" />
+            <el-option label="判断题" :value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="分类">
@@ -184,7 +180,7 @@
         <el-form-item label="题干">
           <el-input v-model="questionForm.stem" type="textarea" :rows="3" placeholder="请输入题干" />
         </el-form-item>
-        <el-form-item label="选项" v-if="['single','multiple'].includes(questionForm.questionType)">
+        <el-form-item label="选项" v-if="[0, 1].includes(questionForm.questionType)">
           <div v-for="(opt, idx) in questionForm.options" :key="idx" class="option-row">
             <el-input v-model="opt.label" style="width:60px" placeholder="A" />
             <el-input v-model="opt.text" style="flex:1;margin-left:8px" placeholder="选项内容" />
@@ -302,7 +298,7 @@
         <div v-for="(q, idx) in previewQuestions" :key="idx" class="preview-question">
           <div class="q-title">{{ idx + 1 }}. ({{ q.score }}分) {{ q.stem }}</div>
           <div v-if="q.options && q.options.length" class="q-options">
-            <div v-for="(opt, oi) in q.options" :key="oi" class="q-opt">{{ opt.label }}. {{ opt.text }}</div>
+            <div v-for="(opt, oi) in q.options" :key="oi" class="q-opt">{{ typeof opt === 'string' ? String.fromCharCode(65 + oi) + '. ' + opt : (opt.label || String.fromCharCode(65 + oi)) + '. ' + (opt.text || '') }}</div>
           </div>
         </div>
         <el-empty v-if="!previewLoading && previewQuestions.length === 0" description="暂无题目" :image-size="80" />
@@ -335,7 +331,7 @@ const questionQuery = reactive({ page: 1, size: 10, keyword: '', type: '', categ
 const questionDialogVisible = ref(false)
 const questionSubmitting = ref(false)
 const questionForm = reactive({
-  id: null, questionType: 'single', stem: '', options: [], correctAnswer: '', score: 5, categoryId: null
+  id: null, questionType: 0, stem: '', options: [], correctAnswer: '', score: 5, categoryId: null
 })
 const questionCategories = ref([])
 const allQuestions = ref([])
@@ -375,12 +371,12 @@ function openQuestionDialog(row) {
   if (row) {
     Object.assign(questionForm, {
       id: row.id, questionType: row.questionType, stem: row.stem,
-      options: Array.isArray(row.options) ? JSON.parse(JSON.stringify(row.options)) : [],
+      options: Array.isArray(row.options) ? row.options.map((t, i) => ({ label: String.fromCharCode(65 + i), text: typeof t === 'string' ? t : (t.text || '') })) : [],
       correctAnswer: row.correctAnswer, score: row.score, categoryId: row.categoryId
     })
   } else {
     Object.assign(questionForm, {
-      id: null, questionType: 'single', stem: '', options: [{ label: 'A', text: '' }, { label: 'B', text: '' }],
+      id: null, questionType: 0, stem: '', options: [{ label: 'A', text: '' }, { label: 'B', text: '' }],
       correctAnswer: '', score: 5, categoryId: null
     })
   }
@@ -393,7 +389,8 @@ async function submitQuestion() {
   try {
     const payload = {
       questionType: questionForm.questionType, stem: questionForm.stem,
-      options: questionForm.options, correctAnswer: questionForm.correctAnswer,
+      options: questionForm.options.map((o) => (typeof o === 'string' ? o : o.text)),
+      correctAnswer: questionForm.correctAnswer,
       score: questionForm.score, categoryId: questionForm.categoryId
     }
     if (questionForm.id) {

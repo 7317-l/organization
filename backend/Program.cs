@@ -19,6 +19,9 @@ builder.Services.AddControllers()
             System.Text.Json.JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.ReferenceHandler =
             System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        // 兼容前端以字符串传枚举（role / contentType / questionType 等），序列化仍输出数字
+        options.JsonSerializerOptions.Converters.Add(
+            new PartySchoolApi.Helpers.FlexibleEnumJsonConverterFactory());
     });
 
 // ===== MySQL数据库 =====
@@ -127,6 +130,9 @@ builder.Services.AddScoped<IMeetingActivityService, MeetingActivityService>();
 builder.Services.AddScoped<ICheckInService, CheckInService>();
 builder.Services.AddScoped<IPointService, PointService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IQwenService, QwenService>();
+builder.Services.AddScoped<IKnowledgeSearchService, KnowledgeSearchService>();
 builder.Services.AddScoped<IAiKnowledgeService, AiKnowledgeService>();
 builder.Services.AddScoped<INl2SqlService, Nl2SqlService>();
 builder.Services.AddScoped<IAiContentGenerationService, AiContentGenerationService>();

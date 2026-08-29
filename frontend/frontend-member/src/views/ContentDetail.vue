@@ -54,7 +54,7 @@
         </div>
         <span class="progress-value">{{ currentProgress }}%</span>
         <el-button
-          v-if="currentProgress < 100"
+          v-if="!reported"
           type="primary"
           size="small"
           :loading="reporting"
@@ -62,8 +62,9 @@
         >
           上报进度
         </el-button>
+        <el-tag v-else type="success" effect="light" size="small">已上报 ✓</el-tag>
         <el-button
-          v-if="content.taskId && currentProgress >= 100"
+          v-if="content.taskId && currentProgress >= 100 && reported"
           type="success"
           size="small"
           :loading="completing"
@@ -71,6 +72,9 @@
         >
           标记任务完成
         </el-button>
+      </div>
+      <div v-if="!isVideo && !reported && currentProgress < 100" class="progress-hint">
+        {{ progressHint }}
       </div>
     </div>
 
@@ -126,9 +130,12 @@ const reporting = ref(false)
 const completing = ref(false)
 const content = ref({})
 const currentProgress = ref(0)
+const reported = ref(false)
+const progressHint = ref('完成本内容学习后，请点击「上报进度」上报学习进度')
 const relatedList = ref([])
 const videoRef = ref(null)
 let progressTimer = null
+let articleTimer = null
 let lastReportedTime = 0
 
 /** 是否为视频内容（兼容 contentType 数字和 type 字符串） */
@@ -157,10 +164,15 @@ async function loadContent() {
     const data = await getContentDetail(contentId.value)
     content.value = data || {}
     currentProgress.value = data?.progress || data?.learningProgress || 0
+    if (currentProgress.value >= 100) {
+      reported.value = true
+      progressHint.value = '该内容学习已完成'
+    }
   } catch {
     // 错误已由拦截器处理
   } finally {
     loading.value = false
+    startArticleAutoProgress()
   }
 }
 
@@ -171,6 +183,16 @@ async function loadRelated() {
   } catch {
     // 错误已由拦截器处理
   }
+}
+
+/** 文章类内容：停留 5 秒后学习进度自动变为 100% */
+function startArticleAutoProgress() {
+  if (isVideo.value || reported.value) return
+  articleTimer = setTimeout(() => {
+    currentProgress.value = 100
+    progressHint.value = '学习时长达标，请点击「上报进度」完成上报'
+    ElMessage.success('学习进度已达 100%，请点击「上报进度」提交')
+  }, 5000)
 }
 
 function handleTimeUpdate() {
@@ -207,14 +229,16 @@ async function autoReportProgress(durationSeconds, isCompleted) {
 async function reportLearningProgress() {
   reporting.value = true
   try {
-    const durationSeconds = videoRef.value ? Math.floor(videoRef.value.currentTime) : 0
+    const durationSeconds = videoRef.value ? Math.floor(videoRef.value.currentTime) : (currentProgress.value >= 100 ? 600 : 0)
     const isCompleted = currentProgress.value >= 100
     await reportProgress({
       contentId: contentId.value,
       durationSeconds,
       isCompleted
     })
-    ElMessage.success('学习进度已上报')
+    reported.value = true
+    progressHint.value = isCompleted ? '学习进度已上报，任务完成' : '学习进度已上报'
+    ElMessage.success(isCompleted ? '学习进度已上报，任务完成' : '学习进度已上报')
   } catch {
     // 错误已由拦截器处理
   } finally {
@@ -257,6 +281,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (progressTimer) clearInterval(progressTimer)
+  if (articleTimer) clearTimeout(articleTimer)
 })
 </script>
 
@@ -420,6 +445,13 @@ onBeforeUnmount(() => {
   font-size: 14px;
   font-weight: 600;
   flex-shrink: 0;
+}
+
+.progress-hint {
+  font-size: 12px;
+  color: var(--t3);
+  margin-top: 10px;
+  line-height: 1.6;
 }
 
 /* AI 解读 */
