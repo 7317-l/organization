@@ -63,7 +63,6 @@
         <router-view />
       </el-main>
     </el-container>
-    </el-container>
 
     <!-- 管理端 AI 悬浮助手 -->
     <AdminAIPanel />
