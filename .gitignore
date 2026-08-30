@@ -7,5 +7,4 @@ dist/
 backend/bin/
 backend/obj/
 frontend/*/dist/
-frontend/*/public/
 *.log
