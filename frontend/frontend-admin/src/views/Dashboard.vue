@@ -1,34 +1,32 @@
 <template>
   <div class="dashboard">
-    <!-- 5张KPI卡片 -->
-    <el-row :gutter="16" class="kpi-row" v-loading="loading">
-      <el-col :span="24">
-        <el-row :gutter="16">
-          <el-col :span="4" v-for="(item, idx) in kpiList" :key="idx">
-            <el-card class="kpi-card" shadow="hover">
-              <div class="kpi-inner">
-                <div class="kpi-icon" :style="{ background: item.bgColor, color: item.iconColor }">
-                  <el-icon :size="22"><component :is="item.icon" /></el-icon>
-                </div>
-                <div class="kpi-info">
-                  <div class="kpi-value" :class="{ 'text-red': item.highlight }">
-                    {{ item.value }}<span class="kpi-unit">{{ item.unit }}</span>
-                  </div>
-                  <div class="kpi-label">{{ item.label }}</div>
-                </div>
+    <!-- 5张KPI卡片（flex均分） -->
+    <div class="kpi-row" v-loading="loading">
+      <div class="kpi-flex">
+        <div class="kpi-col" v-for="(item, idx) in kpiList" :key="idx">
+          <el-card class="kpi-card" shadow="hover">
+            <div class="kpi-inner">
+              <div class="kpi-icon" :style="{ background: item.bgColor, color: item.iconColor }">
+                <el-icon :size="22"><component :is="item.icon" /></el-icon>
               </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <el-empty v-if="!loading && !hasDashboardData" description="暂无工作台数据" :image-size="100" />
-      </el-col>
-    </el-row>
+              <div class="kpi-info">
+                <div class="kpi-value" :class="{ 'text-red': item.highlight }">
+                  {{ item.value }}<span class="kpi-unit">{{ item.unit }}</span>
+                </div>
+                <div class="kpi-label">{{ item.label }}</div>
+              </div>
+            </div>
+          </el-card>
+        </div>
+      </div>
+      <el-empty v-if="!loading && !hasDashboardData" description="暂无工作台数据" :image-size="100" />
+    </div>
 
-    <!-- 预警提醒 + 快捷操作 -->
+    <!-- 预警提醒 + 快捷操作 + 学习趋势 三列并列 -->
     <el-row :gutter="16" class="content-row">
       <!-- 预警提醒 -->
-      <el-col :span="14">
-        <el-card shadow="never" class="warn-card">
+      <el-col :span="8">
+        <el-card shadow="never" class="warn-card equal-card">
           <template #header>
             <div class="card-header">
               <el-icon color="#FA8C16"><Warning /></el-icon>
@@ -52,8 +50,8 @@
       </el-col>
 
       <!-- 快捷操作 -->
-      <el-col :span="10">
-        <el-card shadow="never">
+      <el-col :span="8">
+        <el-card shadow="never" class="equal-card">
           <template #header>
             <div class="card-header">
               <el-icon color="#C8161D"><Operation /></el-icon>
@@ -80,12 +78,10 @@
           </div>
         </el-card>
       </el-col>
-    </el-row>
 
-    <!-- 学习趋势图 -->
-    <el-row :gutter="16" class="content-row">
-      <el-col :span="24">
-        <el-card shadow="never">
+      <!-- 学习趋势图 -->
+      <el-col :span="8">
+        <el-card shadow="never" class="equal-card">
           <template #header>
             <div class="card-header">
               <el-icon color="#C8161D"><TrendCharts /></el-icon>
@@ -327,6 +323,21 @@ onBeforeUnmount(() => {
 <style scoped>
 .dashboard { padding: 0; }
 .kpi-row { margin-bottom: 18px; }
+.kpi-flex {
+  display: flex;
+  gap: 16px;
+}
+.kpi-col {
+  flex: 1;
+  min-width: 0;
+}
+.equal-card {
+  height: 100%;
+}
+.equal-card :deep(.el-card__body) {
+  height: calc(100% - 57px);
+  overflow: hidden;
+}
 .kpi-card {
   border-radius: 6px;
   border: 1px solid #f0f0f0;
@@ -475,6 +486,6 @@ onBeforeUnmount(() => {
 
 .chart-container {
   width: 100%;
-  height: 340px;
+  height: 300px;
 }
 </style>
