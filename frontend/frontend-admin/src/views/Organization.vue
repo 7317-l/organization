@@ -119,8 +119,8 @@
             <el-table-column prop="idleMinutes" label="挂机(分钟)" width="120" />
             <el-table-column label="有效率" width="120">
               <template #default="{ row }">
-                <span :style="{ color: getValidRateColor(row.idleRate), fontWeight: 500 }">
-                  {{ getValidRate(row.idleRate) }}%
+                <span :style="{ color: getValidRateColor(row), fontWeight: 500 }">
+                  {{ getValidRate(row) }}%
                 </span>
               </template>
             </el-table-column>
@@ -610,7 +610,13 @@ function formatMinutes(min) {
   return hours > 0 ? `${hours}.${Math.round(mins / 6)}小时` : `${min}分钟`
 }
 
-function getValidRate(idleRate) {
+function getValidRate(row) {
+  if (!row) return '-'
+  const valid = Number(row.validLearningMinutes) || 0
+  const idle = Number(row.idleMinutes) || 0
+  // 总学习时长为0时，有效率显示0%
+  if (valid + idle <= 0) return '0.0'
+  const idleRate = row.idleRate
   if (idleRate === null || idleRate === undefined || idleRate === '') return '-'
   const rate = typeof idleRate === 'number' ? idleRate : parseFloat(idleRate)
   if (isNaN(rate)) return '-'
@@ -619,8 +625,8 @@ function getValidRate(idleRate) {
   return (100 - normalized).toFixed(1)
 }
 
-function getValidRateColor(idleRate) {
-  const valid = parseFloat(getValidRate(idleRate))
+function getValidRateColor(row) {
+  const valid = parseFloat(getValidRate(row))
   if (isNaN(valid)) return '#909399'
   if (valid >= 80) return '#52C41A'
   if (valid >= 60) return '#FA8C16'

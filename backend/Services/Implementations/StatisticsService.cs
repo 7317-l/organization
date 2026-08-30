@@ -176,9 +176,15 @@ public class StatisticsService : IStatisticsService
                 .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
 
             var totalMinutes = totalSeconds / 60.0;
-            var idleRate = new Random(member.Id).NextDouble() * 0.3;
-            var idleMinutes = Math.Round(totalMinutes * idleRate, 2);
-            var validMinutes = Math.Round(totalMinutes - idleMinutes, 2);
+            double idleRate = 0;
+            double idleMinutes = 0;
+            double validMinutes = 0;
+            if (totalMinutes > 0)
+            {
+                idleRate = new Random(member.Id).NextDouble() * 0.3;
+                idleMinutes = Math.Round(totalMinutes * idleRate, 2);
+                validMinutes = Math.Round(totalMinutes - idleMinutes, 2);
+            }
 
             result.Add(new AntiCheatStatsDto
             {
