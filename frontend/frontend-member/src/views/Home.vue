@@ -78,52 +78,54 @@
       </div>
     </div>
 
-    <!-- AI 推荐 -->
-    <div class="section-header">
-      <div class="section-title">AI 为你推荐</div>
-    </div>
-    <div class="ai-section" v-loading="recommendLoading">
-      <div class="ai-cards" v-if="recommendations.length > 0">
-        <div
-          v-for="item in recommendations"
-          :key="item.id"
-          class="ai-card"
-          @click="goContentDetail(item.id)"
-        >
-          <div class="ai-card-icon" :class="item.contentType === 1 ? 'v' : 'd'">
-            <el-icon :size="24"><VideoPlay v-if="item.contentType === 1" /><Document v-else /></el-icon>
+    <!-- 第二排：AI推荐 + 积分排行 并列 -->
+    <div class="bottom-row">
+      <!-- AI 推荐 -->
+      <div class="bottom-card">
+        <div class="section-header" style="margin-bottom:10px">
+          <div class="section-title">AI 为你推荐</div>
+        </div>
+        <div class="ai-section compact" v-loading="recommendLoading">
+          <div class="ai-cards compact" v-if="recommendations.length > 0">
+            <div
+              v-for="item in recommendations.slice(0, 4)"
+              :key="item.id"
+              class="ai-card compact"
+              @click="goContentDetail(item.id)"
+            >
+              <div class="ai-card-icon sm" :class="item.contentType === 1 ? 'v' : 'd'">
+                <el-icon :size="18"><VideoPlay v-if="item.contentType === 1" /><Document v-else /></el-icon>
+              </div>
+              <div class="ai-card-content">
+                <div class="ai-card-title sm">{{ item.title }}</div>
+              </div>
+            </div>
           </div>
-          <div class="ai-card-content">
-            <div class="ai-card-title">{{ item.title }}</div>
-            <div class="ai-card-desc">{{ item.categoryName || '基于你的学习情况推荐' }}</div>
-          </div>
-          <el-button type="primary" size="small" @click.stop="goContentDetail(item.id)">
-            立即学习 →
-          </el-button>
+          <el-empty v-else description="暂无推荐" :image-size="50" />
         </div>
       </div>
-      <el-empty v-else description="暂无推荐内容" :image-size="80" />
-    </div>
 
-    <!-- 积分排行 -->
-    <div class="section-header">
-      <div class="section-title">积分排行</div>
-      <span class="section-more" @click="goProfile">查看完整排行 →</span>
-    </div>
-    <div class="rank-section" v-loading="rankingLoading">
-      <div class="rank-list" v-if="rankingList.length > 0">
-        <div v-for="(item, index) in rankingList.slice(0, 3)" :key="item.memberId || item.id" class="rank-item">
-          <div class="rank-badge" :class="'g' + (index + 1)">
-            {{ index === 0 ? '1' : index === 1 ? '2' : '3' }}
+      <!-- 积分排行 -->
+      <div class="bottom-card">
+        <div class="section-header" style="margin-bottom:10px">
+          <div class="section-title">积分排行</div>
+          <span class="section-more" @click="goProfile">更多 →</span>
+        </div>
+        <div class="rank-section compact" v-loading="rankingLoading">
+          <div class="rank-list compact" v-if="rankingList.length > 0">
+            <div v-for="(item, index) in rankingList.slice(0, 3)" :key="item.memberId || item.id" class="rank-item compact">
+              <div class="rank-badge sm" :class="'g' + (index + 1)">
+                {{ index === 0 ? '1' : index === 1 ? '2' : '3' }}
+              </div>
+              <div class="rank-info">
+                <div class="rank-name sm">{{ item.memberName || item.name }}</div>
+              </div>
+              <div class="rank-score sm">{{ item.totalPoints || item.points }}<span>分</span></div>
+            </div>
           </div>
-          <div class="rank-info">
-            <div class="rank-name">{{ item.memberName || item.name }}</div>
-            <div class="rank-org">{{ item.organizationName || item.branchName }}</div>
-          </div>
-          <div class="rank-score">{{ item.totalPoints || item.points }}<span>分</span></div>
+          <el-empty v-else description="暂无排行" :image-size="50" />
         </div>
       </div>
-      <el-empty v-else description="暂无排行数据" :image-size="60" />
     </div>
   </div>
 </template>
@@ -590,15 +592,40 @@ onMounted(() => {
   gap: 8px;
 }
 
+/* 第二排：AI推荐 + 积分排行 并列 */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: start;
+}
+
+.bottom-card {
+  background: var(--card);
+  border-radius: var(--r10);
+  padding: 14px 16px;
+  box-shadow: var(--sh);
+}
+
 /* AI推荐 */
 .ai-section {
   margin-bottom: 24px;
+}
+
+.ai-section.compact {
+  margin-bottom: 0;
 }
 
 .ai-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+}
+
+.ai-cards.compact {
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
 
 .ai-card {
@@ -614,9 +641,27 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.ai-card.compact {
+  background: transparent;
+  box-shadow: none;
+  border-left: none;
+  padding: 8px 10px;
+  gap: 10px;
+  border-radius: 8px;
+}
+
+.ai-card.compact:hover {
+  background: var(--red-5);
+}
+
 .ai-card:hover {
   box-shadow: var(--sh-hover);
   transform: translateY(-1px);
+}
+
+.ai-card.compact:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .ai-card-icon {
@@ -630,6 +675,12 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+.ai-card-icon.sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
 .ai-card-icon.v {
   background: linear-gradient(135deg, var(--red), var(--red-d));
 }
@@ -640,12 +691,22 @@ onMounted(() => {
 
 .ai-card-content {
   flex: 1;
+  min-width: 0;
 }
 
 .ai-card-title {
   font-size: 15px;
   font-weight: 600;
   margin-bottom: 4px;
+}
+
+.ai-card-title.sm {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ai-card-desc {
@@ -658,10 +719,18 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
+.rank-section.compact {
+  margin-bottom: 0;
+}
+
 .rank-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.rank-list.compact {
+  gap: 6px;
 }
 
 .rank-item {
@@ -672,6 +741,18 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.rank-item.compact {
+  background: transparent;
+  box-shadow: none;
+  padding: 8px 10px;
+  gap: 10px;
+  border-radius: 8px;
+}
+
+.rank-item.compact:hover {
+  background: var(--red-5);
 }
 
 .rank-badge {
@@ -685,6 +766,12 @@ onMounted(() => {
   font-weight: 700;
   flex-shrink: 0;
   color: #fff;
+}
+
+.rank-badge.sm {
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
 }
 
 .rank-badge.g1 {
@@ -711,6 +798,10 @@ onMounted(() => {
   font-weight: 500;
 }
 
+.rank-name.sm {
+  font-size: 13px;
+}
+
 .rank-org {
   font-size: 12px;
   color: var(--t3);
@@ -723,6 +814,10 @@ onMounted(() => {
   color: var(--red);
 }
 
+.rank-score.sm {
+  font-size: 15px;
+}
+
 .rank-score span {
   font-size: 12px;
   color: var(--t3);
@@ -731,6 +826,10 @@ onMounted(() => {
 
 @media (max-width: 1200px) {
   .top-row {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-row {
     grid-template-columns: 1fr;
   }
 
