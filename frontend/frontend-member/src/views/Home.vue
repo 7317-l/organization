@@ -8,75 +8,74 @@
       </el-tag>
     </div>
 
-    <!-- 统计卡片 -->
-    <div class="stats-row" v-loading="overviewLoading">
-      <div class="stat-card">
-        <div class="stat-icon r">
-          <el-icon :size="24"><List /></el-icon>
+    <!-- 第一排：小统计卡片 + 待办提醒 并列 -->
+    <div class="top-row">
+      <!-- 三个小统计卡片 -->
+      <div class="top-stats" v-loading="overviewLoading">
+        <div class="mini-stat">
+          <div class="mini-icon r">
+            <el-icon :size="18"><List /></el-icon>
+          </div>
+          <div class="mini-info">
+            <div class="mini-label">待办任务</div>
+            <div class="mini-value">{{ overview.pendingCount || 0 }}<span class="unit">项</span></div>
+          </div>
         </div>
-        <div class="stat-info">
-          <div class="stat-label">待办任务</div>
-          <div class="stat-value">{{ overview.pendingCount || 0 }}<span class="unit">项</span></div>
+        <div class="mini-stat clickable" @click="goReport" title="查看学习报告">
+          <div class="mini-icon b">
+            <el-icon :size="18"><Clock /></el-icon>
+          </div>
+          <div class="mini-info">
+            <div class="mini-label">学习进度</div>
+            <div class="mini-value">{{ overview.learningProgress || 0 }}<span class="unit">%</span></div>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-icon g">
+            <el-icon :size="18"><Star /></el-icon>
+          </div>
+          <div class="mini-info">
+            <div class="mini-label">总积分</div>
+            <div class="mini-value">{{ overview.totalPoints || 0 }}<span class="unit">分</span></div>
+          </div>
         </div>
       </div>
-      <div class="stat-card clickable" @click="goReport" title="查看学习报告">
-        <div class="stat-icon b">
-          <el-icon :size="24"><Clock /></el-icon>
-        </div>
-        <div class="stat-info">
-          <div class="stat-label">学习进度</div>
-          <div class="stat-value">{{ overview.learningProgress || 0 }}<span class="unit">%</span></div>
-        </div>
-        <div class="stat-progress">
-          <el-progress :percentage="overview.learningProgress || 0" :show-text="false" :stroke-width="6" color="#C8161D" />
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon g">
-          <el-icon :size="24"><Star /></el-icon>
-        </div>
-        <div class="stat-info">
-          <div class="stat-label">总积分</div>
-          <div class="stat-value">{{ overview.totalPoints || 0 }}<span class="unit">分</span></div>
-        </div>
-      </div>
-    </div>
 
-    <!-- 待办提醒 -->
-    <div class="section-header">
-      <div class="section-title">待办提醒</div>
-    </div>
-    <div class="todo-list" v-loading="todoLoading">
-      <template v-if="todoList.length > 0">
-        <div
-          v-for="item in todoList"
-          :key="item.id"
-          class="todo-item"
-          @click="handleTodoClick(item)"
-        >
-          <div class="todo-icon" :class="item.type === 'exam' ? 'b' : 'r'">
-            <el-icon :size="20">
-              <Document v-if="item.type === 'exam'" />
-              <Calendar v-else />
-            </el-icon>
-          </div>
-          <div class="todo-content">
-            <div class="todo-title">{{ item.title }}</div>
-            <div class="todo-meta">
-              <el-tag v-if="item.deadline" type="danger" effect="light" size="small">
-                {{ formatDeadline(item.deadline) }}
-              </el-tag>
-              <el-tag v-else type="warning" effect="light" size="small">
-                {{ item.type === 'exam' ? '待参加' : '待完成' }}
-              </el-tag>
-            </div>
-          </div>
-          <el-button type="primary" plain size="small" @click.stop="handleTodoClick(item)">
-            去完成 →
-          </el-button>
+      <!-- 待办提醒 -->
+      <div class="top-todo">
+        <div class="section-header" style="margin-bottom:10px">
+          <div class="section-title">待办提醒</div>
         </div>
-      </template>
-      <el-empty v-else description="暂无待办事项" :image-size="80" />
+        <div class="todo-list compact" v-loading="todoLoading">
+          <template v-if="todoList.length > 0">
+            <div
+              v-for="item in todoList.slice(0, 3)"
+              :key="item.id"
+              class="todo-item compact"
+              @click="handleTodoClick(item)"
+            >
+              <div class="todo-icon sm" :class="item.type === 'exam' ? 'b' : 'r'">
+                <el-icon :size="16">
+                  <Document v-if="item.type === 'exam'" />
+                  <Calendar v-else />
+                </el-icon>
+              </div>
+              <div class="todo-content">
+                <div class="todo-title sm">{{ item.title }}</div>
+                <div class="todo-meta">
+                  <el-tag v-if="item.deadline" type="danger" effect="light" size="small">
+                    {{ formatDeadline(item.deadline) }}
+                  </el-tag>
+                  <el-tag v-else type="warning" effect="light" size="small">
+                    {{ item.type === 'exam' ? '待参加' : '待完成' }}
+                  </el-tag>
+                </div>
+              </div>
+            </div>
+          </template>
+          <el-empty v-else description="暂无待办" :image-size="60" />
+        </div>
+      </div>
     </div>
 
     <!-- AI 推荐 -->
@@ -113,9 +112,9 @@
     </div>
     <div class="rank-section" v-loading="rankingLoading">
       <div class="rank-list" v-if="rankingList.length > 0">
-        <div v-for="(item, index) in rankingList" :key="item.memberId || item.id" class="rank-item">
+        <div v-for="(item, index) in rankingList.slice(0, 3)" :key="item.memberId || item.id" class="rank-item">
           <div class="rank-badge" :class="'g' + (index + 1)">
-            {{ index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1 }}
+            {{ index === 0 ? '1' : index === 1 ? '2' : '3' }}
           </div>
           <div class="rank-info">
             <div class="rank-name">{{ item.memberName || item.name }}</div>
@@ -124,7 +123,7 @@
           <div class="rank-score">{{ item.totalPoints || item.points }}<span>分</span></div>
         </div>
       </div>
-      <el-empty v-else description="暂无排行数据" :image-size="80" />
+      <el-empty v-else description="暂无排行数据" :image-size="60" />
     </div>
   </div>
 </template>
@@ -335,7 +334,105 @@ onMounted(() => {
   border-radius: 12px;
 }
 
-/* 统计卡片 */
+/* 第一排：小统计卡片 + 待办提醒 */
+.top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: start;
+}
+
+.top-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mini-stat {
+  background: var(--card);
+  border-radius: var(--r10);
+  padding: 14px 12px;
+  box-shadow: var(--sh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.mini-stat.clickable {
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.mini-stat.clickable:hover {
+  box-shadow: var(--sh-hover);
+  transform: translateY(-2px);
+}
+
+.mini-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-icon.r { background: var(--red-10); color: var(--red); }
+.mini-icon.g { background: var(--gold-50); color: #b07e0a; }
+.mini-icon.b { background: rgba(30, 100, 200, 0.1); color: var(--blue); }
+
+.mini-info { width: 100%; }
+
+.mini-label {
+  font-size: 12px;
+  color: var(--t3);
+  margin-bottom: 2px;
+}
+
+.mini-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.mini-value .unit {
+  font-size: 12px;
+  color: var(--t3);
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+.top-todo {
+  background: var(--card);
+  border-radius: var(--r10);
+  padding: 14px 16px;
+  box-shadow: var(--sh);
+}
+
+.todo-list.compact {
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.todo-item.compact {
+  padding: 10px 12px;
+  gap: 10px;
+}
+
+.todo-icon.sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.todo-title.sm {
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+/* 统计卡片（保留旧类以防其他引用） */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -562,15 +659,15 @@ onMounted(() => {
 }
 
 .rank-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .rank-item {
   background: var(--card);
   border-radius: var(--r10);
-  padding: 20px;
+  padding: 14px 18px;
   box-shadow: var(--sh);
   display: flex;
   align-items: center;
@@ -578,15 +675,16 @@ onMounted(() => {
 }
 
 .rank-badge {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
+  color: #fff;
 }
 
 .rank-badge.g1 {
@@ -632,15 +730,15 @@ onMounted(() => {
 }
 
 @media (max-width: 1200px) {
+  .top-row {
+    grid-template-columns: 1fr;
+  }
+
   .stats-row {
     grid-template-columns: 1fr;
   }
 
   .ai-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .rank-list {
     grid-template-columns: 1fr;
   }
 }
