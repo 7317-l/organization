@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +22,9 @@ builder.Services.AddControllers()
         // 兼容前端以字符串传枚举（role / contentType / questionType 等），序列化仍输出数字
         options.JsonSerializerOptions.Converters.Add(
             new PartySchoolApi.Helpers.FlexibleEnumJsonConverterFactory());
+        // 兼容前端 Element Plus 日期组件传 "yyyy-MM-dd HH:mm:ss"（空格分隔）格式
+        options.JsonSerializerOptions.Converters.Add(
+            new PartySchoolApi.Helpers.FlexibleDateTimeJsonConverter());
     });
 
 // ===== MySQL数据库 =====
