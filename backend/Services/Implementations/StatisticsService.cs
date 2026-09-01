@@ -51,18 +51,27 @@ public class StatisticsService : IStatisticsService
         var ongoingTasks = tasks.Count(t => t.Deadline >= DateTime.Now);
         var ongoingExams = await _context.ExamTests.CountAsync(t => t.Deadline >= DateTime.Now);
 
-        // 支部排名
+        // 支部/总支排名：统一组织口径，总支递归汇总其下所有支部的党员与任务
         var orgs = await _context.Organizations
             .Include(o => o.Members)
             .ToListAsync();
-        // 支部排名：先在内存中计算每个支部的完成率，再排序（避免在 OrderBy lambda 中同步查询数据库导致 N+1）
+        var allMembers = await _context.PartyMembers.Where(m => m.IsEnabled).ToListAsync();
+        var scopeMap = Services.Common.OrgHierarchyHelper.BuildOrgScopeMap(orgs);
         var branchRankings = new List<BranchRankingDto>();
         var orgCompletionRates = new Dictionary<int, double>();
+
         foreach (var org in orgs)
         {
-            var mIds = org.Members.Select(m => m.Id).ToList();
-            var tIds = tasks.Where(t => t.TargetOrgId == org.Id).SelectMany(t => t.TaskContents.Select(tc => tc.ContentId)).Count();
-            if (tIds == 0 || mIds.Count == 0)
+            var orgScope = scopeMap[org.Id];
+            var mIds = allMembers
+                .Where(m => orgScope.Contains(m.OrganizationId) && m.IsEnabled)
+                .Select(m => m.Id)
+                .ToList();
+            var orgTaskContentIds = tasks
+                .Where(t => orgScope.Contains(t.TargetOrgId))
+                .SelectMany(t => t.TaskContents.Select(tc => tc.ContentId))
+                .ToList();
+            if (orgTaskContentIds.Count == 0 || mIds.Count == 0)
             {
                 orgCompletionRates[org.Id] = 0;
                 continue;
@@ -70,23 +79,29 @@ public class StatisticsService : IStatisticsService
             var done = await _context.MemberLearningProgress
                 .Where(p => mIds.Contains(p.MemberId) && p.TaskId.HasValue && p.IsCompleted)
                 .CountAsync();
-            orgCompletionRates[org.Id] = (double)done / (tIds * mIds.Count) * 100;
+            orgCompletionRates[org.Id] = (double)done / (orgTaskContentIds.Count * mIds.Count) * 100;
         }
 
         int rank = 1;
         foreach (var org in orgs.OrderByDescending(o => orgCompletionRates.GetValueOrDefault(o.Id, 0)))
         {
-            var mIds = org.Members.Select(m => m.Id).ToList();
+            var orgScope = scopeMap[org.Id];
+            var mIds = allMembers
+                .Where(m => orgScope.Contains(m.OrganizationId) && m.IsEnabled)
+                .Select(m => m.Id)
+                .ToList();
             var orgExamRecords = examRecords.Where(r => mIds.Contains(r.MemberId)).ToList();
-            var tIds = tasks.Where(t => t.TargetOrgId == org.Id)
-                .SelectMany(t => t.TaskContents.Select(tc => tc.ContentId)).Count();
+            var orgTaskContentIds = tasks
+                .Where(t => orgScope.Contains(t.TargetOrgId))
+                .SelectMany(t => t.TaskContents.Select(tc => tc.ContentId))
+                .Count();
             double compRate = 0;
-            if (tIds > 0 && mIds.Count > 0)
+            if (orgTaskContentIds > 0 && mIds.Count > 0)
             {
                 var done = await _context.MemberLearningProgress
                     .Where(p => mIds.Contains(p.MemberId) && p.TaskId.HasValue && p.IsCompleted)
                     .CountAsync();
-                compRate = Math.Round((double)done / (tIds * mIds.Count) * 100, 2);
+                compRate = Math.Round((double)done / (orgTaskContentIds * mIds.Count) * 100, 2);
             }
             branchRankings.Add(new BranchRankingDto
             {
@@ -94,7 +109,7 @@ public class StatisticsService : IStatisticsService
                 OrgName = org.Name,
                 CompletionRate = compRate,
                 AverageScore = orgExamRecords.Any() ? Math.Round(orgExamRecords.Average(r => r.Score), 2) : 0,
-                MemberCount = org.Members.Count(m => m.IsEnabled),
+                MemberCount = mIds.Count,
                 Rank = rank++
             });
         }

@@ -433,8 +433,8 @@ function buildGlobalChartOption(key, data) {
 
   switch (key) {
     case 'orgCompletion': {
-      const orgStats = data.organizationStats || data.orgStats || data.completionByOrg || []
-      const labels = orgStats.map((d) => d.name || d.organizationName || d.orgName)
+      const orgStats = data.branchRankings || data.BranchRankings || data.organizationStats || data.orgStats || data.completionByOrg || []
+      const labels = orgStats.map((d) => d.orgName || d.name || d.organizationName || '')
       const values = orgStats.map((d) => d.completionRate || d.rate || d.value || 0)
       return {
         tooltip: { trigger: 'axis' },

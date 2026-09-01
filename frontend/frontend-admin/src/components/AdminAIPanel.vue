@@ -68,8 +68,10 @@
                   <template v-else>
                     <div v-if="msg.explanation" class="result-explain">{{ msg.explanation }}</div>
                     <div v-if="msg.generatedSql" class="result-sql">
-                      <div class="sql-label">生成的SQL：</div>
-                      <pre class="sql-code">{{ msg.generatedSql }}</pre>
+                      <details class="sql-details">
+                        <summary class="sql-summary">查看生成SQL</summary>
+                        <pre class="sql-code">{{ msg.generatedSql }}</pre>
+                      </details>
                     </div>
                     <!-- 图表 -->
                     <div v-if="msg.chartData && msg.chartData.labels && msg.chartData.labels.length > 0" class="result-chart">
@@ -91,12 +93,12 @@
                         <table>
                           <thead>
                             <tr>
-                              <th v-for="(key, ki) in Object.keys(msg.resultData[0])" :key="ki">{{ key }}</th>
+                              <th v-for="(key, ki) in Object.keys(msg.resultData[0])" :key="ki">{{ fieldLabel(key) }}</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr v-for="(row, ri) in msg.resultData.slice(0, 20)" :key="ri">
-                              <td v-for="(key, ki) in Object.keys(row)" :key="ki">{{ row[key] }}</td>
+                              <td v-for="(key, ki) in Object.keys(row)" :key="ki">{{ formatCell(row[key]) }}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -290,6 +292,22 @@ async function sendNl2sqlQuery() {
 
 function scrollChat() {
   if (chatRef.value) chatRef.value.scrollTop = chatRef.value.scrollHeight
+}
+
+function fieldLabel(key) {
+  const map = {
+    org_name: '组织', name: '名称', member_name: '姓名', member_count: '党员数',
+    completion_rate: '完成率(%)', avg_score: '平均分', score: '成绩', exam_count: '考试次数',
+    date: '日期', minutes: '分钟', member_type: '身份', is_enabled: '启用',
+    total_tasks: '任务数', completed: '已完成', total: '总数'
+  }
+  return map[key] || key
+}
+
+function formatCell(v) {
+  if (v === null || v === undefined) return '-'
+  if (typeof v === 'number' && !Number.isInteger(v)) return Number(v.toFixed(2))
+  return v
 }
 
 function getBarWidth(values, idx) {
