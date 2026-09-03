@@ -177,7 +177,19 @@ public class BattleService : IBattleService
     {
         var game = await _db.BattleGames.FindAsync(gameId);
         if (game == null) throw new BusinessException("对局不存在");
-        if (game.Status != 1) throw new BusinessException("对局未开始或已结束");
+        // 挑战者可在待应战状态(status=0)直接开始答题；应战者需status=1
+        var isChallenger = game.ChallengerId == memberId;
+        if (game.Status == 0 && !isChallenger)
+            throw new BusinessException("对局未开始，请先应战");
+        if (game.Status >= 2)
+            throw new BusinessException("对局已结束");
+
+        // 挑战者首次答题自动开始
+        if (game.Status == 0 && isChallenger)
+        {
+            game.Status = 1;
+            game.StartedAt = DateTime.Now;
+        }
 
         var qids = JsonSerializer.Deserialize<List<int>>(game.QuestionIds) ?? new();
         if (game.CurrentQuestionIndex >= qids.Count)
@@ -191,7 +203,6 @@ public class BattleService : IBattleService
         if (question == null) throw new BusinessException("题目不存在");
 
         var correct = CheckAnswer(question, request.Answer);
-        var isChallenger = game.ChallengerId == memberId;
 
         if (correct)
         {
@@ -246,6 +257,20 @@ public class BattleService : IBattleService
         var game = await _db.BattleGames.FindAsync(gameId);
         if (game == null) throw new BusinessException("对局不存在");
         return await BuildResultAsync(game, memberId);
+    }
+
+    public async Task ForfeitBattleAsync(int gameId, int memberId)
+    {
+        var game = await _db.BattleGames.FindAsync(gameId);
+        if (game == null) throw new BusinessException("对局不存在");
+        if (game.ChallengerId != memberId && game.OpponentId != memberId)
+            throw new BusinessException("无权操作此对局");
+        if (game.Status >= 2) return;
+
+        game.Status = 2;
+        game.FinishedAt = DateTime.Now;
+        await _db.SaveChangesAsync();
+        await WriteBattleRecordAsync(game);
     }
 
     private async Task WriteBattleRecordAsync(BattleGame game)

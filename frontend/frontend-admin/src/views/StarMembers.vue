@@ -10,7 +10,7 @@
 
       <el-form :inline="true" :model="form">
         <el-form-item label="组织范围">
-          <el-select v-model="form.organizationId" placeholder="全部组织" clearable>
+          <el-select v-model="form.organizationId" placeholder="全部组织" clearable style="width: 200px">
             <el-option v-for="org in orgs" :key="org.id" :label="org.name" :value="org.id" />
           </el-select>
         </el-form-item>
@@ -19,34 +19,30 @@
         </el-form-item>
       </el-form>
 
-      <el-table v-if="result" :data="result.members" stripe>
-        <el-table-column label="排名" width="80">
+      <el-table v-if="result" :data="result.members" stripe size="small" :row-style="{ height: '80px' }">
+        <el-table-column label="排名" width="70" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.rank <= 3 ? 'warning' : 'info'">{{ row.rank }}</el-tag>
+            <el-tag :type="row.rank <= 3 ? 'warning' : 'info'" size="small">{{ row.rank }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="memberName" label="姓名" width="120" />
-        <el-table-column prop="organizationName" label="所属支部" width="180" />
-        <el-table-column prop="totalScore" label="综合得分" width="100">
+        <el-table-column prop="memberName" label="姓名" width="100" />
+        <el-table-column prop="organizationName" label="所属支部" width="160" show-overflow-tooltip />
+        <el-table-column prop="totalScore" label="综合得分" width="90" align="center">
           <template #default="{ row }">
-            <span style="font-weight: bold; color: #409eff">{{ row.totalScore }}</span>
+            <span style="font-weight: bold; color: #C8161D">{{ row.totalScore }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="level" label="等级" width="80">
+        <el-table-column prop="level" label="等级" width="70" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.level === '优秀' ? 'success' : row.level === '良好' ? 'primary' : 'info'">{{ row.level }}</el-tag>
+            <el-tag :type="row.level === '优秀' ? 'success' : row.level === '良好' ? 'primary' : 'info'" size="small">{{ row.level }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="维度得分">
+        <el-table-column label="五维雷达" width="140" align="center">
           <template #default="{ row }">
-            <div class="dimensions">
-              <span v-for="d in row.dimensions" :key="d.name" class="dim-tag">
-                {{ d.name }}: {{ d.score }}
-              </span>
-            </div>
+            <div :ref="el => setRadarRef(el, row.memberId)" class="radar-chart" />
           </template>
         </el-table-column>
-        <el-table-column prop="aiReason" label="AI 评语" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="aiReason" label="AI 评语" min-width="180" show-overflow-tooltip />
       </el-table>
 
       <el-empty v-else description="点击生成按钮，AI 将基于学习数据评选学习标兵" />
@@ -55,10 +51,19 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick, watch } from 'vue'
 import { ElMessage } from 'element-plus'
+import * as echarts from 'echarts'
 import { generateStarMembers } from '@/api/feature15'
 import { getOrganizationTree } from '@/api/organization'
+
+const DIM_LABELS = {
+  learningMinutes: '学习时长',
+  taskCompletion: '任务完成率',
+  examScore: '考试成绩',
+  weaknessImprovement: '薄弱点改进',
+  points: '积分'
+}
 
 const loading = ref(false)
 const result = ref(null)
@@ -68,12 +73,64 @@ const form = reactive({
   topN: 10
 })
 
+const radarInstances = new Map()
+const radarRefs = new Map()
+
+function setRadarRef(el, memberId) {
+  if (el) radarRefs.set(memberId, el)
+}
+
 onMounted(async () => {
   try {
     const tree = await getOrganizationTree()
     orgs.value = flattenOrgTree(tree || [])
   } catch (e) {}
 })
+
+watch(result, async () => {
+  await nextTick()
+  renderRadars()
+})
+
+function renderRadars() {
+  if (!result.value?.members) return
+  for (const m of result.value.members) {
+    const el = radarRefs.get(m.memberId)
+    if (!el) continue
+    if (radarInstances.has(m.memberId)) {
+      radarInstances.get(m.memberId).dispose()
+    }
+    const chart = echarts.init(el)
+    const dims = m.dimensions || []
+    const indicator = dims.map(d => ({
+      name: DIM_LABELS[d.name] || d.name,
+      max: 100
+    }))
+    const values = dims.map(d => d.score)
+    chart.setOption({
+      radar: {
+        indicator,
+        radius: '65%',
+        axisName: { fontSize: 9, color: '#666' },
+        splitArea: { areaStyle: { color: ['rgba(200,22,29,0.02)', 'rgba(200,22,29,0.05)'] } },
+        splitLine: { lineStyle: { color: '#ddd' } },
+        axisLine: { lineStyle: { color: '#ddd' } }
+      },
+      series: [{
+        type: 'radar',
+        data: [{
+          value: values,
+          areaStyle: { color: 'rgba(200,22,29,0.2)' },
+          lineStyle: { color: '#C8161D', width: 1.5 },
+          itemStyle: { color: '#C8161D' },
+          symbol: 'circle',
+          symbolSize: 3
+        }]
+      }]
+    })
+    radarInstances.set(m.memberId, chart)
+  }
+}
 
 function flattenOrgTree(tree) {
   const result = []
@@ -106,16 +163,9 @@ async function generate() {
   justify-content: space-between;
   align-items: center;
 }
-.dimensions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.dim-tag {
-  font-size: 12px;
-  color: #666;
-  background: #f5f7fa;
-  padding: 2px 8px;
-  border-radius: 4px;
+.radar-chart {
+  width: 120px;
+  height: 80px;
+  margin: 0 auto;
 }
 </style>

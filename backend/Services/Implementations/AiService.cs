@@ -1077,7 +1077,12 @@ public class AiService : IAiService
                     Source = "library", Reason = "基础理论核心内容"
                 }).ToList(),
                 Exam = new RoadmapExamDto { SuggestedCount = 3, TargetScore = 70 },
-                Kpis = new List<RoadmapKpiDto> { new() { Metric = "durationMinutes", Target = stageDays * 30 } }
+                Kpis = new List<RoadmapKpiDto>
+                {
+                    new() { Metric = "durationMinutes", Target = stageDays * 30 },
+                    new() { Metric = "completedTasks", Target = 5 },
+                    new() { Metric = "targetScore", Target = 70 }
+                }
             },
             new()
             {
@@ -1091,7 +1096,12 @@ public class AiService : IAiService
                     Source = "library", Reason = "重点深化内容"
                 }).ToList(),
                 Exam = new RoadmapExamDto { SuggestedCount = 5, TargetScore = 80 },
-                Kpis = new List<RoadmapKpiDto> { new() { Metric = "durationMinutes", Target = stageDays * 40 } }
+                Kpis = new List<RoadmapKpiDto>
+                {
+                    new() { Metric = "durationMinutes", Target = stageDays * 40 },
+                    new() { Metric = "completedTasks", Target = 8 },
+                    new() { Metric = "targetScore", Target = 80 }
+                }
             },
             new()
             {
@@ -1105,7 +1115,12 @@ public class AiService : IAiService
                     Source = "library", Reason = "综合复习内容"
                 }).ToList(),
                 Exam = new RoadmapExamDto { SuggestedCount = 8, TargetScore = 90 },
-                Kpis = new List<RoadmapKpiDto> { new() { Metric = "durationMinutes", Target = (periodDays - stageDays * 2) * 50 } }
+                Kpis = new List<RoadmapKpiDto>
+                {
+                    new() { Metric = "durationMinutes", Target = (periodDays - stageDays * 2) * 50 },
+                    new() { Metric = "completedTasks", Target = 10 },
+                    new() { Metric = "targetScore", Target = 90 }
+                }
             }
         };
 

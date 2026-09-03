@@ -213,7 +213,7 @@ import { useUserStore } from '@/stores/user'
 import { getOverview } from '@/api/mobile'
 import { getMyCheckIns } from '@/api/checkin'
 import { getPointsRecords } from '@/api/points'
-import { getUnreadNotifications } from '@/api/notification'
+import { getUnreadNotifications, markNotificationRead, markAllNotificationsRead } from '@/api/notification'
 import { getAvatarChar, formatDateTime, pointSourceText } from '@/utils/format'
 
 const router = useRouter()

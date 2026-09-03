@@ -60,10 +60,6 @@
             <el-icon><Star /></el-icon>
             <span>学习标兵</span>
           </el-menu-item>
-          <el-menu-item index="/meeting-brief">
-            <el-icon><DocumentCopy /></el-icon>
-            <span>三会简报</span>
-          </el-menu-item>
           <el-menu-item index="/education-sites">
             <el-icon><LocationFilled /></el-icon>
             <span>红色基地</span>

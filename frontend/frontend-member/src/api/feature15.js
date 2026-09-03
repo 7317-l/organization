@@ -25,6 +25,9 @@ export function finishBattle(gameId) {
 export function getBattleResult(gameId) {
   return request.get(`/battle/${gameId}/result`)
 }
+export function forfeitBattle(gameId) {
+  return request.post(`/battle/${gameId}/forfeit`)
+}
 
 // ========== (10) 薄弱点互助 ==========
 export function recommendPairHelp(data) {

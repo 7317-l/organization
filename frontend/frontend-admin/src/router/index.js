@@ -55,12 +55,6 @@ const routes = [
         meta: { title: '学习标兵' }
       },
       {
-        path: 'meeting-brief',
-        name: 'MeetingBrief',
-        component: () => import('@/views/MeetingBrief.vue'),
-        meta: { title: '三会一课简报' }
-      },
-      {
         path: 'education-sites',
         name: 'EducationSites',
         component: () => import('@/views/EducationSites.vue'),

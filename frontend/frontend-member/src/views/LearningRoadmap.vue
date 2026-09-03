@@ -44,8 +44,8 @@
         <h4 v-if="stage.exam">测验要求</h4>
         <p v-if="stage.exam">建议完成 {{ stage.exam.suggestedCount }} 道题，目标分数 {{ stage.exam.targetScore }}分</p>
         <h4>关键指标</h4>
-        <el-tag v-for="kpi in stage.kpis" :key="kpi.metric" style="margin-right: 8px">
-          {{ kpi.metric }}: {{ kpi.target }}
+        <el-tag v-for="kpi in stage.kpis" :key="kpi.metric" style="margin-right: 8px; margin-bottom: 4px">
+          {{ kpiLabel(kpi.metric) }}: {{ kpi.target }}{{ kpiUnit(kpi.metric) }}
         </el-tag>
       </el-card>
 
@@ -65,6 +65,27 @@ const form = reactive({
   target: '提升党建理论水平',
   periodDays: 30
 })
+
+const KPI_LABELS = {
+  durationMinutes: '学习时长',
+  completedTasks: '完成任务数',
+  targetScore: '目标分数',
+  examCount: '测验数量',
+  accuracy: '正确率',
+  weeklyHours: '周学习时长',
+  contentCount: '内容数量'
+}
+const KPI_UNITS = {
+  durationMinutes: '分钟',
+  completedTasks: '个',
+  targetScore: '分',
+  examCount: '道',
+  accuracy: '%',
+  weeklyHours: '小时',
+  contentCount: '篇'
+}
+function kpiLabel(key) { return KPI_LABELS[key] || key }
+function kpiUnit(key) { return KPI_UNITS[key] || '' }
 
 async function generate() {
   loading.value = true

@@ -66,6 +66,13 @@ public class BattleController : ControllerBase
         return ApiResponse.Success(await _service.FinishBattleAsync(gameId, _currentUser.UserId));
     }
 
+    [HttpPost("{gameId}/forfeit")]
+    public async Task<ApiResponse> Forfeit(int gameId)
+    {
+        await _service.ForfeitBattleAsync(gameId, _currentUser.UserId);
+        return ApiResponse.Success(null, "已弃权退出");
+    }
+
     [HttpGet("{gameId}/result")]
     public async Task<ApiResponse> GetResult(int gameId)
     {

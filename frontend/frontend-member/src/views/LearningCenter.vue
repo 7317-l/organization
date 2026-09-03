@@ -243,7 +243,17 @@
           <el-empty v-else description="点击上方按钮生成AI定制学习路线" :image-size="120" />
         </div>
       </el-tab-pane>
-    </el-tabs>
+
+      <!-- Tab4 党史PK -->
+      <el-tab-pane label="党史PK" name="battle">
+        <div class="battle-embed">
+          <el-button type="primary" @click="goBattle" size="large">
+            <el-icon><Trophy /></el-icon>
+            进入党史PK对战
+          </el-button>
+          <p style="color: #999; margin-top: 12px; font-size: 13px">双人限时答题对战，赢取积分奖励</p>
+        </div>
+      </el-tab-pane>    </el-tabs>
   </div>
 </template>
 
@@ -251,7 +261,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Search, VideoPlay, Document, List, MagicStick } from '@element-plus/icons-vue'
+import { Search, VideoPlay, Document, List, MagicStick, Trophy } from '@element-plus/icons-vue'
 import { getContents } from '@/api/content'
 import { getPendingTasks, getCompletedTasks } from '@/api/task'
 import { getRecommendations, getAiAssessment } from '@/api/mobile'
@@ -366,6 +376,8 @@ async function generateAiRoute() {
     aiRouteLoading.value = false
   }
 }
+
+function goBattle() { router.push('/battle') }
 
 function handleTabChange(name) {
   if (name === 'materials') {
@@ -572,4 +584,6 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 600;
 }
+
+.battle-embed { text-align: center; padding: 40px 0; }
 </style>

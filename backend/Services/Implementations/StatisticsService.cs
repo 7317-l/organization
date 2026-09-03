@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Models.DTOs;
 using PartySchoolApi.Services.Interfaces;
@@ -15,6 +15,15 @@ public class StatisticsService : IStatisticsService
     public StatisticsService(AppDbContext context)
     {
         _context = context;
+    }
+
+    /// <summary>获取组织及其全部下级组织ID列表（递归汇总）</summary>
+    private async Task<List<int>> GetOrgScopeIdsAsync(int orgId)
+    {
+        var allOrgs = await _context.Organizations.AsNoTracking().ToListAsync();
+        var ids = Services.Common.OrgHierarchyHelper.CollectOrgAndDescendantIds(orgId, allOrgs);
+        if (!ids.Contains(orgId)) ids.Add(orgId);
+        return ids;
     }
     /// <summary>大屏总览数据</summary>
     public async Task<LargeScreenDashboardDto> GetLargeScreenDashboardAsync()
@@ -179,7 +188,10 @@ public class StatisticsService : IStatisticsService
             .AsQueryable();
 
         if (orgId.HasValue)
-            q = q.Where(m => m.OrganizationId == orgId.Value);
+        {
+            var scopeIds = await GetOrgScopeIdsAsync(orgId.Value);
+            q = q.Where(m => scopeIds.Contains(m.OrganizationId));
+        }
 
         var members = await q.ToListAsync();
         var result = new List<AntiCheatStatsDto>();
@@ -408,7 +420,10 @@ public class StatisticsService : IStatisticsService
                 .Where(p => p.UpdatedAt >= date && p.UpdatedAt < nextDay);
 
             if (orgId.HasValue)
-                query = query.Where(p => p.Member.OrganizationId == orgId.Value);
+            {
+                var scopeIds = await GetOrgScopeIdsAsync(orgId.Value);
+                query = query.Where(p => scopeIds.Contains(p.Member.OrganizationId));
+            }
 
             var daySeconds = await query.SumAsync(p => (int?)p.DurationSeconds) ?? 0;
             var dayMinutes = Math.Round(daySeconds / 60.0, 2);
@@ -456,7 +471,10 @@ public class StatisticsService : IStatisticsService
                 query = query.Where(r => r.TestId == testId.Value);
 
             if (orgId.HasValue)
-                query = query.Where(r => r.Member.OrganizationId == orgId.Value);
+            {
+                var scopeIds = await GetOrgScopeIdsAsync(orgId.Value);
+                query = query.Where(r => scopeIds.Contains(r.Member.OrganizationId));
+            }
 
             var records = await query.ToListAsync();
             var participantCount = records.Count;
@@ -502,8 +520,9 @@ public class StatisticsService : IStatisticsService
         if (org == null)
             return new BranchStatisticsDto { OrgId = orgId, OrgName = "未知支部" };
 
+        var scopeIds = await GetOrgScopeIdsAsync(orgId);
         var members = await _context.PartyMembers
-            .Where(m => m.OrganizationId == orgId && m.IsEnabled)
+            .Where(m => scopeIds.Contains(m.OrganizationId) && m.IsEnabled)
             .ToListAsync();
 
         var memberIds = members.Select(m => m.Id).ToList();

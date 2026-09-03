@@ -43,17 +43,9 @@
             <el-icon><Document /></el-icon>
             <span>考试中心</span>
           </el-menu-item>
-          <el-menu-item index="/battle">
-            <el-icon><Trophy /></el-icon>
-            <span>党史PK</span>
-          </el-menu-item>
           <el-menu-item index="/pair-help">
             <el-icon><Connection /></el-icon>
             <span>结对互助</span>
-          </el-menu-item>
-          <el-menu-item index="/roadmap">
-            <el-icon><Guide /></el-icon>
-            <span>学习路线</span>
           </el-menu-item>
           <el-menu-item index="/profile">
             <el-icon><User /></el-icon>

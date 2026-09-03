@@ -12,4 +12,5 @@ public interface IBattleService
     Task<BattleAnswerResponse> SubmitAnswerAsync(int gameId, int memberId, BattleAnswerRequest request);
     Task<BattleResultResponse> FinishBattleAsync(int gameId, int memberId);
     Task<BattleResultResponse> GetBattleResultAsync(int gameId, int memberId);
+    Task ForfeitBattleAsync(int gameId, int memberId);
 }
