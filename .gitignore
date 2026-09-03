@@ -8,3 +8,16 @@ backend/bin/
 backend/obj/
 frontend/*/dist/
 *.log
+
+# IDE 缓存
+.vs/
+*.suo
+*.user
+.idea/
+.vscode/
+
+# 临时目录
+._repo/
+.recon/
+*.tmp
+_temp/
