@@ -117,4 +117,8 @@ public class MobileController : ControllerBase
         var overview = await _service.GetPersonalOverviewAsync(_currentUser.UserId);
         return ApiResponse.Success(overview);
     }
+
+    /// <summary>Contract alias: /mobile/report/overview</summary>
+    [HttpGet("report/overview")]
+    public Task<ApiResponse> GetPersonalOverviewAlias() => GetPersonalOverview();
 }

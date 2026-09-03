@@ -19,6 +19,7 @@ public class AiService : IAiService
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
     private readonly IQwenService _qwen;
+    private readonly INotificationService _notification;
 
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -26,11 +27,12 @@ public class AiService : IAiService
         PropertyNameCaseInsensitive = true
     };
 
-    public AiService(AppDbContext context, IMapper mapper, IQwenService qwen)
+    public AiService(AppDbContext context, IMapper mapper, IQwenService qwen, INotificationService notification)
     {
         _context = context;
         _mapper = mapper;
         _qwen = qwen;
+        _notification = notification;
     }
 
     /// <summary>加权分层推荐（错题匹配0.6 + 相似度0.3 + 紧迫度0.1）</summary>
@@ -289,6 +291,77 @@ public class AiService : IAiService
             ReportJson = report,
             CreatedAt = DateTime.UtcNow
         });
+
+        // 6. 计算评级（任务完成率0.35 + 测验平均分0.25 + 组织生活参与率0.20 + 人均学习时长0.10 + 积分活跃0.10）
+        var avgMinutes = memberCount > 0 ? totalSeconds / 60.0 / memberCount : 0;
+        var durationScore = Math.Min(avgMinutes / 600.0 * 100, 100);
+        var pointsScore = Math.Min(members.Sum(m => m.PointTotal) / (double)(memberCount * 100 + 1) * 100, 100);
+        var ratingScore = Math.Round(completion * 0.35 + avgScore * 0.25 + participation * 0.20 + durationScore * 0.10 + pointsScore * 0.10, 1);
+        var rating = ratingScore >= 90 ? "A" : ratingScore >= 75 ? "B" : ratingScore >= 60 ? "C" : "D";
+
+        var ratings = new List<RatingDimensionDto>
+        {
+            new() { Dimension = "taskCompletion", Score = completion, Grade = completion >= 80 ? "优" : completion >= 60 ? "良" : "待提升", Comment = $"任务完成率{completion}%" },
+            new() { Dimension = "examScore", Score = avgScore, Grade = avgScore >= 80 ? "优" : avgScore >= 60 ? "良" : "待提升", Comment = $"测验平均分{avgScore}" },
+            new() { Dimension = "participation", Score = participation, Grade = participation >= 80 ? "优" : participation >= 60 ? "良" : "待提升", Comment = $"组织生活参与率{participation}%" },
+            new() { Dimension = "learningDuration", Score = Math.Round(durationScore, 1), Grade = durationScore >= 80 ? "优" : durationScore >= 60 ? "良" : "待提升", Comment = $"人均学习{Math.Round(avgMinutes,0)}分钟" },
+            new() { Dimension = "pointsActivity", Score = Math.Round(pointsScore, 1), Grade = pointsScore >= 80 ? "优" : pointsScore >= 60 ? "良" : "待提升", Comment = $"积分活跃{Math.Round(pointsScore,0)}分" }
+        };
+
+        var suggestions = new List<RatingSuggestionDto>();
+        if (completion < 70)
+            suggestions.Add(new() { Id = Guid.NewGuid().ToString("N")[..8], Issue = "任务完成率偏低", Suggestion = "加强任务督促，对未完成党员进行提醒辅导", Priority = "high" });
+        if (avgScore < 60)
+            suggestions.Add(new() { Id = Guid.NewGuid().ToString("N")[..8], Issue = "测验成绩不理想", Suggestion = "组织集中学习与模拟测验，提升理论水平", Priority = "high" });
+        if (participation < 60)
+            suggestions.Add(new() { Id = Guid.NewGuid().ToString("N")[..8], Issue = "组织生活参与率不足", Suggestion = "丰富活动形式，提高党员参与积极性", Priority = "medium" });
+        if (suggestions.Count == 0)
+            suggestions.Add(new() { Id = Guid.NewGuid().ToString("N")[..8], Issue = "整体表现良好", Suggestion = "继续保持，争取更高评级", Priority = "low" });
+
+        // 保存评级到数据库
+        try
+        {
+            var existingRating = await _context.OrganizationQuarterlyRatings
+                .FirstOrDefaultAsync(r => r.OrganizationId == org.Id && r.Quarter == quarter);
+            var ratingDetail = JsonSerializer.Serialize(new { ratings, suggestions });
+            if (existingRating != null)
+            {
+                existingRating.Rating = rating[0];
+                existingRating.RatingScore = (decimal)ratingScore;
+                existingRating.DetailJson = ratingDetail;
+            }
+            else
+            {
+                _context.OrganizationQuarterlyRatings.Add(new Models.Entities.OrganizationQuarterlyRating
+                {
+                    OrganizationId = org.Id,
+                    Quarter = quarter,
+                    Rating = rating[0],
+                    RatingScore = (decimal)ratingScore,
+                    DetailJson = ratingDetail,
+                    CreatedAt = DateTime.Now
+                });
+            }
+
+            // 自动创建整改项
+            foreach (var sug in suggestions.Where(s => s.Priority != "low"))
+            {
+                if (!await _context.OrgRectifications.AnyAsync(r => r.OrganizationId == org.Id && r.Quarter == quarter && r.Issue == sug.Issue))
+                {
+                    _context.OrgRectifications.Add(new Models.Entities.OrgRectification
+                    {
+                        OrganizationId = org.Id,
+                        Quarter = quarter,
+                        Issue = sug.Issue,
+                        Suggestion = sug.Suggestion,
+                        Status = 0,
+                        CreatedAt = DateTime.Now
+                    });
+                }
+            }
+        }
+        catch { }
+
         await _context.SaveChangesAsync();
 
         return new OrganizationReportResponse
@@ -306,7 +379,11 @@ public class AiService : IAiService
                 ["avgScore"] = avgScore,
                 ["totalHours"] = Math.Round(totalSeconds / 3600.0, 1),
                 ["participation"] = participation
-            }
+            },
+            Rating = rating,
+            RatingScore = ratingScore,
+            Ratings = ratings,
+            Suggestions = suggestions
         };
     }
 
@@ -859,5 +936,369 @@ public class AiService : IAiService
             },
             "坚持学习是进步的关键，继续保持！"
         };
+    }
+
+    // ========== (4) AI 评选学习标兵 ==========
+    public async Task<StarMemberResponse> GenerateStarMembersAsync(StarMemberRequest request, int currentMemberId, int currentRole, int currentOrgId)
+    {
+        var topN = Math.Clamp(request.TopN, 1, 50);
+        var weights = request.Weights ?? new StarMemberWeights();
+
+        // 确定成员范围
+        var allOrgs = await _context.Organizations.ToListAsync();
+        var scopeIds = new List<int>();
+        string? scopeOrgName = null;
+        if (request.OrganizationId.HasValue)
+        {
+            scopeIds = Services.Common.OrgHierarchyHelper.CollectOrgAndDescendantIds(request.OrganizationId.Value, allOrgs);
+            scopeOrgName = allOrgs.FirstOrDefault(o => o.Id == request.OrganizationId.Value)?.Name;
+        }
+        else if (currentRole == 1) // 支部书记看本组织
+        {
+            scopeIds = Services.Common.OrgHierarchyHelper.CollectOrgAndDescendantIds(currentOrgId, allOrgs);
+            scopeOrgName = allOrgs.FirstOrDefault(o => o.Id == currentOrgId)?.Name;
+        }
+
+        var membersQuery = _context.PartyMembers.Where(m => m.IsEnabled);
+        if (scopeIds.Count > 0)
+            membersQuery = membersQuery.Where(m => scopeIds.Contains(m.OrganizationId));
+
+        var members = await membersQuery.ToListAsync();
+        var memberIds = members.Select(m => m.Id).ToList();
+
+        // 计算各维度得分
+        var progress = await _context.MemberLearningProgress
+            .Where(p => memberIds.Contains(p.MemberId))
+            .ToListAsync();
+        var testRecords = await _context.MemberTestRecords
+            .Where(r => memberIds.Contains(r.MemberId))
+            .ToListAsync();
+
+        var items = new List<StarMemberItemDto>();
+        foreach (var m in members)
+        {
+            var mProgress = progress.Where(p => p.MemberId == m.Id).ToList();
+            var mTests = testRecords.Where(r => r.MemberId == m.Id).ToList();
+
+            double learningMinutes = mProgress.Sum(p => p.DurationSeconds) / 60.0;
+            double learningScore = Math.Min(learningMinutes / 1200.0 * 100, 100);
+
+            double taskCompletion = mProgress.Count(p => p.IsCompleted) > 0
+                ? Math.Min((double)mProgress.Count(p => p.IsCompleted) / mProgress.Count * 100, 100)
+                : 0;
+
+            double examScore = mTests.Count > 0 ? Math.Min(mTests.Average(r => r.Score), 100) : 0;
+            double weaknessScore = mTests.Count > 0 ? Math.Min(100 - (mTests.Average(r => r.Score) * 0.3), 100) : 50;
+            double pointsScore = Math.Min(m.PointTotal / 500.0 * 100, 100);
+
+            double total = Math.Round(
+                learningScore * weights.LearningMinutes +
+                taskCompletion * weights.TaskCompletion +
+                examScore * weights.ExamScore +
+                weaknessScore * weights.WeaknessImprovement +
+                pointsScore * weights.Points, 1);
+
+            var org = allOrgs.FirstOrDefault(o => o.Id == m.OrganizationId);
+            items.Add(new StarMemberItemDto
+            {
+                MemberId = m.Id,
+                MemberName = m.Name,
+                OrganizationId = m.OrganizationId,
+                OrganizationName = org?.Name ?? "",
+                TotalScore = total,
+                Level = total >= 85 ? "优秀" : total >= 70 ? "良好" : "一般",
+                Dimensions = new List<StarMemberDimensionDto>
+                {
+                    new() { Name = "learningMinutes", Score = Math.Round(learningScore, 1), Weight = weights.LearningMinutes, Comment = $"学习{Math.Round(learningMinutes,0)}分钟" },
+                    new() { Name = "taskCompletion", Score = Math.Round(taskCompletion, 1), Weight = weights.TaskCompletion, Comment = $"完成率{Math.Round(taskCompletion,0)}%" },
+                    new() { Name = "examScore", Score = Math.Round(examScore, 1), Weight = weights.ExamScore, Comment = $"均分{Math.Round(examScore,0)}" },
+                    new() { Name = "weaknessImprovement", Score = Math.Round(weaknessScore, 1), Weight = weights.WeaknessImprovement, Comment = "薄弱点改善" },
+                    new() { Name = "points", Score = Math.Round(pointsScore, 1), Weight = weights.Points, Comment = $"积分{m.PointTotal}" }
+                },
+                AiReason = request.IncludeReason ? $"{m.Name}同志综合表现突出，学习投入充足、任务完成良好、测验成绩优异，建议作为学习标兵表彰。" : null
+            });
+        }
+
+        var topMembers = items.OrderByDescending(i => i.TotalScore).Take(topN).ToList();
+        for (int i = 0; i < topMembers.Count; i++)
+            topMembers[i].Rank = i + 1;
+
+        return new StarMemberResponse
+        {
+            GeneratedAt = DateTime.Now,
+            Scope = new StarMemberScopeDto
+            {
+                OrganizationId = request.OrganizationId,
+                OrganizationName = scopeOrgName,
+                MemberCount = members.Count
+            },
+            Members = topMembers
+        };
+    }
+
+    // ========== (13) AI 分阶段学习路线图 ==========
+    public async Task<LearningRoadmapResponse> GenerateLearningRoadmapAsync(LearningRoadmapRequest request, int currentMemberId, int currentRole)
+    {
+        var memberId = request.MemberId ?? currentMemberId;
+        var member = await _context.PartyMembers.FindAsync(memberId);
+        if (member == null)
+            return new LearningRoadmapResponse { MemberId = memberId, MemberName = "未知用户" };
+
+        var periodDays = Math.Clamp(request.PeriodDays, 7, 90);
+        var target = request.Target ?? "提升党建理论水平";
+        var focusTags = request.FocusTags ?? new List<string> { "党史", "党章", "四个意识" };
+
+        // 推导当前水平
+        var totalSeconds = await _context.MemberLearningProgress
+            .Where(p => p.MemberId == memberId)
+            .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+        var totalMinutes = totalSeconds / 60;
+        var currentLevel = totalMinutes >= 1200 ? "冲刺" : totalMinutes >= 300 ? "进阶" : "入门";
+
+        // 从学习内容库选内容
+        var contents = await _context.LearningContents
+            .Where(c => c.IsPublic)
+            .OrderByDescending(c => c.CreatedAt)
+            .Take(15)
+            .ToListAsync();
+
+        var stageDays = periodDays / 3;
+        var stages = new List<RoadmapStageDto>
+        {
+            new()
+            {
+                StageNo = 1,
+                StageName = "基础夯实期",
+                DurationDays = stageDays,
+                Objectives = new List<string> { "系统学习基础理论", "完成核心知识点学习", "建立学习习惯" },
+                Contents = contents.Take(5).Select(c => new RoadmapContentDto
+                {
+                    ContentId = c.Id, Title = c.Title, ContentType = (int)c.ContentType,
+                    Source = "library", Reason = "基础理论核心内容"
+                }).ToList(),
+                Exam = new RoadmapExamDto { SuggestedCount = 3, TargetScore = 70 },
+                Kpis = new List<RoadmapKpiDto> { new() { Metric = "durationMinutes", Target = stageDays * 30 } }
+            },
+            new()
+            {
+                StageNo = 2,
+                StageName = "强化提升期",
+                DurationDays = stageDays,
+                Objectives = new List<string> { "深化重点领域", "强化薄弱环节", "提升应用能力" },
+                Contents = contents.Skip(5).Take(5).Select(c => new RoadmapContentDto
+                {
+                    ContentId = c.Id, Title = c.Title, ContentType = (int)c.ContentType,
+                    Source = "library", Reason = "重点深化内容"
+                }).ToList(),
+                Exam = new RoadmapExamDto { SuggestedCount = 5, TargetScore = 80 },
+                Kpis = new List<RoadmapKpiDto> { new() { Metric = "durationMinutes", Target = stageDays * 40 } }
+            },
+            new()
+            {
+                StageNo = 3,
+                StageName = "冲刺巩固期",
+                DurationDays = periodDays - stageDays * 2,
+                Objectives = new List<string> { "综合复习巩固", "模拟测验检验", "形成长效机制" },
+                Contents = contents.Skip(10).Take(5).Select(c => new RoadmapContentDto
+                {
+                    ContentId = c.Id, Title = c.Title, ContentType = (int)c.ContentType,
+                    Source = "library", Reason = "综合复习内容"
+                }).ToList(),
+                Exam = new RoadmapExamDto { SuggestedCount = 8, TargetScore = 90 },
+                Kpis = new List<RoadmapKpiDto> { new() { Metric = "durationMinutes", Target = (periodDays - stageDays * 2) * 50 } }
+            }
+        };
+
+        return new LearningRoadmapResponse
+        {
+            MemberId = memberId,
+            MemberName = member.Name,
+            CurrentLevel = currentLevel,
+            Target = target,
+            FocusTags = focusTags,
+            TotalDays = periodDays,
+            Stages = stages,
+            NextAction = $"建议从今天开始，每天安排30-50分钟学习，先完成「{stages[0].Contents.FirstOrDefault()?.Title ?? "基础理论"}」的学习。",
+            GeneratedAt = DateTime.Now
+        };
+    }
+
+    // ========== (12) AI 学习预警 ==========
+    public async Task<LearningWarningResponse> GetLearningWarningsAsync(int? organizationId, int currentMemberId, int currentRole, int currentOrgId)
+    {
+        var warnings = await DetectWarningsAsync(organizationId, currentRole, currentOrgId);
+        return new LearningWarningResponse
+        {
+            GeneratedAt = DateTime.Now,
+            TotalWarnings = warnings.Count,
+            Warnings = warnings,
+            TypeBreakdown = warnings.GroupBy(w => w.WarningType).ToDictionary(g => g.Key, g => g.Count())
+        };
+    }
+
+    public async Task<LearningWarningTriggerResponse> TriggerLearningWarningsAsync(int? organizationId, int currentMemberId, int currentRole, int currentOrgId)
+    {
+        var warnings = await DetectWarningsAsync(organizationId, currentRole, currentOrgId);
+        int sent = 0;
+        foreach (var w in warnings)
+        {
+            try
+            {
+                await _notification.SendAsync(new SendNotificationRequest
+                {
+                    PartyMemberId = w.MemberId,
+                    Type = (PartySchoolApi.Models.Common.NotificationType)2,
+                    Title = "学习预警",
+                    Content = w.Message
+                });
+                sent++;
+            }
+            catch { }
+        }
+        return new LearningWarningTriggerResponse
+        {
+            ScannedCount = warnings.Select(w => w.MemberId).Distinct().Count(),
+            WarningCount = warnings.Count,
+            NotificationSentCount = sent,
+            Warnings = warnings
+        };
+    }
+
+    private async Task<List<LearningWarningItemDto>> DetectWarningsAsync(int? organizationId, int currentRole, int currentOrgId)
+    {
+        var warnings = new List<LearningWarningItemDto>();
+        var orgs = await _context.Organizations.AsNoTracking().ToListAsync();
+        var orgMap = orgs.ToDictionary(o => o.Id, o => o.Name);
+
+        // 组织范围过滤
+        List<int> accessibleOrgIds;
+        if (currentRole == 2) // SystemAdmin
+        {
+            accessibleOrgIds = organizationId.HasValue
+                ? Services.Common.OrgHierarchyHelper.CollectOrgAndDescendantIds(organizationId.Value, orgs)
+                : orgs.Select(o => o.Id).ToList();
+        }
+        else // BranchSecretary
+        {
+            accessibleOrgIds = Services.Common.OrgHierarchyHelper.CollectOrgAndDescendantIds(currentOrgId, orgs);
+        }
+
+        var members = await _context.PartyMembers.AsNoTracking()
+            .Where(m => m.IsEnabled && accessibleOrgIds.Contains(m.OrganizationId))
+            .ToListAsync();
+
+        var memberIds = members.Select(m => m.Id).ToList();
+        var now = DateTime.Now;
+
+        // 1. 低正确率：最近3次考试平均分<60
+        var recentRecords = await _context.MemberTestRecords.AsNoTracking()
+            .Where(r => memberIds.Contains(r.MemberId))
+            .OrderByDescending(r => r.SubmittedAt)
+            .ToListAsync();
+
+        foreach (var member in members)
+        {
+            var memberRecords = recentRecords.Where(r => r.MemberId == member.Id).Take(3).ToList();
+            if (memberRecords.Count >= 2)
+            {
+                var avg = memberRecords.Average(r => r.Score);
+                if (avg < 60)
+                {
+                    warnings.Add(new LearningWarningItemDto
+                    {
+                        MemberId = member.Id, MemberName = member.Name,
+                        OrganizationId = member.OrganizationId, OrganizationName = orgMap.GetValueOrDefault(member.OrganizationId, ""),
+                        WarningType = "low_accuracy", WarningTypeText = "连续低正确率",
+                        Message = $"{member.Name} 最近{memberRecords.Count}次考试平均分{avg:F1}，低于及格线60分",
+                        MetricValue = avg, Threshold = 60,
+                        Suggestion = "建议安排专项练习和错题巩固",
+                        DetectedAt = now
+                    });
+                }
+            }
+        }
+
+        // 2. 任务逾期：存在超过截止日期未完成的学习任务
+        var overdueTasks = await _context.LearningTasks.AsNoTracking()
+            .Where(t => t.Deadline < now && accessibleOrgIds.Contains(t.TargetOrgId))
+            .ToListAsync();
+        var taskIds = overdueTasks.Select(t => t.Id).ToList();
+        var completedProgress = await _context.MemberLearningProgress.AsNoTracking()
+            .Where(p => taskIds.Contains(p.TaskId ?? 0) && p.IsCompleted)
+            .Select(p => new { p.MemberId, p.TaskId })
+            .ToListAsync();
+
+        foreach (var task in overdueTasks)
+        {
+            var taskMemberIds = members.Where(m => m.OrganizationId == task.TargetOrgId).Select(m => m.Id).ToList();
+            var completedMemberIds = completedProgress.Where(p => p.TaskId == task.Id).Select(p => p.MemberId).ToHashSet();
+            var overdueMembers = taskMemberIds.Where(id => !completedMemberIds.Contains(id)).ToList();
+            foreach (var mid in overdueMembers)
+            {
+                var member = members.FirstOrDefault(m => m.Id == mid);
+                if (member == null) continue;
+                warnings.Add(new LearningWarningItemDto
+                {
+                    MemberId = mid, MemberName = member.Name,
+                    OrganizationId = member.OrganizationId, OrganizationName = orgMap.GetValueOrDefault(member.OrganizationId, ""),
+                    WarningType = "task_overdue", WarningTypeText = "任务逾期未完成",
+                    Message = $"{member.Name} 学习任务「{task.TaskName}」已逾期（截止{task.Deadline:yyyy-MM-dd}）",
+                    MetricValue = (now - task.Deadline).TotalDays, Threshold = 0,
+                    Suggestion = "建议推送催办通知并安排补学",
+                    DetectedAt = now
+                });
+            }
+        }
+
+        // 3. 学习活跃度低：近7天无学习记录
+        var sevenDaysAgo = now.AddDays(-7);
+        var recentProgress = await _context.MemberLearningProgress.AsNoTracking()
+            .Where(p => memberIds.Contains(p.MemberId) && p.UpdatedAt >= sevenDaysAgo)
+            .Select(p => p.MemberId)
+            .Distinct()
+            .ToListAsync();
+        var inactiveMembers = memberIds.Except(recentProgress).ToList();
+        foreach (var mid in inactiveMembers)
+        {
+            var member = members.FirstOrDefault(m => m.Id == mid);
+            if (member == null) continue;
+            warnings.Add(new LearningWarningItemDto
+            {
+                MemberId = mid, MemberName = member.Name,
+                OrganizationId = member.OrganizationId, OrganizationName = orgMap.GetValueOrDefault(member.OrganizationId, ""),
+                WarningType = "low_activity", WarningTypeText = "长期未学习",
+                Message = $"{member.Name} 近7天无学习记录",
+                MetricValue = 7, Threshold = 7,
+                Suggestion = "建议发送学习提醒，了解是否存在困难",
+                DetectedAt = now
+            });
+        }
+
+        // 4. 学习时长异常：有学习记录但近7天总时长<30分钟
+        var recentDuration = await _context.MemberLearningProgress.AsNoTracking()
+            .Where(p => memberIds.Contains(p.MemberId) && p.UpdatedAt >= sevenDaysAgo)
+            .GroupBy(p => p.MemberId)
+            .Select(g => new { MemberId = g.Key, Total = g.Sum(p => p.DurationSeconds) })
+            .ToListAsync();
+        foreach (var rd in recentDuration)
+        {
+            if (rd.Total < 1800) // < 30分钟
+            {
+                var member = members.FirstOrDefault(m => m.Id == rd.MemberId);
+                if (member == null) continue;
+                warnings.Add(new LearningWarningItemDto
+                {
+                    MemberId = rd.MemberId, MemberName = member.Name,
+                    OrganizationId = member.OrganizationId, OrganizationName = orgMap.GetValueOrDefault(member.OrganizationId, ""),
+                    WarningType = "duration_abnormal", WarningTypeText = "学习时长异常",
+                    Message = $"{member.Name} 近7天学习时长仅{rd.Total / 60}分钟，低于30分钟基准",
+                    MetricValue = rd.Total / 60.0, Threshold = 30,
+                    Suggestion = "建议关注学习质量，防止挂机刷时长",
+                    DetectedAt = now
+                });
+            }
+        }
+
+        return warnings;
     }
 }

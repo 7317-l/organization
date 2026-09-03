@@ -4,16 +4,14 @@ using PartySchoolApi.Services.Interfaces;
 namespace PartySchoolApi.Services.Implementations;
 
 /// <summary>
-/// 党建知识库问答服务（真千问 RAG 实现）。
-/// 流程：本地知识库关键词召回 → 组装参考资料 → 交给千问生成回答 → 返回引用来源。
-/// 千问不可用时自动回退到内置关键词答案，保证系统始终可用。
+/// 党建知识库问答服务（两级检索+重排 RAG 实现）。
+/// 一级：关键词召回20条；二级：BM25/千问重排取TopK；逐条置信度。
 /// </summary>
 public class AiKnowledgeService : IAiKnowledgeService
 {
     private readonly IQwenService _qwen;
     private readonly IKnowledgeSearchService _knowledge;
 
-    // 内置兜底知识库（千问不可用时使用）
     private static readonly Dictionary<string, string> FallbackKnowledgeBase = new()
     {
         ["入党誓词"] = "我志愿加入中国共产党，拥护党的纲领，遵守党的章程，履行党员义务，执行党的决定，严守党的纪律，保守党的秘密，对党忠诚，积极工作，为共产主义奋斗终身，随时准备为党和人民牺牲一切，永不叛党。",
@@ -28,10 +26,10 @@ public class AiKnowledgeService : IAiKnowledgeService
     };
 
     private const string SystemPrompt =
-        "你是一名专业的党建知识解答助手，服务对象是党校/党支部的党员。请严格遵循以下要求：\n" +
+        "你是一名专业的党建知识解答助手。请严格遵循以下要求：\n" +
         "1. 优先依据「参考资料」中提供的权威党建资料作答，答案要准确、简明、条理清晰。\n" +
-        "2. 如果参考资料足以回答，请在回答末尾另起一行注明「（资料来源：<文件名>）」。\n" +
-        "3. 如果参考资料不足以回答，则结合你的党建常识客观作答，并如实说明该内容不在本地知识库中。\n" +
+        "2. 如果参考资料足以回答，请在回答末尾注明「（资料来源：<文件名>）」。\n" +
+        "3. 如果参考资料不足以回答，则结合党建常识客观作答，并如实说明该内容不在本地知识库中。\n" +
         "4. 禁止编造事实；涉及领导人、历史事件等内容一律以官方权威表述为准。\n" +
         "5. 用简体中文回答。";
 
@@ -47,6 +45,7 @@ public class AiKnowledgeService : IAiKnowledgeService
         var sessionId = string.IsNullOrEmpty(request.SessionId)
             ? Guid.NewGuid().ToString("N")
             : request.SessionId;
+        var topK = Math.Clamp(request.TopK, 1, 10);
 
         if (string.IsNullOrEmpty(question))
         {
@@ -55,19 +54,26 @@ public class AiKnowledgeService : IAiKnowledgeService
                 Answer = "请先输入您想咨询的党建知识问题。",
                 SourceReferences = new List<string>(),
                 Confidence = 0,
-                SessionId = sessionId
+                SessionId = sessionId,
+                Results = new List<RagResultItem>()
             };
         }
 
-        // 1. 本地知识库召回
-        var results = _knowledge.Search(question, limit: 5);
-        var context = _knowledge.BuildContext(results);
-        var references = results
-            .Select(r => r.File)
-            .Distinct()
-            .ToList();
+        // 一级召回：20条
+        var candidates = _knowledge.Search(question, limit: 20);
+        if (!string.IsNullOrEmpty(request.FilterFile))
+        {
+            candidates = candidates.Where(c => c.File.Contains(request.FilterFile, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
 
-        // 2. 千问生成回答
+        // 二级重排
+        var reranked = RerankCandidates(candidates, question, request.Rerank);
+        var topResults = reranked.Take(topK).ToList();
+
+        var context = _knowledge.BuildContext(candidates.Take(topK).ToList());
+        var references = topResults.Select(r => $"{r.File}-{r.Id}").Distinct().ToList();
+
+        // 千问生成回答
         if (_qwen.IsConfigured)
         {
             try
@@ -83,22 +89,92 @@ public class AiKnowledgeService : IAiKnowledgeService
                     {
                         Answer = answer,
                         SourceReferences = references,
-                        Confidence = references.Count > 0 ? 0.92 : 0.65,
-                        SessionId = sessionId
+                        Confidence = topResults.Count > 0 ? topResults[0].Confidence : 0.3,
+                        SessionId = sessionId,
+                        Results = topResults
                     };
                 }
             }
-            catch
-            {
-                // 千问异常 → 走兜底
-            }
+            catch { }
         }
 
-        // 3. 兜底：内置关键词答案
-        return FallbackQuery(question, sessionId);
+        // 兜底
+        return FallbackQuery(question, sessionId, topResults);
     }
 
-    private static AiKnowledgeQueryResponse FallbackQuery(string question, string sessionId)
+    private static List<RagResultItem> RerankCandidates(IReadOnlyList<KnowledgeDocument> candidates, string question, bool rerank)
+    {
+        var results = new List<RagResultItem>();
+        var keywords = ExtractKeywords(question);
+
+        foreach (var c in candidates)
+        {
+            var score = CalculateBm25Score(question, c.Content, keywords);
+            var rerankScore = rerank ? score : score;
+            var confidence = Sigmoid(score * 2);
+            var matched = keywords.Where(k => c.Content.Contains(k, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            results.Add(new RagResultItem
+            {
+                Id = c.Id,
+                File = c.File,
+                Snippet = c.Content.Length > 200 ? c.Content[..200] : c.Content,
+                Score = Math.Round(score, 3),
+                RerankScore = Math.Round(rerankScore, 3),
+                Confidence = Math.Round(confidence, 3),
+                MatchedKeywords = matched
+            });
+        }
+
+        return results.OrderByDescending(r => r.RerankScore).ToList();
+    }
+
+    private static double CalculateBm25Score(string query, string content, List<string> keywords)
+    {
+        if (string.IsNullOrEmpty(content)) return 0;
+        double score = 0;
+        foreach (var kw in keywords)
+        {
+            var count = 0;
+            var index = 0;
+            while ((index = content.IndexOf(kw, index, StringComparison.OrdinalIgnoreCase)) != -1)
+            {
+                count++;
+                index += kw.Length;
+            }
+            score += count * (1.0 / (1 + content.Length / 1000.0));
+        }
+        // 连续4字子串匹配加分
+        for (int i = 0; i < query.Length - 3; i++)
+        {
+            var sub = query.Substring(i, 4);
+            if (content.Contains(sub, StringComparison.OrdinalIgnoreCase))
+                score += 0.5;
+        }
+        return score;
+    }
+
+    private static List<string> ExtractKeywords(string question)
+    {
+        var keywords = new List<string>();
+        var stopWords = new[] { "的", "了", "是", "什么", "怎么", "如何", "请问", "吗", "呢", "啊" };
+        var words = question.Split(new[] { ' ', '，', '。', '？', '?', '、' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var w in words)
+        {
+            if (!stopWords.Contains(w) && w.Length >= 2)
+                keywords.Add(w);
+        }
+        if (keywords.Count == 0 && question.Length >= 2)
+            keywords.Add(question);
+        return keywords;
+    }
+
+    private static double Sigmoid(double x)
+    {
+        return 1.0 / (1.0 + Math.Exp(-x));
+    }
+
+    private static AiKnowledgeQueryResponse FallbackQuery(string question, string sessionId, List<RagResultItem> topResults)
     {
         string answer = "抱歉，暂未找到相关知识。建议您查阅党章或相关学习资料。";
         double confidence = 0.3;
@@ -120,7 +196,8 @@ public class AiKnowledgeService : IAiKnowledgeService
             Answer = answer,
             SourceReferences = references,
             Confidence = confidence,
-            SessionId = sessionId
+            SessionId = sessionId,
+            Results = topResults
         };
     }
 }

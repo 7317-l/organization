@@ -57,6 +57,111 @@ namespace PartySchoolApi.Migrations
                     b.ToTable("ActivityHearts");
                 });
 
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.AntiCheatRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ChallengeId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("challenge_id");
+
+                    b.Property<int?>("ContentId")
+                        .HasColumnType("int")
+                        .HasColumnName("content_id");
+
+                    b.Property<bool>("IsPass")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_pass");
+
+                    b.Property<int>("PartyMemberId")
+                        .HasColumnType("int")
+                        .HasColumnName("party_member_id");
+
+                    b.Property<int?>("QuestionId")
+                        .HasColumnType("int")
+                        .HasColumnName("question_id");
+
+                    b.Property<DateTime>("VerifiedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("verified_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PartyMemberId", "VerifiedAt");
+
+                    b.ToTable("anticheat_records");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.BattleGame", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChallengerId")
+                        .HasColumnType("int")
+                        .HasColumnName("challenger_id");
+
+                    b.Property<int>("ChallengerScore")
+                        .HasColumnType("int")
+                        .HasColumnName("challenger_score");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrentQuestionIndex")
+                        .HasColumnType("int")
+                        .HasColumnName("current_question_index");
+
+                    b.Property<DateTime?>("FinishedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("finished_at");
+
+                    b.Property<int>("OpponentId")
+                        .HasColumnType("int")
+                        .HasColumnName("opponent_id");
+
+                    b.Property<int>("OpponentScore")
+                        .HasColumnType("int")
+                        .HasColumnName("opponent_score");
+
+                    b.Property<string>("QuestionIds")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("question_ids");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("started_at");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("status");
+
+                    b.Property<int>("TimeoutMinutes")
+                        .HasColumnType("int")
+                        .HasColumnName("timeout_minutes");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChallengerId");
+
+                    b.HasIndex("OpponentId");
+
+                    b.ToTable("battle_games");
+                });
+
             modelBuilder.Entity("PartySchoolApi.Models.Entities.BattleRecord", b =>
                 {
                     b.Property<int>("Id")
@@ -118,11 +223,16 @@ namespace PartySchoolApi.Migrations
                     b.Property<int>("PointsEarned")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SiteId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LocationName");
 
                     b.HasIndex("PartyMemberId");
+
+                    b.HasIndex("SiteId");
 
                     b.ToTable("CheckInRecords");
                 });
@@ -172,6 +282,65 @@ namespace PartySchoolApi.Migrations
                     b.HasIndex("TagId");
 
                     b.ToTable("content_tags");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.EducationSite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("address");
+
+                    b.Property<string>("AiInterpretation")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("ai_interpretation");
+
+                    b.Property<string>("CoverUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("cover_url");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext")
+                        .HasColumnName("description");
+
+                    b.Property<string>("HistoricalFacts")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("historical_facts");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("latitude");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("longitude");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("education_sites");
                 });
 
             modelBuilder.Entity("PartySchoolApi.Models.Entities.ExamPaper", b =>
@@ -581,6 +750,117 @@ namespace PartySchoolApi.Migrations
                     b.ToTable("MessageNotifications");
                 });
 
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.Nl2SqlSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Explanation")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("explanation");
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int")
+                        .HasColumnName("member_id");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("question");
+
+                    b.Property<string>("ResultSummary")
+                        .HasMaxLength(4000)
+                        .HasColumnType("varchar(4000)")
+                        .HasColumnName("result_summary");
+
+                    b.Property<string>("Rewritten")
+                        .HasColumnType("longtext")
+                        .HasColumnName("rewritten");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("session_id");
+
+                    b.Property<string>("SqlText")
+                        .HasColumnType("longtext")
+                        .HasColumnName("sql_text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberId");
+
+                    b.HasIndex("SessionId")
+                        .IsUnique();
+
+                    b.ToTable("nl2sql_sessions");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.OrgRectification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("completed_at");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Issue")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("issue");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Quarter")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("quarter");
+
+                    b.Property<string>("Remark")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("remark");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Suggestion")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("suggestion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "Quarter");
+
+                    b.ToTable("org_rectifications");
+                });
+
             modelBuilder.Entity("PartySchoolApi.Models.Entities.Organization", b =>
                 {
                     b.Property<int>("Id")
@@ -611,6 +891,51 @@ namespace PartySchoolApi.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("organizations");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.OrganizationQuarterlyRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DetailJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("varchar(4000)")
+                        .HasColumnName("detail_json");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Quarter")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("quarter");
+
+                    b.Property<string>("Rating")
+                        .IsRequired()
+                        .HasColumnType("varchar(1)")
+                        .HasColumnName("rating");
+
+                    b.Property<decimal>("RatingScore")
+                        .HasColumnType("decimal(65,30)")
+                        .HasColumnName("rating_score");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "Quarter")
+                        .IsUnique();
+
+                    b.ToTable("organization_quarterly_ratings");
                 });
 
             modelBuilder.Entity("PartySchoolApi.Models.Entities.OrganizationQuarterlyReport", b =>
@@ -681,6 +1006,49 @@ namespace PartySchoolApi.Migrations
                     b.ToTable("PairHelpRecords");
                 });
 
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.PairHelpRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("HelpReceiverId")
+                        .HasColumnType("int")
+                        .HasColumnName("help_receiver_id");
+
+                    b.Property<int>("HelperId")
+                        .HasColumnType("int")
+                        .HasColumnName("helper_id");
+
+                    b.Property<string>("MatchReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("match_reason");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HelpReceiverId");
+
+                    b.HasIndex("HelperId");
+
+                    b.ToTable("pair_help_requests");
+                });
+
             modelBuilder.Entity("PartySchoolApi.Models.Entities.PartyDevelopmentProcess", b =>
                 {
                     b.Property<int>("Id")
@@ -733,6 +1101,60 @@ namespace PartySchoolApi.Migrations
                     b.ToTable("PartyDevelopmentProcesses");
                 });
 
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.PartyDevelopmentReminder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("due_date");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("message");
+
+                    b.Property<int>("PartyMemberId")
+                        .HasColumnType("int")
+                        .HasColumnName("party_member_id");
+
+                    b.Property<int>("ProcessId")
+                        .HasColumnType("int")
+                        .HasColumnName("process_id");
+
+                    b.Property<string>("ReminderType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("reminder_type");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("sent_at");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PartyMemberId");
+
+                    b.HasIndex("ProcessId");
+
+                    b.ToTable("party_development_reminders");
+                });
+
             modelBuilder.Entity("PartySchoolApi.Models.Entities.PartyMember", b =>
                 {
                     b.Property<int>("Id")
@@ -746,6 +1168,11 @@ namespace PartySchoolApi.Migrations
 
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("MemberType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -930,6 +1357,36 @@ namespace PartySchoolApi.Migrations
                     b.Navigation("MeetingActivity");
 
                     b.Navigation("PartyMember");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.AntiCheatRecord", b =>
+                {
+                    b.HasOne("PartySchoolApi.Models.Entities.PartyMember", "PartyMember")
+                        .WithMany()
+                        .HasForeignKey("PartyMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PartyMember");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.BattleGame", b =>
+                {
+                    b.HasOne("PartySchoolApi.Models.Entities.PartyMember", "Challenger")
+                        .WithMany()
+                        .HasForeignKey("ChallengerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PartySchoolApi.Models.Entities.PartyMember", "Opponent")
+                        .WithMany()
+                        .HasForeignKey("OpponentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Challenger");
+
+                    b.Navigation("Opponent");
                 });
 
             modelBuilder.Entity("PartySchoolApi.Models.Entities.BattleRecord", b =>
@@ -1128,6 +1585,28 @@ namespace PartySchoolApi.Migrations
                     b.Navigation("PartyMember");
                 });
 
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.Nl2SqlSession", b =>
+                {
+                    b.HasOne("PartySchoolApi.Models.Entities.PartyMember", "Member")
+                        .WithMany()
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.OrgRectification", b =>
+                {
+                    b.HasOne("PartySchoolApi.Models.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
             modelBuilder.Entity("PartySchoolApi.Models.Entities.Organization", b =>
                 {
                     b.HasOne("PartySchoolApi.Models.Entities.Organization", "Parent")
@@ -1136,6 +1615,17 @@ namespace PartySchoolApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.OrganizationQuarterlyRating", b =>
+                {
+                    b.HasOne("PartySchoolApi.Models.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
                 });
 
             modelBuilder.Entity("PartySchoolApi.Models.Entities.OrganizationQuarterlyReport", b =>
@@ -1168,6 +1658,25 @@ namespace PartySchoolApi.Migrations
                     b.Navigation("Helper");
                 });
 
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.PairHelpRequest", b =>
+                {
+                    b.HasOne("PartySchoolApi.Models.Entities.PartyMember", "HelpReceiver")
+                        .WithMany()
+                        .HasForeignKey("HelpReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PartySchoolApi.Models.Entities.PartyMember", "Helper")
+                        .WithMany()
+                        .HasForeignKey("HelperId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("HelpReceiver");
+
+                    b.Navigation("Helper");
+                });
+
             modelBuilder.Entity("PartySchoolApi.Models.Entities.PartyDevelopmentProcess", b =>
                 {
                     b.HasOne("PartySchoolApi.Models.Entities.PartyMember", "PartyMember")
@@ -1177,6 +1686,25 @@ namespace PartySchoolApi.Migrations
                         .IsRequired();
 
                     b.Navigation("PartyMember");
+                });
+
+            modelBuilder.Entity("PartySchoolApi.Models.Entities.PartyDevelopmentReminder", b =>
+                {
+                    b.HasOne("PartySchoolApi.Models.Entities.PartyMember", "PartyMember")
+                        .WithMany()
+                        .HasForeignKey("PartyMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PartySchoolApi.Models.Entities.PartyDevelopmentProcess", "Process")
+                        .WithMany()
+                        .HasForeignKey("ProcessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PartyMember");
+
+                    b.Navigation("Process");
                 });
 
             modelBuilder.Entity("PartySchoolApi.Models.Entities.PartyMember", b =>

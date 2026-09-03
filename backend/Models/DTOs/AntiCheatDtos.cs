@@ -1,4 +1,4 @@
-﻿namespace PartySchoolApi.Models.DTOs;
+namespace PartySchoolApi.Models.DTOs;
 
 public class AntiCheatChallengeDto
 {
@@ -12,6 +12,7 @@ public class AntiCheatVerifyRequest
 {
     public string ChallengeId { get; set; } = string.Empty;
     public string Answer { get; set; } = string.Empty;
+    public int? ContentId { get; set; }
 }
 
 public class AntiCheatVerifyResponse

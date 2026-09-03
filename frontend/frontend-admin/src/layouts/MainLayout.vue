@@ -56,6 +56,22 @@
             <el-icon><PieChart /></el-icon>
             <span>数据智能分析</span>
           </el-menu-item>
+          <el-menu-item index="/star-members">
+            <el-icon><Star /></el-icon>
+            <span>学习标兵</span>
+          </el-menu-item>
+          <el-menu-item index="/meeting-brief">
+            <el-icon><DocumentCopy /></el-icon>
+            <span>三会简报</span>
+          </el-menu-item>
+          <el-menu-item index="/education-sites">
+            <el-icon><LocationFilled /></el-icon>
+            <span>红色基地</span>
+          </el-menu-item>
+          <el-menu-item index="/rectification">
+            <el-icon><CircleCheck /></el-icon>
+            <span>整改闭环</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
 

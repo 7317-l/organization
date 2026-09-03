@@ -43,6 +43,18 @@
             <el-icon><Document /></el-icon>
             <span>考试中心</span>
           </el-menu-item>
+          <el-menu-item index="/battle">
+            <el-icon><Trophy /></el-icon>
+            <span>党史PK</span>
+          </el-menu-item>
+          <el-menu-item index="/pair-help">
+            <el-icon><Connection /></el-icon>
+            <span>结对互助</span>
+          </el-menu-item>
+          <el-menu-item index="/roadmap">
+            <el-icon><Guide /></el-icon>
+            <span>学习路线</span>
+          </el-menu-item>
           <el-menu-item index="/profile">
             <el-icon><User /></el-icon>
             <span>我的</span>
@@ -75,7 +87,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { House, Reading, Document, User } from '@element-plus/icons-vue'
+import { House, Reading, Document, User, Trophy, Connection, Guide } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { getAvatarChar } from '@/utils/format'
 import { useAiDataStore } from '@/stores/aiData'

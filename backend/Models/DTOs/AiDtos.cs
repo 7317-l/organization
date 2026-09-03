@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace PartySchoolApi.Models.DTOs;
 
@@ -74,4 +74,8 @@ public class OrganizationReportResponse
     public string Quarter { get; set; } = string.Empty;
     public string Report { get; set; } = string.Empty;
     public Dictionary<string, double> Metrics { get; set; } = new();
+    public string Rating { get; set; } = string.Empty;
+    public double RatingScore { get; set; }
+    public List<RatingDimensionDto> Ratings { get; set; } = new();
+    public List<RatingSuggestionDto> Suggestions { get; set; } = new();
 }

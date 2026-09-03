@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Helpers;
 using PartySchoolApi.Models.Common;
@@ -67,4 +67,16 @@ public class MeetingActivityController : ControllerBase
     {
         return ApiResponse.Success(await _service.GenerateAiSummaryAsync(id), "AI总结已生成");
     }
+
+    [HttpPost("brief")]
+    [Authorize(Roles = "SystemAdmin,BranchSecretary")]
+    public async Task<ApiResponse> GenerateBrief([FromBody] MeetingBriefRequest request)
+    {
+        return ApiResponse.Success(await _service.GenerateBriefAsync(request, (int)_currentUser.Role, _currentUser.OrganizationId));
+    }
+
+    /// <summary>Contract alias: /meeting-activities/ai-brief</summary>
+    [HttpPost("ai-brief")]
+    [Authorize(Roles = "SystemAdmin,BranchSecretary")]
+    public Task<ApiResponse> GenerateBriefAlias([FromBody] MeetingBriefRequest request) => GenerateBrief(request);
 }

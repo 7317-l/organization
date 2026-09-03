@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>党校学习双端系统 · 系统文书</title>
+<style>
+  :root { --red:#C0392B; --red-d:#A93226; --blue:#2C5F8A; --ink:#1A1B1C; --gray:#6B7280; --line:#E4E3DD; --bg:#F7F6F2; }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.7; }
+  .page { max-width:1000px; margin:0 auto; background:#fff; padding:48px 56px; box-shadow:0 1px 6px rgba(0,0,0,.08); }
+  /* 封面 */
+  .cover { text-align:center; padding:36px 0 40px; border-bottom:3px solid var(--red); margin-bottom:36px; }
+  .cover .tag { display:inline-block; background:var(--red); color:#fff; font-size:13px; padding:3px 14px; border-radius:20px; letter-spacing:2px; margin-bottom:18px; }
+  .cover h1 { font-size:30px; font-weight:700; color:var(--red); letter-spacing:4px; }
+  .cover .sub { font-size:15px; color:var(--gray); margin-top:10px; }
+  .cover .meta { font-size:12px; color:var(--gray); margin-top:18px; line-height:2; }
+  h2 { font-size:20px; color:var(--blue); margin:38px 0 14px; padding-left:12px; border-left:4px solid var(--red); }
+  h3 { font-size:15px; margin:20px 0 8px; color:var(--ink); }
+  p { margin:8px 0; font-size:14px; }
+  ul,ol { margin:8px 0 8px 22px; font-size:14px; }
+  li { margin:4px 0; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
+  th,td { border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top; }
+  th { background:#F2EFEA; font-weight:600; color:var(--blue); }
+  tr:nth-child(even) td { background:#FAF9F6; }
+  .code { background:#F5F4F0; border:1px solid var(--line); border-radius:6px; padding:12px 16px; font-family:Consolas,'Courier New',monospace; font-size:12.5px; overflow-x:auto; margin:10px 0; white-space:pre; }
+  .badge { display:inline-block; padding:1px 8px; border-radius:4px; font-size:12px; margin-right:6px; }
+  .b-red { background:#FCE9E7; color:var(--red); }
+  .b-blue { background:#E7EFF7; color:var(--blue); }
+  .b-green { background:#E6F5EC; color:#1F7A5C; }
+  .b-purple { background:#F1EAF8; color:#6A3E9E; }
+  .note { background:#FBF6EA; border-left:3px solid #E6A23C; padding:10px 14px; font-size:13px; margin:12px 0; border-radius:0 6px 6px 0; }
+  .grid2 { display:flex; gap:16px; flex-wrap:wrap; margin:10px 0; }
+  .grid2 > div { flex:1 1 300px; border:1px solid var(--line); border-radius:8px; padding:12px 16px; background:#FBFAF7; }
+  .grid2 h4 { font-size:14px; color:var(--blue); margin-bottom:6px; }
+  .footer { text-align:center; color:var(--gray); font-size:12px; margin-top:44px; padding-top:16px; border-top:1px solid var(--line); }
+  a { color:var(--blue); }
+  @media print { .page { box-shadow:none; } }
+  @media (max-width:720px){ .page { padding:24px 18px; } .cover h1{ font-size:24px; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 封面 -->
+  <div class="cover">
+    <div class="tag">系统设计文档</div>
+    <h1>党校学习双端系统</h1>
+    <div class="sub">管理后台 · 党员端 · 数据智能分析 · AI 能力</div>
+    <div class="meta">
+      项目名称：party-school-system<br>
+      后端：ASP.NET Core Web API（.NET 8）｜ 前端：Vue 3 + Vite + Element Plus<br>
+      数据库：MySQL（party_school）｜ 文档日期：2026-09-01
+    </div>
+  </div>
+
+  <!-- 一、项目概述 -->
+  <h2>一、项目概述</h2>
+  <p>党校学习双端系统是一套面向基层党组织（党委—总支—支部三级架构）的数字化党建学习与管理系统，由<b>管理后台</b>与<b>党员端</b>两个前端应用及一个统一后端服务组成。系统覆盖组织人员管理、学习内容与任务、题库测验、三会一课组织生活、打卡签到与积分、消息通知、防挂机监督、多维度统计分析，并深度集成<b>通义千问大模型 AI</b>，提供党建智能问答、自然语言查数据（NL2SQL）、AI 错题专项巩固、AI 内容生成、AI 考核报告等能力。</p>
+  <div class="grid2">
+    <div><h4>面向用户</h4>系统管理员 / 支部书记（管理后台）；正式党员 / 预备党员 / 积极分子（党员端）</div>
+    <div><h4>核心目标</h4>让党建学习有组织、有任务、有测验、有监督、有数据、有 AI 辅助，形成"学—测—评—改"闭环。</div>
+  </div>
+
+  <!-- 二、技术架构 -->
+  <h2>二、技术架构总览</h2>
+  <table>
+    <tr><th style="width:18%">层次</th><th style="width:26%">技术选型</th><th>说明</th></tr>
+    <tr><td><b>展示层</b></td><td>Vue 3 + Vite + Element Plus + ECharts + Pinia + Vue Router + Axios</td><td>管理后台（:5173）与党员端（:5174）两个独立 SPA，共用后端 API；ECharts 用于工作台/数据分析可视化。</td></tr>
+    <tr><td><b>接口/服务层</b></td><td>ASP.NET Core Web API（.NET 8）、EF Core、JWT、AutoMapper、Swagger</td><td>RESTful 风格，路由统一 <code>/api/v1</code>；端口 5091；分层为 Controller → Service（接口+实现）→ Repository（DbContext）三层结构。</td></tr>
+    <tr><td><b>数据层</b></td><td>MySQL 8（Pomelo.EntityFrameworkCore.MySql）</td><td>数据库 <code>party_school</code>，26 张业务表，含 2 个 EF Migration（初始 + 扩展功能）。</td></tr>
+    <tr><td><b>智能服务</b></td><td>通义千问（DashScope 兼容模式 · qwen-plus）</td><td>统一封装 QwenService，支持文本对话与 JSON 结构化输出；密钥按 appsettings → 环境变量 → 仓库根 .env 三级解析。</td></tr>
+    <tr><td><b>辅助能力</b></td><td>BCrypt 密码哈希 / ClosedXML + CsvHelper（题库批量导入）</td><td>安全与效率配套。</td></tr>
+  </table>
+  <p>系统总体架构（展示层 / 接口层 / 数据层 / 智能服务）见同目录 <code>architecture.html</code> 架构图。</p>
+
+  <!-- 三、功能模块 -->
+  <h2>三、功能模块说明</h2>
+
+  <h3>3.1 管理后台（frontend-admin · 6 大模块）</h3>
+  <table>
+    <tr><th style="width:16%">模块</th><th style="width:22%">页面</th><th>主要功能</th></tr>
+    <tr><td>工作台</td><td>Dashboard</td><td>5 张 KPI 卡片（党员总数/待办任务/待批阅测验/挂机人员/支部完成率均值）；预警提醒、快捷操作、学习趋势三列并列。</td></tr>
+    <tr><td>组织人员</td><td>Organization</td><td>党委—总支—支部多级组织树维护；党员档案（姓名/手机号/角色/党员类型/所属支部）增删改查、按组织筛选。</td></tr>
+    <tr><td>学习内容</td><td>LearningContent / ContentDetail</td><td>文章与视频学习素材管理（含 6 个"党组织生活"专题视频）、分类/标签、来源（手动/AI/文档）。</td></tr>
+    <tr><td>题库测验</td><td>ExamManagement</td><td>题库（单选/多选/判断）维护与 Excel/CSV 批量导入；试卷组卷；向指定支部发布测验（含截止时间）。</td></tr>
+    <tr><td>组织生活</td><td>OrgLife</td><td>三会一课/主题党日等活动管理、党员发展流程、学习报告与支部季度考核报告。</td></tr>
+    <tr><td>数据智能分析</td><td>DataAnalysis</td><td>全局基础统计图表（组织学习完成率/党员身份构成/挂机原因等）、支部 AI 季度考核报告、AI 自然语言数据查询（NL2SQL）。</td></tr>
+  </table>
+
+  <h3>3.2 党员端（frontend-member · 5 大模块）</h3>
+  <table>
+    <tr><th style="width:16%">模块</th><th style="width:22%">页面</th><th>主要功能</th></tr>
+    <tr><td>首页</td><td>Home</td><td>小统计卡片 + 待办提醒并列；AI 学习推荐；积分排行（列表展示前三）。</td></tr>
+    <tr><td>学习中心</td><td>LearningCenter / ContentDetail</td><td>学习任务列表、文章/视频在线学习、学习进度上报（含防挂机有效时长统计）。</td></tr>
+    <tr><td>考试中心</td><td>ExamCenter / Quiz</td><td>待答测验、在线答题（单选/多选/判断）、成绩查询、AI 专项巩固练习（错题 KMeans 聚类）。</td></tr>
+    <tr><td>我的</td><td>Profile</td><td>个人资料、积分明细、学习报告、消息通知、打卡记录。</td></tr>
+    <tr><td>AI 能力</td><td>AiChat / Report / AIChatPanel</td><td>AI 党建助手（悬浮对话）、AI 学习报告、AI 一对一问答辅导。</td></tr>
+  </table>
+
+  <h3>3.3 AI 能力矩阵</h3>
+  <table>
+    <tr><th style="width:22%">能力</th><th style="width:20%">接口</th><th>说明</th></tr>
+    <tr><td>党建智能问答</td><td>POST /ai-knowledge/query</td><td>基于党建知识库检索 + 千问生成回答。</td></tr>
+    <tr><td>数据智能分析</td><td>POST /ai/query</td><td>规则意图优先（完成率/平均分/身份构成/学习趋势/时长/人数/挂机原因）+ 千问兜底，返回文本+图表。</td></tr>
+    <tr><td>自然语言查数据（NL2SQL）</td><td>POST /nl2sql/query</td><td>规则意图优先 + 千问生成 SQL + 安全校验 + 真实只读执行，返回数据表格与图表。</td></tr>
+    <tr><td>错题专项巩固</td><td>POST /kmeans/cluster</td><td>基于真实错题（考试记录+判题）做知识点聚类，生成薄弱项 TOP 标签。</td></tr>
+    <tr><td>AI 内容生成</td><td>POST /ai-content/generate</td><td>自动生成党建学习文章/题目素材。</td></tr>
+    <tr><td>AI 考核/评估</td><td>POST /ai/organization-report、/mobile/report/ai-assessment</td><td>支部季度考核报告、个人学习 AI 评估。</td></tr>
+    <tr><td>AI 学习推荐</td><td>GET /mobile/recommendations</td><td>按党员学习情况智能推荐内容。</td></tr>
+  </table>
+
+  <!-- 四、后端结构 -->
+  <h2>四、后端代码结构</h2>
+  <div class="code">backend/
+├── Controllers/          22 个 API 控制器（路由前缀均带 /api/v1）
+│   Auth · Organizations · PartyMembers · LearningContents · LearningTasks
+│   Questions · ExamPapers · ExamTests · MeetingActivity · PartyDevelopment
+│   CheckIn · Point · Notification · AntiCheat · Statistics · Mobile
+│   Ai · AiKnowledge · AiContentGeneration · Nl2Sql · KMeans · WeatherForecast
+├── Services/
+│   ├── Interfaces/        22 个服务接口
+│   └── Implementations/   22 个服务实现（含 QwenService 千问客户端）
+│        AuthService · OrganizationService · PartyMemberService
+│        LearningContentService · LearningTaskService · QuestionService
+│        ExamService · MobileService · StatisticsService · AiService
+│        PartyDevelopmentService · MeetingActivityService · CheckInService
+│        PointService · NotificationService · AntiCheatService · KMeansService
+│        AiKnowledgeService · AiContentGenerationService · Nl2SqlService
+│        KnowledgeSearchService · QwenService
+├── Models/
+│   ├── Entities/          22 个实体（Organization · PartyMember · LearningContent ...）
+│   ├── DTOs/              25 个 DTO 文件（请求/响应模型）
+│   └── Common/            ApiResponse · Enums（角色/类型枚举）
+├── Helpers/               JwtHelper · PasswordHelper · ExcelHelper · CurrentUserService
+│                          FlexibleEnumJsonConverter · FlexibleDateTimeJsonConverter
+├── Middleware/            ExceptionMiddleware（全局异常处理）
+├── Migrations/            2 个 EF 迁移（InitialCreate · ExtendedFeatures）
+├── Date/AppDbContext.cs   数据库上下文（26 张表 DbSet + 关系配置）
+└── Program.cs             服务注册 · JWT · CORS · Swagger · 全局中间件</div>
+
+  <!-- 五、前端结构 -->
+  <h2>五、前端代码结构</h2>
+  <div class="grid2">
+    <div>
+      <h4>frontend-admin（管理后台）</h4>
+      <ul>
+        <li>views：Dashboard、Organization、LearningContent、ContentDetail、ExamManagement、OrgLife、DataAnalysis 等 15 页</li>
+        <li>components：AdminAIPanel（AI 数据查询助手悬浮面板）</li>
+        <li>api：16 个模块化接口封装（auth/member/content/task/exam/question/statistics/ai 等）</li>
+        <li>router：登录守卫 + 6 个业务路由</li>
+      </ul>
+    </div>
+    <div>
+      <h4>frontend-member（党员端）</h4>
+      <ul>
+        <li>views：Home、LearningCenter、ContentDetail、ExamCenter、Quiz、Profile、AiChat、Report 等 9 页</li>
+        <li>components：AIChatDialog、AIChatPanel、AIFloatingButton（AI 悬浮助手）</li>
+        <li>api：11 个模块化接口封装</li>
+        <li>router：登录守卫 + 底部导航路由</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">两端均为 Vue 3 Composition API（<code>&lt;script setup&gt;</code>），状态用 Pinia，请求统一走 Axios 实例（自动附加 JWT、统一错误处理）。</p>
+
+  <!-- 六、数据模型 -->
+  <h2>六、数据模型（MySQL · party_school）</h2>
+  <p>共 26 张业务表，按域分组如下：</p>
+  <table>
+    <tr><th style="width:22%">业务域</th><th>数据表</th></tr>
+    <tr><td>组织与用户</td><td><code>organizations</code>（多级组织）、<code>partymembers</code>（党员，含角色/党员类型/积分）</td></tr>
+    <tr><td>学习内容</td><td><code>learningcontents</code>、<code>content_categories</code>、<code>tags</code>、<code>content_tags</code></td></tr>
+    <tr><td>学习任务与进度</td><td><code>learning_tasks</code>、<code>task_contents</code>、<code>member_learning_progress</code>（含有效时长/完成状态）</td></tr>
+    <tr><td>题库测验</td><td><code>questions</code>、<code>question_categories</code>、<code>exam_papers</code>、<code>examtests</code>、<code>member_test_records</code>（答题详情+得分）</td></tr>
+    <tr><td>组织生活</td><td><code>meetingactivities</code>（三会一课）、<code>activityhearts</code>（活动心得）、<code>partydevelopmentprocesses</code>（党员发展流程）</td></tr>
+    <tr><td>监督与激励</td><td><code>checkinrecords</code>（打卡）、<code>learningpoints</code>（积分）、<code>battlerecords`（PK对战）、<code>pairhelprecords</code>（结对帮扶）</td></tr>
+    <tr><td>消息与报告</td><td><code>messagenotifications</code>（通知）、<code>memberlearningreports`（个人学习报告）、<code>organizationquarterlyreports</code>（支部季度报告）</td></tr>
+  </table>
+  <p class="note">命名约定：EF 实体映射的表名存在两种风格（部分表名为 PascalCase 如 <code>partymembers</code>/<code>examtests</code>，部分为下划线小写如 <code>learning_tasks</code>/<code>member_test_records</code>），所有 SQL 均按真实表名编写。</p>
+
+  <!-- 七、API 接口 -->
+  <h2>七、API 接口清单（统一前缀 /api/v1）</h2>
+  <table>
+    <tr><th style="width:30%">控制器</th><th style="width:20%">路由</th><th>提供能力</th></tr>
+    <tr><td>AuthController</td><td>/auth</td><td>登录、刷新令牌、当前用户</td></tr>
+    <tr><td>OrganizationsController</td><td>/organizations</td><td>组织树、组织 CRUD</td></tr>
+    <tr><td>PartyMembersController</td><td>/members</td><td>党员管理、按组织筛选</td></tr>
+    <tr><td>LearningContentsController</td><td>/contents</td><td>学习内容 CRUD、分类标签</td></tr>
+    <tr><td>LearningTasksController</td><td>/tasks</td><td>学习任务 CRUD</td></tr>
+    <tr><td>QuestionsController</td><td>/questions</td><td>题库、分类、批量导入</td></tr>
+    <tr><td>ExamPapersController</td><td>/exam-papers</td><td>试卷组卷 CRUD</td></tr>
+    <tr><td>ExamTestsController</td><td>/exam-tests</td><td>发布测验、列表、成绩详情</td></tr>
+    <tr><td>MobileController</td><td>/mobile</td><td>党员端聚合数据、学习进度上报、答题提交、AI 推荐/评估</td></tr>
+    <tr><td>MeetingActivityController</td><td>/meeting-activities</td><td>三会一课活动、心得</td></tr>
+    <tr><td>PartyDevelopmentController</td><td>/party-development</td><td>党员发展流程审批</td></tr>
+    <tr><td>CheckInController</td><td>/check-in</td><td>活动打卡</td></tr>
+    <tr><td>PointController</td><td>/points</td><td>积分明细、排行</td></tr>
+    <tr><td>NotificationController</td><td>/notifications</td><td>消息通知（任务/测验/预警/系统）</td></tr>
+    <tr><td>AntiCheatController</td><td>/anti-cheat</td><td>防挂机监督统计（有效率/挂机时长）</td></tr>
+    <tr><td>StatisticsController</td><td>/statistics</td><td>工作台 KPI、学习/考试统计、大屏数据、支部统计</td></tr>
+    <tr><td>AiController</td><td>/ai</td><td>AI 数据智能分析、组织/个人 AI 评估报告</td></tr>
+    <tr><td>AiKnowledgeController</td><td>/ai-knowledge</td><td>党建知识问答</td></tr>
+    <tr><td>AiContentGenerationController</td><td>/ai-content</td><td>AI 生成学习内容</td></tr>
+    <tr><td>Nl2SqlController</td><td>/nl2sql</td><td>自然语言生成 SQL 并执行查询</td></tr>
+    <tr><td>KMeansController</td><td>/kmeans</td><td>错题知识点聚类（专项巩固）</td></tr>
+  </table>
+
+  <!-- 八、关键设计 -->
+  <h2>八、关键设计与亮点</h2>
+  <h3>8.1 认证与权限</h3>
+  <p>JWT Bearer 认证（AccessToken 120 分钟 + RefreshToken 7 天），密码 BCrypt 哈希；三类角色 <span class="badge b-blue">系统管理员</span><span class="badge b-green">支部书记</span><span class="badge b-red">普通党员</span>，通过 <code>[Authorize(Roles=...)]</code> 控制发布测验、删除等敏感操作。</p>
+
+  <h3>8.2 组织架构统一口径（递归汇总）</h3>
+  <p>新增 <code>OrgHierarchyHelper</code> 工具类，实现"组织 = 自身 + 全部子孙组织"的递归汇总。总支统计党员数/任务/成绩/完成率时自动包含其下所有支部，保证大屏排名、AI 各支部统计、支部考核报告、NL2SQL 四处口径一致，杜绝"第一党总支无数据"类问题。</p>
+
+  <h3>8.3 防挂机监督</h3>
+  <p>AntiCheatService 按"有效学习时长 / 总时长"计算有效率；AI 数据快照附带挂机监控（挂机人数、累计挂机分钟、原因分布：后台切换/长时间无动作/录屏黑屏/加速播放等），并支持"挂机原因 TOP5"自然语言查询。</p>
+
+  <h3>8.4 AI 能力工程化</h3>
+  <ul>
+    <li><b>NL2SQL</b>：规则意图优先（稳定）→ 千问兜底（复杂）→ 安全校验（仅 SELECT、危险关键字拦截、白名单表、自动 LIMIT）→ 真实只读执行 → 自动生成图表；前端折叠 SQL、中文列名展示。</li>
+    <li><b>错题 KMeans</b>：读取党员真实答题记录，按题目知识点聚合错误次数与严重度，输出薄弱标签与个性化练习建议（非随机占位）。</li>
+    <li><b>数据智能分析</b>：确定性意图识别（完成率/平均分/身份构成/趋势/时长/人数/挂机）+ 千问兜底，统一返回文本 + ECharts 图表数据。</li>
+  </ul>
+
+  <h3>8.5 健壮性</h3>
+  <ul>
+    <li>全局异常中间件统一返回 { code, message } 结构；BusinessException 映射 4xx。</li>
+    <li>FlexibleDateTimeJsonConverter 兼容前端 "yyyy-MM-dd HH:mm:ss" 与 ISO 两种日期格式。</li>
+    <li>AutoMapper 统一实体 ↔ DTO 映射；EF 迁移管理表结构演进。</li>
+  </ul>
+
+  <!-- 九、运行部署 -->
+  <h2>九、运行与部署</h2>
+  <h3>9.1 环境要求</h3>
+  <ul>
+    <li>Node.js ≥ 18（Vite 5）；.NET 8 SDK；MySQL 8（库名 party_school）</li>
+    <li>千问 API Key：appsettings.json → 环境变量 DASHSCOPE_API_KEY → 仓库根 .env 三级配置</li>
+  </ul>
+  <h3>9.2 启动命令</h3>
+  <div class="code"># 后端（端口 5091）
+cd backend
+dotnet run --urls http://localhost:5091
+# Swagger 文档：http://localhost:5091/swagger
+
+# 管理后台（端口 5173）
+cd frontend/frontend-admin
+npm install && npm run dev
+
+# 党员端（端口 5174）
+cd frontend/frontend-member
+npm install && npm run dev</div>
+  <h3>9.3 默认账号</h3>
+  <table>
+    <tr><th>端</th><th>账号</th><th>密码</th><th>角色</th></tr>
+    <tr><td>管理后台</td><td>13800000000</td><td>123456</td><td>系统管理员</td></tr>
+    <tr><td>管理后台/党员端</td><td>13800000002</td><td>123456</td><td>党员（第一支部）</td></tr>
+  </table>
+
+  <!-- 十、版本迭代 -->
+  <h2>十、版本迭代记录（Git 提交摘要）</h2>
+  <table>
+    <tr><th style="width:10%">提交</th><th style="width:24%">说明</th><th>内容</th></tr>
+    <tr><td>04233f0</td><td>fix: 发布测验 500 错误</td><td>新增 FlexibleDateTimeJsonConverter，兼容空格日期格式</td></tr>
+    <tr><td>e28fe39</td><td>fix: 完善 AI 功能与组织架构口径</td><td>NL2SQL 真实执行、错题 KMeans 真实聚类、挂机 TOP5、组织递归汇总</td></tr>
+    <tr><td>1d473cc</td><td>fix: 防挂机有效率</td><td>总时长为 0 学员有效率修正为 0%</td></tr>
+    <tr><td>e47ab50 / 7116740 / 437c48f</td><td>style: 前端布局</td><td>首页 AI 推荐与积分排行并列、统计卡片变小、工作台三列并列</td></tr>
+    <tr><td>dcff5f1</td><td>feat: 工作台数据</td><td>补充学习趋势和预警提醒数据</td></tr>
+    <tr><td>b2395b4</td><td>feat: 视频素材</td><td>替换为 6 个党组织生活真实视频、补充背景图</td></tr>
+    <tr><td>540d994</td><td>feat: AI 能力</td><td>接入千问 AI 并完善党建数据分析</td></tr>
+  </table>
+
+  <div class="footer">
+    党校学习双端系统 · 系统文书 · 2026-09-01<br>
+    本文档基于项目源码整理，供团队开发与维护参考。
+  </div>
+</div>
+</body>
+</html>

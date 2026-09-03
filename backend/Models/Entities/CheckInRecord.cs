@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace PartySchoolApi.Models.Entities;
 
@@ -22,6 +22,9 @@ public class CheckInRecord
     /// <summary>AI背景解读</summary>
     [MaxLength(2000)]
     public string? AiBackgroundInterpretation { get; set; }
+
+    /// <summary>教育基地ID</summary>
+    public int? SiteId { get; set; }
 
     /// <summary>获得的积分</summary>
     public int PointsEarned { get; set; } = 5;

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Helpers;
 using PartySchoolApi.Models.Common;
@@ -52,14 +52,22 @@ public class NotificationController : ControllerBase
     [HttpPut("{id}/read")]
     public async Task<ApiResponse> MarkAsRead(int id)
     {
-        await _service.MarkAsReadAsync(_currentUser.UserId, id);
+        await _service.MarkReadAsync(id, _currentUser.UserId);
         return ApiResponse.Success(null, "已标记已读");
     }
 
     [HttpPut("read-all")]
     public async Task<ApiResponse> MarkAllAsRead()
     {
-        await _service.MarkAllAsReadAsync(_currentUser.UserId);
+        await _service.MarkAllReadAsync(_currentUser.UserId);
         return ApiResponse.Success(null, "全部已读");
+    }
+
+    // ========== (14) 精准分层推送 ==========
+    [HttpPost("targeted-send")]
+    [Authorize(Roles = "SystemAdmin,BranchSecretary")]
+    public async Task<ApiResponse> TargetedSend([FromBody] TargetedSendRequest request)
+    {
+        return ApiResponse.Success(await _service.TargetedSendAsync(request, (int)_currentUser.Role, _currentUser.OrganizationId));
     }
 }

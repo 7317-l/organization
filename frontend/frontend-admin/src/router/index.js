@@ -47,6 +47,30 @@ const routes = [
         name: 'DataAnalysis',
         component: () => import('@/views/DataAnalysis.vue'),
         meta: { title: '数据智能分析' }
+      },
+      {
+        path: 'star-members',
+        name: 'StarMembers',
+        component: () => import('@/views/StarMembers.vue'),
+        meta: { title: '学习标兵' }
+      },
+      {
+        path: 'meeting-brief',
+        name: 'MeetingBrief',
+        component: () => import('@/views/MeetingBrief.vue'),
+        meta: { title: '三会一课简报' }
+      },
+      {
+        path: 'education-sites',
+        name: 'EducationSites',
+        component: () => import('@/views/EducationSites.vue'),
+        meta: { title: '红色教育基地' }
+      },
+      {
+        path: 'rectification',
+        name: 'Rectification',
+        component: () => import('@/views/Rectification.vue'),
+        meta: { title: '整改闭环' }
       }
     ]
   }
@@ -57,7 +81,6 @@ const router = createRouter({
   routes
 })
 
-// 登录守卫
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken')
   if (to.path === '/login') {

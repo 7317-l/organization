@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Models.Common;
@@ -48,6 +48,9 @@ public class CheckInService : ICheckInService
             CheckInTime = c.CheckInTime,
             Note = c.Note,
             AiBackgroundInterpretation = c.AiBackgroundInterpretation,
+            SiteId = c.SiteId,
+            SiteName = c.SiteId.HasValue ? _context.EducationSites.Find(c.SiteId.Value)?.Name : null,
+            HistoricalFacts = new List<string> { "革命历史悠久", "精神内涵丰富", "教育意义深远" },
             PointsEarned = c.PointsEarned
         }).ToList();
 
@@ -56,22 +59,34 @@ public class CheckInService : ICheckInService
 
     public async Task<CheckInRecordDto> CreateAsync(int memberId, CreateCheckInRequest request)
     {
-        var aiInterp = await GetAiBackgroundAsync(request.LocationName);
+        var locationName = request.LocationName;
+        EducationSite? site = null;
+
+        // 如果有 siteId，从教育基地获取名称和AI解读
+        if (request.SiteId.HasValue)
+        {
+            site = await _context.EducationSites.FindAsync(request.SiteId.Value);
+            if (site != null)
+            {
+                locationName = site.Name;
+            }
+        }
+
+        var aiInterp = await GetAiBackgroundAsync(locationName);
 
         var record = new CheckInRecord
         {
             PartyMemberId = memberId,
-            LocationName = request.LocationName,
+            LocationName = locationName,
             CheckInTime = DateTime.UtcNow,
             Note = request.Note,
             AiBackgroundInterpretation = aiInterp.Interpretation,
+            SiteId = request.SiteId,
             PointsEarned = 5
         };
         _context.CheckInRecords.Add(record);
 
-        // 增加积分
         await _pointService.AddPointsAsync(memberId, 5, PointSourceType.ActivityCheckIn, record.Id);
-
         await _context.SaveChangesAsync();
 
         var member = await _context.PartyMembers.FindAsync(memberId);
@@ -84,13 +99,15 @@ public class CheckInService : ICheckInService
             CheckInTime = record.CheckInTime,
             Note = record.Note,
             AiBackgroundInterpretation = record.AiBackgroundInterpretation,
+            SiteId = record.SiteId,
+            SiteName = site?.Name,
+            HistoricalFacts = aiInterp.HistoricalFacts,
             PointsEarned = record.PointsEarned
         };
     }
 
     public Task<AiBackgroundDto> GetAiBackgroundAsync(string locationName)
     {
-        // 占位：AI背景解读
         var dict = new Dictionary<string, string>
         {
             ["井冈山"] = "井冈山是中国革命的摇篮，1927年毛泽东同志在此创建了第一个农村革命根据地，开辟了农村包围城市、武装夺取政权的革命道路。",

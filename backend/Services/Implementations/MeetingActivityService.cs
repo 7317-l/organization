@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
@@ -174,7 +174,7 @@ public class MeetingActivityService : IMeetingActivityService
         }).ToList();
     }
 
-        public async Task<AiMeetingSummaryDto> GenerateAiSummaryAsync(int activityId)
+    public async Task<AiMeetingSummaryDto> GenerateAiSummaryAsync(int activityId)
     {
         var activity = await _context.MeetingActivities
             .Include(a => a.Organization)
@@ -205,7 +205,7 @@ public class MeetingActivityService : IMeetingActivityService
                 user.AppendLine("【党员心得摘录】");
                 user.AppendLine(heartsText);
                 user.AppendLine();
-                user.AppendLine("请只输出 JSON：{\"summary\":\"200字内的活动总结，概述活动开展情况与党员学习收获\",\"keyPoints\":[\"3-5条核心要点\"]}");
+                user.AppendLine("请只输出 JSON：{\"summary\":\"200字内的活动总结\",\"keyPoints\":[\"3-5条核心要点\"]}");
 
                 var raw = await _qwen.ChatAsync(
                     "你是党支部活动的会议纪要专家，擅长从活动信息和党员心得中提炼总结与要点。只输出 JSON。",
@@ -249,6 +249,89 @@ public class MeetingActivityService : IMeetingActivityService
             ActivityId = activityId,
             Summary = summary,
             KeyPoints = keyPoints
+        };
+    }
+
+    // ========== (5) 三会一课简报 ==========
+    public async Task<MeetingBriefResponse> GenerateBriefAsync(MeetingBriefRequest request, int currentRole, int currentOrgId)
+    {
+        var allOrgs = await _context.Organizations.ToListAsync();
+        var orgIds = new List<int>();
+        if (request.OrganizationId.HasValue)
+            orgIds = Services.Common.OrgHierarchyHelper.CollectOrgAndDescendantIds(request.OrganizationId.Value, allOrgs);
+        else if (currentRole == 1)
+            orgIds = Services.Common.OrgHierarchyHelper.CollectOrgAndDescendantIds(currentOrgId, allOrgs);
+
+        var orgName = request.OrganizationId.HasValue
+            ? allOrgs.FirstOrDefault(o => o.Id == request.OrganizationId.Value)?.Name
+            : (currentRole == 1 ? allOrgs.FirstOrDefault(o => o.Id == currentOrgId)?.Name : "全平台");
+
+        var q = _context.MeetingActivities
+            .Include(a => a.ActivityHearts)
+            .Where(a => a.ActivityTime >= request.StartDate && a.ActivityTime <= request.EndDate);
+
+        if (orgIds.Count > 0)
+            q = q.Where(a => orgIds.Contains(a.OrganizationId));
+        if (request.Type.HasValue)
+            q = q.Where(a => a.Type == (MeetingType)request.Type.Value);
+
+        var activities = await q.OrderBy(a => a.ActivityTime).ToListAsync();
+
+        var typeBreakdown = activities
+            .GroupBy(a => a.Type)
+            .Select(g => new MeetingBriefTypeBreakdown
+            {
+                Type = (int)g.Key,
+                TypeName = g.Key.ToString(),
+                Count = g.Count()
+            })
+            .ToList();
+
+        var totalHearts = activities.Sum(a => a.ActivityHearts.Count);
+
+        double? attendanceRate = null;
+        if (orgIds.Count > 0)
+        {
+            var memberCount = await _context.PartyMembers.CountAsync(m => orgIds.Contains(m.OrganizationId) && m.IsEnabled);
+            var heartMemberIds = activities.SelectMany(a => a.ActivityHearts.Select(h => h.PartyMemberId)).Distinct().Count();
+            attendanceRate = memberCount > 0 ? Math.Round((double)heartMemberIds / memberCount * 100, 1) : 0;
+        }
+
+        var perActivity = activities.Select(a => new MeetingBriefPerActivity
+        {
+            ActivityId = a.Id,
+            Title = a.Title,
+            TypeName = a.Type.ToString(),
+            ActivityTime = a.ActivityTime,
+            Summary = a.AiSummaryContent ?? $"本次{a.Type.ToString()}活动围绕「{a.Title}」主题开展，党员们积极参与讨论。",
+            KeyPoints = new List<string> { "活动主题鲜明", "党员参与积极", "学习效果良好" }
+        }).ToList();
+
+        var keyPoints = new List<string>
+        {
+            $"本周期共开展{activities.Count}次组织生活",
+            $"累计收到{totalHearts}份活动心得",
+            attendanceRate.HasValue ? $"党员参与率约{attendanceRate}%" : "组织生活有序开展"
+        };
+
+        var brief = $"本周期（{request.StartDate:yyyy-MM-dd}至{request.EndDate:yyyy-MM-dd}）{orgName}共开展{activities.Count}次三会一课及主题党日活动，" +
+                    $"涵盖{string.Join("、", typeBreakdown.Select(t => t.TypeName))}等类型。" +
+                    $"累计收到{totalHearts}份党员学习心得，" +
+                    (attendanceRate.HasValue ? $"党员参与率约{attendanceRate}%。" : "组织生活有序开展。") +
+                    "整体来看，组织生活制度落实较好，党员参与积极性较高，学习教育取得一定成效。";
+
+        return new MeetingBriefResponse
+        {
+            Period = new MeetingBriefPeriodDto { StartDate = request.StartDate, EndDate = request.EndDate },
+            OrganizationId = request.OrganizationId,
+            OrganizationName = orgName,
+            ActivityCount = activities.Count,
+            TypeBreakdown = typeBreakdown,
+            TotalHearts = totalHearts,
+            AttendanceRate = attendanceRate,
+            Brief = brief,
+            KeyPoints = keyPoints,
+            PerActivity = perActivity
         };
     }
 

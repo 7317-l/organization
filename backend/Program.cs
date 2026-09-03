@@ -142,6 +142,13 @@ builder.Services.AddScoped<IAiContentGenerationService, AiContentGenerationServi
 builder.Services.AddScoped<IAntiCheatService, AntiCheatService>();
 builder.Services.AddScoped<IKMeansService, KMeansService>();
 
+// ===== 15项功能新增服务 =====
+builder.Services.AddScoped<IBattleService, BattleService>();
+builder.Services.AddScoped<IPairHelpService, PairHelpService>();
+builder.Services.AddScoped<IEducationSiteService, EducationSiteService>();
+builder.Services.AddScoped<IRectificationService, RectificationService>();
+builder.Services.AddScoped<IDataPermissionService, DataPermissionService>();
+
 var app = builder.Build();
 
 // ===== 全局异常处理中间件 =====

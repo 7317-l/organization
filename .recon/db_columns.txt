@@ -1,0 +1,201 @@
+===== TABLE: __efmigrationshistory =====
+MigrationId	varchar(150)	NO	PRI	NULL	
+ProductVersion	varchar(32)	NO		NULL	
+
+===== TABLE: activityhearts =====
+Id	int	NO	PRI	NULL	auto_increment
+MeetingActivityId	int	NO	MUL	NULL	
+PartyMemberId	int	NO	MUL	NULL	
+Content	varchar(4000)	NO		NULL	
+SubmittedAt	datetime(6)	NO		NULL	
+AiPolishSuggestion	varchar(2000)	YES		NULL	
+
+===== TABLE: battlerecords =====
+Id	int	NO	PRI	NULL	auto_increment
+ChallengerId	int	NO	MUL	NULL	
+OpponentId	int	NO	MUL	NULL	
+ResultJson	varchar(1000)	NO		NULL	
+BattleTime	datetime(6)	NO		NULL	
+
+===== TABLE: checkinrecords =====
+Id	int	NO	PRI	NULL	auto_increment
+PartyMemberId	int	NO	MUL	NULL	
+LocationName	varchar(200)	NO	MUL	NULL	
+CheckInTime	datetime(6)	NO		NULL	
+Note	varchar(2000)	YES		NULL	
+AiBackgroundInterpretation	varchar(2000)	YES		NULL	
+PointsEarned	int	NO		NULL	
+
+===== TABLE: content_categories =====
+id	int	NO	PRI	NULL	auto_increment
+name	varchar(100)	NO		NULL	
+parent_id	int	YES	MUL	NULL	
+created_at	datetime(6)	NO		NULL	
+
+===== TABLE: content_tags =====
+content_id	int	NO	PRI	NULL	
+tag_id	int	NO	PRI	NULL	
+
+===== TABLE: exam_papers =====
+id	int	NO	PRI	NULL	auto_increment
+name	varchar(200)	NO	MUL	NULL	
+description	text	YES		NULL	
+question_ids	json	NO		NULL	
+total_score	int	NO		NULL	
+created_at	datetime(6)	NO		NULL	
+
+===== TABLE: examtests =====
+Id	int	NO	PRI	NULL	auto_increment
+PaperId	int	NO	MUL	NULL	
+PublisherId	int	NO	MUL	NULL	
+TargetOrgId	int	NO	MUL	NULL	
+TimeLimitMinutes	int	NO		NULL	
+Deadline	datetime(6)	NO		NULL	
+CreatedAt	datetime(6)	NO		NULL	
+IsAiGenerated	tinyint(1)	NO		0	
+TargetWeaknessTags	varchar(1000)	YES		NULL	
+
+===== TABLE: learning_tasks =====
+id	int	NO	PRI	NULL	auto_increment
+task_name	varchar(200)	NO		NULL	
+target_org_id	int	NO	MUL	NULL	
+deadline	datetime(6)	NO		NULL	
+created_at	datetime(6)	NO		NULL	
+
+===== TABLE: learningcontents =====
+Id	int	NO	PRI	NULL	auto_increment
+Title	varchar(200)	NO	MUL	NULL	
+Body	varchar(8000)	YES		NULL	
+VideoUrl	varchar(500)	YES		NULL	
+ContentType	int	NO	MUL	NULL	
+CategoryId	int	YES	MUL	NULL	
+IsPublic	tinyint(1)	NO	MUL	NULL	
+CreatedAt	datetime(6)	NO		NULL	
+RelatedDocumentUrl	varchar(500)	YES		NULL	
+SourceType	int	NO		0	
+
+===== TABLE: learningpoints =====
+Id	int	NO	PRI	NULL	auto_increment
+PartyMemberId	int	NO	MUL	NULL	
+SourceType	int	NO	MUL	NULL	
+SourceId	int	YES		NULL	
+Points	int	NO		NULL	
+EarnedAt	datetime(6)	NO		NULL	
+
+===== TABLE: meetingactivities =====
+Id	int	NO	PRI	NULL	auto_increment
+OrganizationId	int	NO	MUL	NULL	
+Type	int	NO	MUL	NULL	
+Title	varchar(200)	NO		NULL	
+Description	varchar(4000)	YES		NULL	
+ActivityTime	datetime(6)	NO	MUL	NULL	
+CreatedAt	datetime(6)	NO		NULL	
+IsAiSummaryGenerated	tinyint(1)	NO		NULL	
+AiSummaryContent	varchar(4000)	YES		NULL	
+
+===== TABLE: member_learning_progress =====
+id	int	NO	PRI	NULL	auto_increment
+member_id	int	NO	MUL	NULL	
+content_id	int	NO	MUL	NULL	
+task_id	int	YES	MUL	NULL	
+duration_seconds	int	NO		NULL	
+is_completed	tinyint(1)	NO		NULL	
+completed_at	datetime(6)	YES		NULL	
+updated_at	datetime(6)	NO		NULL	
+
+===== TABLE: member_test_records =====
+id	int	NO	PRI	NULL	auto_increment
+member_id	int	NO	MUL	NULL	
+test_id	int	NO	MUL	NULL	
+answers	json	NO		NULL	
+score	int	NO		NULL	
+submitted_at	datetime(6)	NO		NULL	
+
+===== TABLE: memberlearningreports =====
+Id	int	NO	PRI	NULL	auto_increment
+PartyMemberId	int	NO	MUL	NULL	
+ReportJson	varchar(4000)	NO		NULL	
+CreatedAt	datetime(6)	NO		NULL	
+
+===== TABLE: messagenotifications =====
+Id	int	NO	PRI	NULL	auto_increment
+PartyMemberId	int	NO	MUL	NULL	
+Type	int	NO		NULL	
+Title	varchar(200)	NO		NULL	
+Content	varchar(2000)	NO		NULL	
+IsRead	tinyint(1)	NO	MUL	NULL	
+CreatedAt	datetime(6)	NO		NULL	
+
+===== TABLE: organizationquarterlyreports =====
+Id	int	NO	PRI	NULL	auto_increment
+OrganizationId	int	NO	MUL	NULL	
+Quarter	varchar(20)	NO		NULL	
+ReportJson	varchar(4000)	NO		NULL	
+CreatedAt	datetime(6)	NO		NULL	
+
+===== TABLE: organizations =====
+id	int	NO	PRI	NULL	auto_increment
+name	varchar(100)	NO	MUL	NULL	
+parent_id	int	YES	MUL	NULL	
+created_at	datetime(6)	NO		NULL	
+
+===== TABLE: pairhelprecords =====
+Id	int	NO	PRI	NULL	auto_increment
+HelperId	int	NO	MUL	NULL	
+HelpReceiverId	int	NO	MUL	NULL	
+StartTime	datetime(6)	NO		NULL	
+EndTime	datetime(6)	YES		NULL	
+HelpContentJson	varchar(4000)	YES		NULL	
+OutcomeSummary	varchar(2000)	YES		NULL	
+
+===== TABLE: partydevelopmentprocesses =====
+Id	int	NO	PRI	NULL	auto_increment
+PartyMemberId	int	NO	MUL	NULL	
+Stage	int	NO	MUL	NULL	
+Status	int	NO	MUL	NULL	
+MaterialsJson	varchar(2000)	YES		NULL	
+ReportContent	varchar(4000)	YES		NULL	
+SubmittedAt	datetime(6)	YES		NULL	
+ReviewComment	varchar(1000)	YES		NULL	
+ReviewedAt	datetime(6)	YES		NULL	
+IsReminderSent	tinyint(1)	NO		NULL	
+CreatedAt	datetime(6)	NO		NULL	
+
+===== TABLE: partymembers =====
+Id	int	NO	PRI	NULL	auto_increment
+Name	varchar(50)	NO		NULL	
+Phone	varchar(20)	NO	UNI	NULL	
+PasswordHash	varchar(200)	NO		NULL	
+Role	int	NO	MUL	NULL	
+OrganizationId	int	NO	MUL	NULL	
+IsEnabled	tinyint(1)	NO		NULL	
+RefreshToken	varchar(500)	YES		NULL	
+RefreshTokenExpiry	datetime(6)	YES		NULL	
+CreatedAt	datetime(6)	NO		NULL	
+PointTotal	int	NO		0	
+MemberType	varchar(20)	NO		正式党员	
+
+===== TABLE: question_categories =====
+id	int	NO	PRI	NULL	auto_increment
+name	varchar(100)	NO	UNI	NULL	
+created_at	datetime(6)	NO		NULL	
+
+===== TABLE: questions =====
+id	int	NO	PRI	NULL	auto_increment
+question_type	int	NO	MUL	NULL	
+stem	text	NO		NULL	
+options	json	NO		NULL	
+correct_answer	varchar(200)	NO		NULL	
+score	int	NO		NULL	
+category_id	int	YES	MUL	NULL	
+created_at	datetime(6)	NO		NULL	
+
+===== TABLE: tags =====
+id	int	NO	PRI	NULL	auto_increment
+name	varchar(50)	NO	UNI	NULL	
+created_at	datetime(6)	NO		NULL	
+
+===== TABLE: task_contents =====
+task_id	int	NO	PRI	NULL	
+content_id	int	NO	PRI	NULL	
+

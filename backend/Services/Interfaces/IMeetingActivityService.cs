@@ -1,4 +1,4 @@
-﻿using PartySchoolApi.Models.Common;
+using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
 
 namespace PartySchoolApi.Services.Interfaces;
@@ -12,4 +12,5 @@ public interface IMeetingActivityService
     Task<ActivityHeartDto> SubmitHeartAsync(int memberId, SubmitActivityHeartRequest request);
     Task<List<ActivityHeartDto>> GetHeartsByActivityAsync(int activityId);
     Task<AiMeetingSummaryDto> GenerateAiSummaryAsync(int activityId);
+    Task<MeetingBriefResponse> GenerateBriefAsync(MeetingBriefRequest request, int currentRole, int currentOrgId);
 }

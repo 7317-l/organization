@@ -30,10 +30,12 @@ public class PartyMemberService : IPartyMemberService
             .Include(m => m.Organization)
             .AsQueryable();
 
-        // 数据权限：支部书记只能看本支部
+        // 数据权限：支部书记只能看本支部及下级
         if (_currentUser.Role == UserRole.BranchSecretary)
         {
-            queryable = queryable.Where(m => m.OrganizationId == _currentUser.OrganizationId);
+            var scopeIds = await GetSubtreeOrgIdsAsync(_currentUser.OrganizationId);
+            scopeIds.Add(_currentUser.OrganizationId);
+            queryable = queryable.Where(m => scopeIds.Contains(m.OrganizationId));
         }
 
         if (!string.IsNullOrWhiteSpace(query.Name))

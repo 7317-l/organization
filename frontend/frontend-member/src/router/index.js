@@ -55,6 +55,24 @@ const routes = [
         meta: { title: 'AI学习报告', hidden: true }
       },
       {
+        path: 'battle',
+        name: 'Battle',
+        component: () => import('@/views/Battle.vue'),
+        meta: { title: '党史PK', icon: 'battle' }
+      },
+      {
+        path: 'pair-help',
+        name: 'PairHelp',
+        component: () => import('@/views/PairHelp.vue'),
+        meta: { title: '薄弱点互助', icon: 'help' }
+      },
+      {
+        path: 'roadmap',
+        name: 'LearningRoadmap',
+        component: () => import('@/views/LearningRoadmap.vue'),
+        meta: { title: '学习路线图', hidden: true }
+      },
+      {
         path: 'profile',
         name: 'Profile',
         component: () => import('@/views/Profile.vue'),
@@ -73,7 +91,6 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫：未登录跳转登录页
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken')
   if (to.path === '/login') {
@@ -91,7 +108,6 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-// 页面标题
 router.afterEach(to => {
   document.title = to.meta.title ? `${to.meta.title} · 党员学习平台` : '党员学习平台'
 })

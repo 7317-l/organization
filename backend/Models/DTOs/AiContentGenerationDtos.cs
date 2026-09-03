@@ -1,20 +1,21 @@
-﻿using PartySchoolApi.Models.Common;
+using PartySchoolApi.Models.Common;
 
 namespace PartySchoolApi.Models.DTOs;
 
 public class AiGenerateContentRequest
 {
-    /// <summary>源文本内容</summary>
+    public string ContentType { get; set; } = "questions";
     public string? SourceText { get; set; }
-    /// <summary>PDF文件URL（二选一）</summary>
     public string? PdfUrl { get; set; }
-    /// <summary>生成单选题数量</summary>
+    public string? Topic { get; set; }
+    public string? Audience { get; set; }
+    public int? DurationMinutes { get; set; }
+    public string? Tone { get; set; }
+    public int? MaxWords { get; set; }
+    public List<string>? Keywords { get; set; }
     public int SingleChoiceCount { get; set; } = 5;
-    /// <summary>生成多选题数量</summary>
     public int MultiChoiceCount { get; set; } = 3;
-    /// <summary>生成判断题数量</summary>
     public int TrueFalseCount { get; set; } = 2;
-    /// <summary>是否生成学习卡片</summary>
     public bool GenerateFlashCards { get; set; } = true;
     public int? CategoryId { get; set; }
 }
@@ -33,11 +34,14 @@ public class AiFlashCardDto
 {
     public string Front { get; set; } = string.Empty;
     public string Back { get; set; } = string.Empty;
+    public string? Tag { get; set; }
 }
 
 public class AiGenerateContentResponse
 {
+    public string ContentType { get; set; } = "questions";
     public List<AiGeneratedQuestionDto> Questions { get; set; } = new();
     public List<AiFlashCardDto> FlashCards { get; set; } = new();
     public string Summary { get; set; } = string.Empty;
+    public AiGeneratedContentDto? Content { get; set; }
 }

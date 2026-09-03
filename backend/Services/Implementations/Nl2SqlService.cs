@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Models.DTOs;
+using PartySchoolApi.Models.Entities;
 using PartySchoolApi.Services.Interfaces;
 using System.Data;
 using System.Text.Json;
@@ -8,9 +9,7 @@ using System.Text.Json;
 namespace PartySchoolApi.Services.Implementations;
 
 /// <summary>
-/// NL2SQL服务（真千问 + 真实执行）：
-/// 流程：错别字修正 → 千问生成 SQL（附带安全约束）→ 危险关键字/白名单安全校验 → 只读执行并返回真实数据。
-/// 千问不可用时回退到规则式 SQL，同样真实执行返回数据；绝不执行非 SELECT 语句。
+/// NL2SQL服务（真千问 + 真实执行 + 多轮上下文 + 字段白名单 + 敏感脱敏）
 /// </summary>
 public class Nl2SqlService : INl2SqlService
 {
@@ -23,7 +22,6 @@ public class Nl2SqlService : INl2SqlService
         PropertyNameCaseInsensitive = true
     };
 
-    // 白名单表（使用数据库真实表名）
     private static readonly HashSet<string> AllowedTables = new()
     {
         "partymembers", "learningcontents", "learning_tasks",
@@ -33,42 +31,59 @@ public class Nl2SqlService : INl2SqlService
         "content_categories", "content_tags", "tags"
     };
 
-    // 常见错别字映射
-    private static readonly Dictionary<string, string> TypoMap = new()
+    // 字段级白名单：表.列 → 允许
+    private static readonly HashSet<string> AllowedColumns = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["党元"] = "党员",
-        ["党支"] = "党支部",
-        ["完成绿"] = "完成率",
-        ["学西"] = "学习",
-        ["考式"] = "考试",
-        ["平钧分"] = "平均分"
+        "partymembers.Id", "partymembers.Name", "partymembers.OrganizationId", "partymembers.IsEnabled", "partymembers.MemberType", "partymembers.Role", "partymembers.CreatedAt", "partymembers.PointTotal",
+        "organizations.id", "organizations.name", "organizations.parent_id", "organizations.created_at",
+        "learning_tasks.id", "learning_tasks.task_name", "learning_tasks.target_org_id", "learning_tasks.deadline", "learning_tasks.created_at",
+        "learningcontents.Id", "learningcontents.Title", "learningcontents.ContentType", "learningcontents.IsPublic", "learningcontents.CreatedAt", "learningcontents.CategoryId",
+        "member_learning_progress.id", "member_learning_progress.member_id", "member_learning_progress.content_id", "member_learning_progress.task_id", "member_learning_progress.is_completed", "member_learning_progress.duration_seconds", "member_learning_progress.completed_at", "member_learning_progress.updated_at",
+        "examtests.Id", "examtests.PaperId", "examtests.TargetOrgId", "examtests.Deadline", "examtests.CreatedAt",
+        "member_test_records.id", "member_test_records.member_id", "member_test_records.test_id", "member_test_records.score", "member_test_records.submitted_at",
+        "questions.id", "questions.question_type", "questions.stem", "questions.score", "questions.category_id", "questions.created_at",
+        "question_categories.id", "question_categories.name",
+        "checkinrecords.Id", "checkinrecords.PartyMemberId", "checkinrecords.LocationName", "checkinrecords.CheckInTime", "checkinrecords.PointsEarned", "checkinrecords.SiteId",
+        "learningpoints.Id", "learningpoints.PartyMemberId", "learningpoints.SourceType", "learningpoints.Points", "learningpoints.EarnedAt",
+        "exam_papers.id", "exam_papers.name", "exam_papers.total_score", "exam_papers.created_at"
     };
 
-    // SQL危险关键字黑名单
+    // 敏感字段（输出时脱敏）
+    private static readonly HashSet<string> SensitiveColumns = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "partymembers.Phone", "partymembers.PasswordHash", "partymembers.RefreshToken", "partymembers.RefreshTokenExpiry"
+    };
+
+    private static readonly Dictionary<string, string> TypoMap = new()
+    {
+        ["党元"] = "党员", ["党支"] = "党支部", ["完成绿"] = "完成率",
+        ["学西"] = "学习", ["考式"] = "考试", ["平钧分"] = "平均分"
+    };
+
     private static readonly string[] DangerousKeywords =
     {
         "DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "TRUNCATE",
         "CREATE", "EXEC", "EXECUTE", "--", ";--", "/*", "*/", "xp_"
     };
 
-    // 单次查询返回的最大行数
+    // 指代词
+    private static readonly string[] ReferenceWords = { "同上", "继续", "再看", "和上次一样", "上一条", "上个结果", "同样条件" };
+
     private const int MaxRows = 100;
 
     private const string SchemaDescription =
         "数据库表结构（MySQL，注意各表列名大小写）：\n" +
-        "- organizations(id, name, parent_id)：党组织（党委/总支/支部，多级，id/name/parent_id 小写）\n" +
-        "- partymembers(Id, Name, OrganizationId, IsEnabled, MemberType)：党员（列名 PascalCase；MemberType 为 正式党员/预备党员；OrganizationId 关联 organizations.id）\n" +
-        "- learning_tasks(id, task_name, target_org_id, deadline)：学习任务（target_org_id 关联 organizations.id）\n" +
-        "- learningcontents(Id, Title, Body, VideoUrl, IsPublic)：学习内容（列名 PascalCase）\n" +
-        "- task_contents(task_id, content_id)：任务与内容关联\n" +
-        "- member_learning_progress(id, member_id, content_id, task_id, is_completed, duration_seconds, updated_at)：党员学习进度（小写）\n" +
-        "- exam_papers(id, name, question_ids)：试卷（question_ids 为题目Id数组）\n" +
-        "- examtests(Id, PaperId, TargetOrgId, Deadline)：考试（列名 PascalCase）\n" +
-        "- member_test_records(id, member_id, test_id, answers, score, submitted_at)：党员考试成绩（小写）\n" +
-        "- questions(id, question_type, stem, options, correct_answer, score, category_id)：题目\n" +
-        "- question_categories(id, name)：题目知识点分类\n" +
-        "- checkinrecords(Id, PartyMemberId)：签到\n" +
-        "- learningpoints(Id, PartyMemberId, Points, EarnedAt)：积分";
+        "- organizations(id, name, parent_id)：党组织\n" +
+        "- partymembers(Id, Name, OrganizationId, IsEnabled, MemberType, Role, PointTotal)：党员\n" +
+        "- learning_tasks(id, task_name, target_org_id, deadline)：学习任务\n" +
+        "- learningcontents(Id, Title, ContentType, IsPublic, CategoryId)：学习内容\n" +
+        "- member_learning_progress(id, member_id, content_id, task_id, is_completed, duration_seconds, updated_at)：学习进度\n" +
+        "- examtests(Id, PaperId, TargetOrgId, Deadline)：考试\n" +
+        "- member_test_records(id, member_id, test_id, score, submitted_at)：考试成绩\n" +
+        "- questions(id, question_type, stem, score, category_id)：题目\n" +
+        "- question_categories(id, name)：题目分类\n" +
+        "- checkinrecords(Id, PartyMemberId, LocationName, CheckInTime, PointsEarned)：签到\n" +
+        "- learningpoints(Id, PartyMemberId, SourceType, Points, EarnedAt)：积分";
 
     public Nl2SqlService(IQwenService qwen, AppDbContext context)
     {
@@ -76,12 +91,14 @@ public class Nl2SqlService : INl2SqlService
         _context = context;
     }
 
-    public async Task<Nl2SqlResponse> QueryAsync(Nl2SqlRequest request)
+    public async Task<Nl2SqlResponse> QueryAsync(Nl2SqlRequest request, int memberId)
     {
         var corrections = new List<string>();
         var nl = request.NaturalLanguage ?? string.Empty;
+        var effectiveMemberId = request.UserId ?? memberId;
+        var historyCount = Math.Clamp(request.HistoryCount, 1, 10);
 
-        // 步骤1：错别字修正
+        // 错别字修正
         foreach (var typo in TypoMap)
         {
             if (nl.Contains(typo.Key))
@@ -93,33 +110,51 @@ public class Nl2SqlService : INl2SqlService
 
         var sessionId = request.SessionId ?? Guid.NewGuid().ToString("N");
 
-        // 步骤2：规则意图优先（稳定可靠、不依赖千问）。常见问题（完成率/平均分/时长/党员数）走统一组织口径内存聚合
-        var intent = DetectIntent(nl);
+        // 多轮上下文：取最近历史
+        var history = await GetSessionHistoryInternalAsync(sessionId, effectiveMemberId, historyCount);
+        var conversation = history.Select(h => new Nl2SqlConversationItem
+        {
+            Question = h.Question,
+            Explanation = h.Explanation ?? "",
+            ResultSummary = h.ResultSummary
+        }).ToList();
+
+        // 指代改写
+        var (rewritten, isResolved) = ResolveReference(nl, history);
+        var intent = DetectIntent(rewritten);
+
+        // 规则意图优先
         if (intent != "general_query")
         {
-            var ruleSql = GenerateSql(intent, nl);
+            var ruleSql = GenerateSql(intent, rewritten);
             var ruleData = await ExecuteRuleQueryAsync(intent);
             if (ruleData.Count > 0)
             {
-                return BuildResult(sessionId, corrections, ruleSql, true,
-                    $"已识别意图「{IntentName(intent)}」，查询结果如下。", ruleData, TryBuildChart(ruleData, nl));
+                var masked = MaskSensitiveData(ruleData);
+                await SaveSessionAsync(sessionId, effectiveMemberId, nl, rewritten, ruleSql,
+                    $"已识别意图「{IntentName(intent)}」，查询结果如下。", BuildResultSummary(masked));
+                return BuildResultV2(sessionId, corrections, ruleSql, true,
+                    $"已识别意图「{IntentName(intent)}」，查询结果如下。", masked,
+                    TryBuildChart(masked, rewritten), intent, rewritten, isResolved, conversation);
             }
         }
 
-        // 步骤3：千问生成 SQL 并真实执行（处理复杂/非规则意图）
+        // 千问生成 SQL
         if (_qwen.IsConfigured)
         {
             try
             {
+                var contextPrompt = history.Count > 0
+                    ? "\n\n【历史对话】\n" + string.Join("\n", history.Take(3).Select(h => $"问：{h.Question}\n答：{h.Explanation}"))
+                    : "";
+
                 var system =
-                    "你是 MySQL 专家，负责把自然语言查询转成安全的只读 SQL。只输出一个 JSON 对象，禁止多余文字：\n" +
-                    "{\"intent\":\"意图标识\",\"sql\":\"只读SELECT语句\",\"explanation\":\"对查询含义的一句话中文说明\"}\n" +
-                    "约束：只允许 SELECT 查询；只能使用上述白名单表；禁止 DELETE/UPDATE/INSERT/ALTER/DROP/TRUNCATE/CREATE/EXEC 等危险语句；禁止分号拼接多条语句；禁止注释符；结果建议加 LIMIT 100。";
+                    "你是 MySQL 专家，把自然语言转成安全的只读 SQL。只输出 JSON：\n" +
+                    "{\"intent\":\"意图\",\"sql\":\"SELECT语句\",\"explanation\":\"中文说明\"}\n" +
+                    "约束：只允许 SELECT；只能用白名单表；禁止危险语句；禁止分号拼接；加 LIMIT 100。" +
+                    "注意：partymembers 表禁止查询 Phone、PasswordHash、RefreshToken、RefreshTokenExpiry 字段。";
 
-                var user =
-                    SchemaDescription +
-                    "\n\n【用户自然语言】\n" + nl;
-
+                var user = SchemaDescription + contextPrompt + "\n\n【用户问题】\n" + rewritten;
                 var raw = await _qwen.ChatAsync(system, user, temperature: 0.2, jsonMode: true);
                 var parsed = ParseRaw(raw);
 
@@ -129,59 +164,169 @@ public class Nl2SqlService : INl2SqlService
                     var safety = SafetyCheck(sql);
                     if (!safety.IsSafe)
                     {
-                        return BuildResult(sessionId, corrections, sql, false,
-                            $"SQL安全校验未通过：{safety.Reason}");
+                        await SaveSessionAsync(sessionId, effectiveMemberId, nl, rewritten, sql,
+                            $"SQL安全校验未通过：{safety.Reason}", null);
+                        return BuildResultV2(sessionId, corrections, sql, false,
+                            $"SQL安全校验未通过：{safety.Reason}", null, null, intent, rewritten, isResolved, conversation);
+                    }
+
+                    var colCheck = CheckColumnsAllowed(sql);
+                    if (!colCheck.Ok)
+                    {
+                        return BuildResultV2(sessionId, corrections, sql, false,
+                            $"字段级白名单校验未通过：{colCheck.Reason}", null, null, intent, rewritten, isResolved, conversation);
                     }
 
                     var data = await ExecuteReadOnlyAsync(sql);
-                    if (data.Count > 0)
+                    var masked = MaskSensitiveData(data);
+                    if (masked.Count > 0)
                     {
-                        return BuildResult(sessionId, corrections, sql, true,
-                            parsed.Explanation ?? "已查询到结果。", data, TryBuildChart(data, nl));
+                        await SaveSessionAsync(sessionId, effectiveMemberId, nl, rewritten, sql,
+                            parsed.Explanation ?? "已查询到结果。", BuildResultSummary(masked));
+                        return BuildResultV2(sessionId, corrections, sql, true,
+                            parsed.Explanation ?? "已查询到结果。", masked,
+                            TryBuildChart(masked, rewritten), parsed.Intent ?? intent, rewritten, isResolved, conversation);
                     }
-                    // 千问 SQL 执行无结果 → 回退到规则式
                 }
             }
-            catch
+            catch { }
+        }
+
+        // 最终回退
+        var fbIntent = DetectIntent(rewritten);
+        var fbSql = GenerateSql(fbIntent, rewritten);
+        var fbSafety = SafetyCheck(fbSql);
+        if (!fbSafety.IsSafe)
+        {
+            return BuildResultV2(sessionId, corrections, fbSql, false,
+                $"SQL安全校验未通过：{fbSafety.Reason}", null, null, fbIntent, rewritten, isResolved, conversation);
+        }
+        var fbData = await ExecuteReadOnlyAsync(fbSql);
+        var fbMasked = MaskSensitiveData(fbData);
+        await SaveSessionAsync(sessionId, effectiveMemberId, nl, rewritten, fbSql,
+            $"已识别意图「{fbIntent}」，查询结果如下。", BuildResultSummary(fbMasked));
+        return BuildResultV2(sessionId, corrections, fbSql, true,
+            $"已识别意图「{fbIntent}」，查询结果如下。", fbMasked,
+            TryBuildChart(fbMasked, rewritten), fbIntent, rewritten, isResolved, conversation);
+    }
+
+    public async Task<List<Nl2SqlHistoryItem>> GetHistoryAsync(string sessionId, int memberId, int limit = 5)
+    {
+        return await _context.Nl2SqlSessions
+            .Where(s => s.SessionId == sessionId && s.MemberId == memberId)
+            .OrderByDescending(s => s.CreatedAt)
+            .Take(limit)
+            .Select(s => new Nl2SqlHistoryItem
             {
-                // 千问异常 → 回退到规则式
+                Question = s.Question,
+                Rewritten = s.Rewritten,
+                Explanation = s.Explanation,
+                ResultSummary = s.ResultSummary,
+                CreatedAt = s.CreatedAt
+            })
+            .ToListAsync();
+    }
+
+    private async Task<List<Nl2SqlSession>> GetSessionHistoryInternalAsync(string sessionId, int memberId, int limit)
+    {
+        return await _context.Nl2SqlSessions
+            .Where(s => s.SessionId == sessionId && s.MemberId == memberId)
+            .OrderByDescending(s => s.CreatedAt)
+            .Take(limit)
+            .ToListAsync();
+    }
+
+    private async Task SaveSessionAsync(string sessionId, int memberId, string question, string? rewritten,
+        string? sql, string explanation, string? resultSummary)
+    {
+        try
+        {
+            _context.Nl2SqlSessions.Add(new Nl2SqlSession
+            {
+                SessionId = sessionId,
+                MemberId = memberId,
+                Question = question,
+                Rewritten = rewritten,
+                SqlText = sql,
+                Explanation = explanation.Length > 2000 ? explanation[..2000] : explanation,
+                ResultSummary = resultSummary?.Length > 4000 ? resultSummary[..4000] : resultSummary,
+                CreatedAt = DateTime.Now
+            });
+            await _context.SaveChangesAsync();
+        }
+        catch { }
+    }
+
+    private static (string rewritten, bool isResolved) ResolveReference(string nl, List<Nl2SqlSession> history)
+    {
+        var hasRef = ReferenceWords.Any(w => nl.Contains(w));
+        if (!hasRef || history.Count == 0)
+            return (nl, false);
+
+        var last = history[0];
+        var rewritten = nl;
+        foreach (var w in ReferenceWords)
+        {
+            if (rewritten.Contains(w))
+            {
+                rewritten = rewritten.Replace(w, $"（基于上一轮：{last.Question}）");
             }
         }
-
-        // 步骤4：最终回退：规则式生成 SQL 并真实执行
-        return await FallbackQueryAsync(nl, corrections, sessionId);
+        return (rewritten, true);
     }
 
-    private static string IntentName(string intent)
+    private static (bool Ok, string Reason) CheckColumnsAllowed(string sql)
     {
-        return intent switch
+        var upper = sql.ToUpperInvariant();
+        // 检查是否引用了敏感字段
+        foreach (var col in SensitiveColumns)
         {
-            "task_completion" => "任务完成率",
-            "exam_score" => "测验成绩/平均分",
-            "learning_duration" => "学习时长",
-            "member_count" => "党员人数",
-            "ranking" => "排名对比",
-            _ => intent
-        };
-    }
-
-    private async Task<Nl2SqlResponse> FallbackQueryAsync(string nl, List<string> corrections, string sessionId)
-    {
-        var intent = DetectIntent(nl);
-        var sql = GenerateSql(intent, nl);
-        var safetyResult = SafetyCheck(sql);
-        if (!safetyResult.IsSafe)
-        {
-            return BuildResult(sessionId, corrections, sql, false,
-                $"SQL安全校验未通过：{safetyResult.Reason}");
+            var parts = col.Split('.');
+            var table = parts[0].ToUpperInvariant();
+            var column = parts[1].ToUpperInvariant();
+            if (upper.Contains(table) && upper.Contains(column))
+                return (false, $"禁止查询敏感字段 {col}");
         }
-
-        var data = await ExecuteReadOnlyAsync(sql);
-        return BuildResult(sessionId, corrections, sql, true,
-            $"已识别意图「{intent}」，查询结果如下。", data, TryBuildChart(data, nl));
+        return (true, "");
     }
 
-    // ============ 规则意图：统一组织口径的内存聚合（党总支递归汇总其下支部） ============
+    private static List<Dictionary<string, object>> MaskSensitiveData(List<Dictionary<string, object>> data)
+    {
+        foreach (var row in data)
+        {
+            var keys = row.Keys.ToList();
+            foreach (var key in keys)
+            {
+                var lowerKey = key.ToLowerInvariant();
+                if (lowerKey == "phone" && row[key] is string phone && phone.Length >= 7)
+                {
+                    row[key] = phone[..3] + "****" + phone[^4..];
+                }
+                else if (lowerKey is "passwordhash" or "refreshtoken" or "refreshtokenexpiry")
+                {
+                    row[key] = "***";
+                }
+            }
+        }
+        return data;
+    }
+
+    private static string? BuildResultSummary(List<Dictionary<string, object>> data)
+    {
+        if (data.Count == 0) return null;
+        var first = data[0];
+        return $"共{data.Count}行，首行：{string.Join(", ", first.Take(5).Select(kv => $"{kv.Key}={kv.Value}"))}";
+    }
+
+    private static string IntentName(string intent) => intent switch
+    {
+        "task_completion" => "任务完成率",
+        "exam_score" => "测验成绩/平均分",
+        "learning_duration" => "学习时长",
+        "member_count" => "党员人数",
+        "ranking" => "排名对比",
+        _ => intent
+    };
 
     private async Task<List<Dictionary<string, object>>> ExecuteRuleQueryAsync(string intent)
     {
@@ -217,9 +362,7 @@ public class Nl2SqlService : INl2SqlService
                 ? Math.Round((double)done / (contentCount * mIds.Count) * 100, 2) : 0.0;
             rows.Add(new Dictionary<string, object>
             {
-                ["org_name"] = org.Name,
-                ["member_count"] = mIds.Count,
-                ["completion_rate"] = rate
+                ["org_name"] = org.Name, ["member_count"] = mIds.Count, ["completion_rate"] = rate
             });
         }
         return rows.OrderByDescending(r => r["completion_rate"]).ToList();
@@ -241,9 +384,7 @@ public class Nl2SqlService : INl2SqlService
             var avg = orgRecords.Any() ? Math.Round(orgRecords.Average(r => r.Score), 2) : 0.0;
             rows.Add(new Dictionary<string, object>
             {
-                ["org_name"] = org.Name,
-                ["avg_score"] = avg,
-                ["exam_count"] = orgRecords.Count
+                ["org_name"] = org.Name, ["avg_score"] = avg, ["exam_count"] = orgRecords.Count
             });
         }
         return rows.OrderByDescending(r => r["avg_score"]).ToList();
@@ -260,11 +401,7 @@ public class Nl2SqlService : INl2SqlService
         {
             var scope = scopeMap[org.Id];
             var count = members.Count(m => scope.Contains(m.OrganizationId));
-            rows.Add(new Dictionary<string, object>
-            {
-                ["org_name"] = org.Name,
-                ["member_count"] = count
-            });
+            rows.Add(new Dictionary<string, object> { ["org_name"] = org.Name, ["member_count"] = count });
         }
         return rows.OrderByDescending(r => r["member_count"]).ToList();
     }
@@ -290,15 +427,11 @@ public class Nl2SqlService : INl2SqlService
         return rows;
     }
 
-    // ============ 真实执行 ============
-
-    /// <summary>只读执行 SELECT，返回最多 MaxRows 行结果</summary>
     private async Task<List<Dictionary<string, object>>> ExecuteReadOnlyAsync(string sql)
     {
         var result = new List<Dictionary<string, object>>();
         try
         {
-            // 兜底：未带 LIMIT 的 SELECT 强制追加 LIMIT，防止超大结果
             var safeSql = sql.Trim().TrimEnd(';', ' ', '\t', '\r', '\n');
             var upper = safeSql.ToUpperInvariant();
             if (!upper.Contains(" LIMIT "))
@@ -326,21 +459,18 @@ public class Nl2SqlService : INl2SqlService
         }
         catch
         {
-            // 执行失败（如列名/表名不合法）：返回空，由上层提示
             return new List<Dictionary<string, object>>();
         }
         return result;
     }
 
-    /// <summary>根据结果行数生成回答文本；无结果时给出可读提示</summary>
-    private static Nl2SqlResponse BuildResult(string sessionId, List<string> corrections, string sql, bool executed,
-        string explanation, List<Dictionary<string, object>>? data = null, ChartDataDto? chart = null)
+    private static Nl2SqlResponse BuildResultV2(string sessionId, List<string> corrections, string sql, bool executed,
+        string explanation, List<Dictionary<string, object>>? data, ChartDataDto? chart,
+        string intent, string rewrittenQuery, bool isResolved, List<Nl2SqlConversationItem> conversation)
     {
         var resultData = data ?? new List<Dictionary<string, object>>();
         if (executed && resultData.Count == 0)
-        {
-            explanation += "（未查询到匹配数据，请尝试换个问法或检查是否该维度暂无记录）";
-        }
+            explanation += "（未查询到匹配数据，请尝试换个问法）";
         return new Nl2SqlResponse
         {
             GeneratedSql = sql,
@@ -348,11 +478,14 @@ public class Nl2SqlService : INl2SqlService
             ResultData = resultData,
             ChartData = chart,
             SessionId = sessionId,
-            CorrectionsApplied = corrections
+            CorrectionsApplied = corrections,
+            Intent = intent,
+            RewrittenQuery = rewrittenQuery,
+            IsResolvedFromHistory = isResolved,
+            Conversation = conversation
         };
     }
 
-    /// <summary>把查询结果转为图表（按前两列：名称+数值）</summary>
     private static ChartDataDto? TryBuildChart(List<Dictionary<string, object>> data, string nl)
     {
         if (data == null || data.Count == 0) return null;
@@ -360,21 +493,19 @@ public class Nl2SqlService : INl2SqlService
         var keys = first.Keys.ToList();
         if (keys.Count < 2) return null;
 
-        // 找到字符串列（名称）和数值列（值）：数值列优先选含 rate/score/avg/count 语义的
         string? nameKey = null;
         string? valueKey = null;
-        var numericKeys = keys.Where(k => first[k] is int || first[k] is long || first[k] is double || first[k] is decimal).ToList();
+        var numericKeys = keys.Where(k => first[k] is int or long or double or decimal).ToList();
         var preferred = numericKeys.FirstOrDefault(k =>
             k.Contains("rate", StringComparison.OrdinalIgnoreCase) ||
             k.Contains("percent", StringComparison.OrdinalIgnoreCase) ||
             k.Contains("score", StringComparison.OrdinalIgnoreCase) ||
             k.Contains("avg", StringComparison.OrdinalIgnoreCase) ||
-            k.Contains("minutes", StringComparison.OrdinalIgnoreCase) ||
-            k.Contains("hours", StringComparison.OrdinalIgnoreCase));
+            k.Contains("minutes", StringComparison.OrdinalIgnoreCase));
         valueKey = preferred ?? numericKeys.FirstOrDefault();
         foreach (var k in keys)
         {
-            if (nameKey == null && k != valueKey && first[k] is string s) { nameKey = k; break; }
+            if (nameKey == null && k != valueKey && first[k] is string) { nameKey = k; break; }
         }
         if (nameKey == null || valueKey == null) return null;
 
@@ -388,7 +519,6 @@ public class Nl2SqlService : INl2SqlService
             return 0.0;
         }).ToList();
 
-        // 前两列数量接近说明是趋势型数据（按行）
         bool isPie = labels.Distinct().Count() == labels.Count && labels.Count <= 12;
         bool isTrend = nl.Contains("趋势") || nl.Contains("每月") || nl.Contains("时长");
         return new ChartDataDto
@@ -398,8 +528,6 @@ public class Nl2SqlService : INl2SqlService
             Values = values
         };
     }
-
-    // ============ 意图识别与 SQL 生成（回退路径） ============
 
     private static string DetectIntent(string nl)
     {
@@ -413,54 +541,32 @@ public class Nl2SqlService : INl2SqlService
 
     private static string GenerateSql(string intent, string nl)
     {
-        switch (intent)
+        return intent switch
         {
-            case "task_completion":
-                return "SELECT o.name AS org_name, " +
-                       "COUNT(DISTINCT pm.Id) AS member_count, " +
-                       "ROUND(COALESCE(AVG(CASE WHEN mlp.is_completed = 1 THEN 1 ELSE 0 END), 0) * 100, 2) AS completion_rate " +
-                       "FROM organizations o " +
-                       "LEFT JOIN partymembers pm ON o.id = pm.OrganizationId AND pm.IsEnabled = 1 " +
-                       "LEFT JOIN member_learning_progress mlp ON pm.Id = mlp.member_id " +
-                       "GROUP BY o.id, o.name " +
-                       "ORDER BY completion_rate DESC";
-            case "exam_score":
-                return "SELECT o.name AS org_name, " +
-                       "ROUND(COALESCE(AVG(mtr.score), 0), 2) AS avg_score, " +
-                       "COUNT(mtr.id) AS exam_count " +
-                       "FROM organizations o " +
-                       "LEFT JOIN partymembers pm ON o.id = pm.OrganizationId AND pm.IsEnabled = 1 " +
-                       "LEFT JOIN member_test_records mtr ON pm.Id = mtr.member_id " +
-                       "GROUP BY o.id, o.name " +
-                       "ORDER BY avg_score DESC";
-            case "learning_duration":
-                return "SELECT DATE(mlp.updated_at) AS date, " +
-                       "ROUND(SUM(mlp.duration_seconds) / 60, 2) AS minutes " +
-                       "FROM member_learning_progress mlp " +
-                       "WHERE mlp.duration_seconds > 0 " +
-                       "GROUP BY DATE(mlp.updated_at) " +
-                       "ORDER BY date DESC";
-            case "member_count":
-                return "SELECT o.name AS org_name, COUNT(DISTINCT pm.Id) AS member_count " +
-                       "FROM organizations o " +
-                       "LEFT JOIN partymembers pm ON o.id = pm.OrganizationId AND pm.IsEnabled = 1 " +
-                       "GROUP BY o.id, o.name " +
-                       "ORDER BY member_count DESC";
-            default:
-                return "SELECT pm.Id, pm.Name AS member_name, o.name AS org_name, pm.MemberType, pm.IsEnabled " +
-                       "FROM partymembers pm " +
-                       "LEFT JOIN organizations o ON pm.OrganizationId = o.id " +
-                       "WHERE pm.IsEnabled = 1 " +
-                       "ORDER BY pm.Id LIMIT 20";
-        }
+            "task_completion" => "SELECT o.name AS org_name, COUNT(DISTINCT pm.Id) AS member_count, " +
+                                 "ROUND(COALESCE(AVG(CASE WHEN mlp.is_completed = 1 THEN 1 ELSE 0 END), 0) * 100, 2) AS completion_rate " +
+                                 "FROM organizations o LEFT JOIN partymembers pm ON o.id = pm.OrganizationId AND pm.IsEnabled = 1 " +
+                                 "LEFT JOIN member_learning_progress mlp ON pm.Id = mlp.member_id " +
+                                 "GROUP BY o.id, o.name ORDER BY completion_rate DESC",
+            "exam_score" => "SELECT o.name AS org_name, ROUND(COALESCE(AVG(mtr.score), 0), 2) AS avg_score, COUNT(mtr.id) AS exam_count " +
+                            "FROM organizations o LEFT JOIN partymembers pm ON o.id = pm.OrganizationId AND pm.IsEnabled = 1 " +
+                            "LEFT JOIN member_test_records mtr ON pm.Id = mtr.member_id " +
+                            "GROUP BY o.id, o.name ORDER BY avg_score DESC",
+            "learning_duration" => "SELECT DATE(mlp.updated_at) AS date, ROUND(SUM(mlp.duration_seconds) / 60, 2) AS minutes " +
+                                   "FROM member_learning_progress mlp WHERE mlp.duration_seconds > 0 " +
+                                   "GROUP BY DATE(mlp.updated_at) ORDER BY date DESC",
+            "member_count" => "SELECT o.name AS org_name, COUNT(DISTINCT pm.Id) AS member_count " +
+                              "FROM organizations o LEFT JOIN partymembers pm ON o.id = pm.OrganizationId AND pm.IsEnabled = 1 " +
+                              "GROUP BY o.id, o.name ORDER BY member_count DESC",
+            _ => "SELECT pm.Id, pm.Name AS member_name, o.name AS org_name, pm.MemberType, pm.IsEnabled " +
+                 "FROM partymembers pm LEFT JOIN organizations o ON pm.OrganizationId = o.id " +
+                 "WHERE pm.IsEnabled = 1 ORDER BY pm.Id LIMIT 20"
+        };
     }
-
-    // ============ 安全校验 ============
 
     private static (bool IsSafe, string Reason) SafetyCheck(string sql)
     {
         var upper = sql.ToUpperInvariant().Replace(" ", "");
-        // 必须以 SELECT 开头（允许 WITH? 不，仅 SELECT）
         var trimmed = upper.TrimStart();
         if (!trimmed.StartsWith("SELECT"))
             return (false, "仅允许 SELECT 只读查询");
@@ -469,7 +575,6 @@ public class Nl2SqlService : INl2SqlService
             if (upper.Contains(keyword))
                 return (false, $"包含危险关键字：{keyword}");
         }
-        // 白名单表校验（至少引用一张白名单表）
         foreach (var table in AllowedTables)
         {
             if (upper.Contains(table.ToUpperInvariant())) return (true, string.Empty);

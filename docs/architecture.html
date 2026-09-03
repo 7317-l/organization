@@ -1,0 +1,75 @@
+<html style="margin:0;padding:0;">
+<div style="background-color:transparent;box-sizing:border-box;font-family:'Roboto','PingFang SC','Segoe UI',Arial,sans-serif;--accent:#9BBBF4;">
+  <div style="padding:4px 2px;">
+    <div style="font-size:15px;font-weight:600;color:#1A1B1C;margin-bottom:10px;">党校学习双端系统 · 总体架构图</div>
+
+    <!-- 展示层 -->
+    <div style="border:1px solid rgba(155,187,244,0.55);border-radius:12px;padding:12px 12px 10px;background:linear-gradient(135deg, rgba(155,187,244,0.10), rgba(155,187,244,0.22));">
+      <div style="font-size:12px;font-weight:600;color:#3B5BA5;margin-bottom:8px;">① 展示层（前端 · Vue 3 + Vite + Element Plus）</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="flex:1 1 280px;min-width:0;background:#FFFFFF;border-radius:10px;padding:10px;box-sizing:border-box;">
+          <div style="font-size:12px;font-weight:600;color:#1A1B1C;">管理后台 <span style="color:#6B7280;font-weight:400;">frontend-admin · :5173</span></div>
+          <div style="font-size:11px;color:#6B7280;margin-top:5px;line-height:1.6;">工作台 · 组织人员 · 学习内容 · 题库测验 · 组织生活 · 数据智能分析</div>
+        </div>
+        <div style="flex:1 1 280px;min-width:0;background:#FFFFFF;border-radius:10px;padding:10px;box-sizing:border-box;">
+          <div style="font-size:12px;font-weight:600;color:#1A1B1C;">党员端 <span style="color:#6B7280;font-weight:400;">frontend-member · :5174</span></div>
+          <div style="font-size:11px;color:#6B7280;margin-top:5px;line-height:1.6;">首页 · 学习中心 · 考试中心 · 我的 · AI 党建助手 · 学习报告</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 连接箭头 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 2px;color:#3B5BA5;">
+      <svg width="100%" height="20" viewBox="0 0 600 20" preserveAspectRatio="none" style="display:block;">
+        <line x1="0" y1="10" x2="600" y2="10" stroke="#8FA8DC" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <polygon points="596,10 588,6 588,14" fill="#8FA8DC"/>
+      </svg>
+    </div>
+    <div style="text-align:center;font-size:11px;color:#3B5BA5;margin:-2px 0 6px;">RESTful API /api/v1 · JSON · JWT Bearer 认证</div>
+
+    <!-- 接口层 -->
+    <div style="border:1px solid rgba(94,129,172,0.5);border-radius:12px;padding:12px 12px 10px;background:linear-gradient(135deg, rgba(94,129,172,0.08), rgba(94,129,172,0.18));">
+      <div style="font-size:12px;font-weight:600;color:#33507A;margin-bottom:8px;">② 接口与服务层（后端 · ASP.NET Core Web API · :5091）</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div style="flex:1 1 180px;min-width:0;background:#FFFFFF;border-radius:8px;padding:8px 10px;box-sizing:border-box;">
+          <div style="font-size:11px;font-weight:600;color:#33507A;">核心业务</div>
+          <div style="font-size:11px;color:#4B5563;margin-top:4px;line-height:1.7;">认证授权 · 组织架构 · 党员管理<br/>学习内容/任务 · 题库/试卷/测验<br/>组织生活(三会一课) · 打卡 · 积分<br/>消息通知 · 防挂机 · 统计分析</div>
+        </div>
+        <div style="flex:1 1 180px;min-width:0;background:#FFFFFF;border-radius:8px;padding:8px 10px;box-sizing:border-box;">
+          <div style="font-size:11px;font-weight:600;color:#33507A;">AI 智能能力</div>
+          <div style="font-size:11px;color:#4B5563;margin-top:4px;line-height:1.7;">党建智能问答 · 知识检索<br/>数据NL2SQL(自然语言查数据)<br/>错题KMeans聚类 · AI内容生成<br/>AI考核报告/季度报告/学习评估</div>
+        </div>
+        <div style="flex:1 1 180px;min-width:0;background:#FFFFFF;border-radius:8px;padding:8px 10px;box-sizing:border-box;">
+          <div style="font-size:11px;font-weight:600;color:#33507A;">框架设施</div>
+          <div style="font-size:11px;color:#4B5563;margin-top:4px;line-height:1.7;">22 个 Controller · 19+ Service<br/>JWT + 角色授权 · 全局异常<br/>AutoMapper · Swagger 文档<br/>依赖注入 · CORS 全开</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 连接箭头 -->
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 2px;color:#3B5BA5;">
+      <svg width="100%" height="20" viewBox="0 0 600 20" preserveAspectRatio="none" style="display:block;">
+        <line x1="0" y1="10" x2="600" y2="10" stroke="#8FA8DC" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <polygon points="596,10 588,6 588,14" fill="#8FA8DC"/>
+      </svg>
+    </div>
+    <div style="text-align:center;font-size:11px;color:#3B5BA5;margin:-2px 0 6px;">EF Core (Pomelo MySQL)　·　HTTP 千问大模型调用</div>
+
+    <!-- 数据与服务层 -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="flex:1 1 320px;min-width:0;border:1px solid rgba(148,216,195,0.55);border-radius:12px;padding:12px;background:linear-gradient(135deg, rgba(148,216,195,0.10), rgba(148,216,195,0.20));box-sizing:border-box;">
+        <div style="font-size:12px;font-weight:600;color:#1F7A5C;margin-bottom:8px;">③ 数据层 · MySQL <span style="color:#6B7280;font-weight:400;">party_school · :3306</span></div>
+        <div style="font-size:11px;color:#4B5563;line-height:1.7;">26 张业务表：组织 · 党员 · 学习内容/任务/进度<br/>试卷 · 测验 · 答题记录 · 题库/分类<br/>三会一课 · 打卡 · 积分 · 通知 · 发展流程<br/>学习报告 · 季度报告 · PK对战 · 结对帮扶</div>
+      </div>
+      <div style="flex:1 1 280px;min-width:0;border:1px solid rgba(201,167,232,0.55);border-radius:12px;padding:12px;background:linear-gradient(135deg, rgba(201,167,232,0.10), rgba(201,167,232,0.20));box-sizing:border-box;">
+        <div style="font-size:12px;font-weight:600;color:#6A3E9E;margin-bottom:8px;">④ 智能服务 · 通义千问</div>
+        <div style="font-size:11px;color:#4B5563;line-height:1.7;">DashScope 兼容模式 · qwen-plus<br/>文本对话 · JSON 结构化输出<br/>密钥：appsettings / 环境变量 / .env</div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:#6B7280;margin-top:10px;border-top:1px solid rgba(0,0,0,0.08);padding-top:8px;line-height:1.6;">
+      说明：两端通过 JWT 令牌访问同一后端；管理后台角色为系统管理员/支部书记，党员端面向普通党员；数据口径与组织架构递归汇总（总支=其下所有支部）。本图为系统结构示意，基于项目源码整理。
+    </div>
+  </div>
+</div>
+</html>

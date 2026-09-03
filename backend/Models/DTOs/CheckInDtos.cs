@@ -1,4 +1,4 @@
-﻿using PartySchoolApi.Models.Common;
+using PartySchoolApi.Models.Common;
 
 namespace PartySchoolApi.Models.DTOs;
 
@@ -17,6 +17,9 @@ public class CheckInRecordDto
     public DateTime CheckInTime { get; set; }
     public string? Note { get; set; }
     public string? AiBackgroundInterpretation { get; set; }
+    public int? SiteId { get; set; }
+    public string? SiteName { get; set; }
+    public List<string> HistoricalFacts { get; set; } = new();
     public int PointsEarned { get; set; }
 }
 
@@ -24,6 +27,7 @@ public class CreateCheckInRequest
 {
     public string LocationName { get; set; } = string.Empty;
     public string? Note { get; set; }
+    public int? SiteId { get; set; }
 }
 
 public class AiBackgroundDto

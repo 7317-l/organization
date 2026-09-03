@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
@@ -29,4 +29,8 @@ public class PointController : ControllerBase
     {
         return ApiResponse.Success(await _service.GetRankingAsync(orgId));
     }
+
+    /// <summary>Contract alias: /points/my</summary>
+    [HttpGet("my")]
+    public Task<PagedResponse> GetMyRecords([FromQuery] PointRecordQueryParams query) => GetRecords(query);
 }

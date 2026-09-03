@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.Entities;
 
@@ -38,6 +38,16 @@ public class AppDbContext : DbContext
     public DbSet<MessageNotification> MessageNotifications => Set<MessageNotification>();
     public DbSet<BattleRecord> BattleRecords => Set<BattleRecord>();
     public DbSet<PairHelpRecord> PairHelpRecords => Set<PairHelpRecord>();
+
+    // ===== 15项功能新增表 =====
+    public DbSet<Nl2SqlSession> Nl2SqlSessions => Set<Nl2SqlSession>();
+    public DbSet<PartyDevelopmentReminder> PartyDevelopmentReminders => Set<PartyDevelopmentReminder>();
+    public DbSet<OrganizationQuarterlyRating> OrganizationQuarterlyRatings => Set<OrganizationQuarterlyRating>();
+    public DbSet<OrgRectification> OrgRectifications => Set<OrgRectification>();
+    public DbSet<PairHelpRequest> PairHelpRequests => Set<PairHelpRequest>();
+    public DbSet<BattleGame> BattleGames => Set<BattleGame>();
+    public DbSet<EducationSite> EducationSites => Set<EducationSite>();
+    public DbSet<AntiCheatRecord> AntiCheatRecords => Set<AntiCheatRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -106,7 +116,6 @@ public class AppDbContext : DbContext
             entity.HasOne(e => e.Category).WithMany(e => e.Contents)
                   .HasForeignKey(e => e.CategoryId).OnDelete(DeleteBehavior.SetNull);
             entity.Property(e => e.ContentType).HasConversion<int>();
-            // 修正默认值：使用枚举成员
             entity.Property(e => e.SourceType).HasConversion<int>().HasDefaultValue(ContentSourceType.Manual);
         });
 
@@ -258,6 +267,7 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.PartyMemberId);
             entity.HasIndex(e => e.LocationName);
+            entity.HasIndex(e => e.SiteId);
             entity.HasOne(e => e.PartyMember).WithMany()
                   .HasForeignKey(e => e.PartyMemberId).OnDelete(DeleteBehavior.Cascade);
         });
@@ -306,6 +316,88 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.HelperId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(e => e.HelpReceiver).WithMany()
                   .HasForeignKey(e => e.HelpReceiverId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ===== 15项功能新增表配置 =====
+
+        // NL2SQL会话
+        modelBuilder.Entity<Nl2SqlSession>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.SessionId).IsUnique();
+            entity.HasIndex(e => e.MemberId);
+            entity.HasOne(e => e.Member).WithMany()
+                  .HasForeignKey(e => e.MemberId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 党员发展到期提醒
+        modelBuilder.Entity<PartyDevelopmentReminder>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.PartyMemberId);
+            entity.HasIndex(e => e.ProcessId);
+            entity.HasOne(e => e.Process).WithMany()
+                  .HasForeignKey(e => e.ProcessId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.PartyMember).WithMany()
+                  .HasForeignKey(e => e.PartyMemberId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 支部季度评级
+        modelBuilder.Entity<OrganizationQuarterlyRating>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.OrganizationId, e.Quarter }).IsUnique();
+            entity.HasOne(e => e.Organization).WithMany()
+                  .HasForeignKey(e => e.OrganizationId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 支部整改项
+        modelBuilder.Entity<OrgRectification>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.OrganizationId, e.Quarter });
+            entity.HasOne(e => e.Organization).WithMany()
+                  .HasForeignKey(e => e.OrganizationId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 结对帮扶申请
+        modelBuilder.Entity<PairHelpRequest>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.HelpReceiverId);
+            entity.HasIndex(e => e.HelperId);
+            entity.HasOne(e => e.Helper).WithMany()
+                  .HasForeignKey(e => e.HelperId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.HelpReceiver).WithMany()
+                  .HasForeignKey(e => e.HelpReceiverId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // 党史PK对局
+        modelBuilder.Entity<BattleGame>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ChallengerId);
+            entity.HasIndex(e => e.OpponentId);
+            entity.HasOne(e => e.Challenger).WithMany()
+                  .HasForeignKey(e => e.ChallengerId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Opponent).WithMany()
+                  .HasForeignKey(e => e.OpponentId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // 红色教育基地
+        modelBuilder.Entity<EducationSite>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Name).IsUnique();
+        });
+
+        // 防挂机记录
+        modelBuilder.Entity<AntiCheatRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.PartyMemberId, e.VerifiedAt });
+            entity.HasOne(e => e.PartyMember).WithMany()
+                  .HasForeignKey(e => e.PartyMemberId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
