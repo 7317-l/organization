@@ -47,6 +47,14 @@
             <el-icon><Connection /></el-icon>
             <span>结对互助</span>
           </el-menu-item>
+          <el-menu-item index="/org-life">
+            <el-icon><Calendar /></el-icon>
+            <span>组织生活</span>
+          </el-menu-item>
+          <el-menu-item index="/education-sites">
+            <el-icon><LocationFilled /></el-icon>
+            <span>红色基地</span>
+          </el-menu-item>
           <el-menu-item index="/profile">
             <el-icon><User /></el-icon>
             <span>我的</span>

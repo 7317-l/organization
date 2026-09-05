@@ -24,3 +24,23 @@ export function deleteTask(id) {
 export function getTaskCompletion(id) {
   return request.get(`/tasks/${id}/completion`)
 }
+
+// 催办任务
+export function urgeTask(id) {
+  return request.post(`/tasks/${id}/urge`)
+}
+
+// 获取待完成任务（党员端）
+export function getPendingTasks(params = {}) {
+  return request.get('/mobile/tasks/pending', { params })
+}
+
+// 获取已完成任务（党员端）
+export function getCompletedTasks(params = {}) {
+  return request.get('/mobile/tasks/completed', { params })
+}
+
+// 完成任务（党员端）
+export function completeTask(data) {
+  return request.post('/mobile/tasks/complete', data)
+}

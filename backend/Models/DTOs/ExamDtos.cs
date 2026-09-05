@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace PartySchoolApi.Models.DTOs;
 
@@ -99,4 +99,14 @@ public class MemberTestRecordDto
     public string MemberName { get; set; } = string.Empty;
     public int Score { get; set; }
     public DateTime SubmittedAt { get; set; }
+}
+
+/// <summary>专项练习卷（随机抽题生成）</summary>
+public class PracticePaperDto
+{
+    public string PracticeId { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public int QuestionCount { get; set; }
+    public int TotalScore { get; set; }
+    public List<QuestionListItemDto> Questions { get; set; } = new();
 }

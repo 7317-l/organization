@@ -32,6 +32,20 @@
           </div>
           <div class="chat-bubble-wrap">
             <div class="chat-bubble" v-html="formatMessage(msg.content)"></div>
+            <!-- RAG引用来源 -->
+            <div v-if="msg.role === 'ai' && msg.sources && msg.sources.length > 0" class="chat-sources">
+              <div class="sources-title">📚 参考来源</div>
+              <div
+                v-for="(src, sidx) in msg.sources"
+                :key="sidx"
+                class="source-item"
+                @click="openSource(src)"
+              >
+                <span class="source-title">{{ src.title }}</span>
+                <span class="source-score">相似度: {{ formatScore(src.score) }}%</span>
+                <div class="source-snippet">{{ src.snippet }}</div>
+              </div>
+            </div>
             <div class="chat-time">{{ msg.time }}</div>
           </div>
         </div>
@@ -75,10 +89,21 @@
         <input
           v-model="inputText"
           type="text"
-          placeholder="请输入党建问题..."
+          :placeholder="isRecording ? '正在聆听...' : '请输入党建问题...'"
           @keyup.enter="handleSend"
           :disabled="loading"
+          :class="{ 'recording-input': isRecording }"
         />
+        <el-button
+          v-if="speechSupported"
+          :type="isRecording ? 'danger' : 'default'"
+          :class="{ 'recording-pulse': isRecording }"
+          @click="toggleSpeechRecognition"
+          :title="isRecording ? '停止录音' : '语音输入'"
+          circle
+        >
+          <el-icon><Microphone /></el-icon>
+        </el-button>
         <el-button type="primary" :loading="loading" @click="handleSend">
           发送
         </el-button>
@@ -88,9 +113,10 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChatDotRound } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { ChatDotRound, Microphone } from '@element-plus/icons-vue'
 import { aiQuery } from '@/api/ai'
 import { useUserStore } from '@/stores/user'
 import { getAvatarChar } from '@/utils/format'
@@ -105,6 +131,11 @@ const messagesRef = ref(null)
 
 const avatarChar = ref(getAvatarChar(userStore.userName || '用户'))
 
+// 语音识别相关
+const speechSupported = ref(false)
+const isRecording = ref(false)
+let recognition = null
+
 const quickQuestions = [
   '什么是四个意识？',
   '什么是两个维护？',
@@ -114,8 +145,13 @@ const quickQuestions = [
 
 function formatMessage(text) {
   if (!text) return ''
-  // 简单的换行处理
   return text.replace(/\n/g, '<br>')
+}
+
+function formatScore(score) {
+  if (!score) return 0
+  const s = typeof score === 'number' ? score : parseFloat(score)
+  return (s * 100).toFixed(1)
 }
 
 function getCurrentTime() {
@@ -131,10 +167,15 @@ function scrollToBottom() {
   })
 }
 
+function openSource(src) {
+  if (src.id || src.contentId) {
+    router.push(`/content/${src.id || src.contentId}`)
+  }
+}
+
 async function sendMessage(question) {
   if (!question.trim() || loading.value) return
 
-  // 添加用户消息
   messages.value.push({
     role: 'user',
     content: question,
@@ -147,15 +188,18 @@ async function sendMessage(question) {
   try {
     const data = await aiQuery(question)
     const answer = data?.answer || data?.content || data?.message || '抱歉，我暂时无法回答这个问题。'
+    const sources = data?.sources || data?.references || data?.searchResults || []
     messages.value.push({
       role: 'ai',
       content: answer,
+      sources: Array.isArray(sources) ? sources : [],
       time: getCurrentTime()
     })
   } catch {
     messages.value.push({
       role: 'ai',
       content: '抱歉，服务暂时不可用，请稍后重试。',
+      sources: [],
       time: getCurrentTime()
     })
   } finally {
@@ -176,11 +220,68 @@ function goBack() {
   router.back()
 }
 
+// 语音识别初始化
+function initSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (!SpeechRecognition) {
+    speechSupported.value = false
+    return
+  }
+  speechSupported.value = true
+  recognition = new SpeechRecognition()
+  recognition.lang = 'zh-CN'
+  recognition.interimResults = true
+  recognition.continuous = false
+
+  recognition.onresult = (event) => {
+    let transcript = ''
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript
+    }
+    inputText.value = transcript
+  }
+
+  recognition.onerror = (event) => {
+    isRecording.value = false
+    if (event.error === 'not-allowed') {
+      ElMessage.error('请允许麦克风权限')
+    } else if (event.error !== 'no-speech') {
+      ElMessage.warning('语音识别出错：' + event.error)
+    }
+  }
+
+  recognition.onend = () => {
+    isRecording.value = false
+  }
+}
+
+function toggleSpeechRecognition() {
+  if (!recognition) return
+  if (isRecording.value) {
+    recognition.stop()
+    isRecording.value = false
+  } else {
+    try {
+      recognition.start()
+      isRecording.value = true
+    } catch (e) {
+      ElMessage.warning('启动语音识别失败')
+    }
+  }
+}
+
 onMounted(() => {
+  initSpeechRecognition()
   if (!userStore.userInfo) {
     userStore.fetchUserInfo().then(() => {
       avatarChar.value = getAvatarChar(userStore.userName || '用户')
     }).catch(() => {})
+  }
+})
+
+onBeforeUnmount(() => {
+  if (recognition) {
+    recognition.abort()
   }
 })
 </script>
@@ -333,6 +434,58 @@ onMounted(() => {
   border-top-right-radius: 4px;
 }
 
+/* RAG引用来源 */
+.chat-sources {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #f5f7fa;
+  border-radius: 8px;
+  font-size: 12px;
+  border-left: 3px solid #409eff;
+}
+
+.sources-title {
+  font-weight: 600;
+  color: #606266;
+  margin-bottom: 6px;
+}
+
+.source-item {
+  padding: 6px 0;
+  border-bottom: 1px solid #e4e7ed;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.source-item:hover {
+  background: #ecf5ff;
+}
+
+.source-item:last-child {
+  border-bottom: none;
+}
+
+.source-title {
+  color: #409eff;
+  margin-right: 8px;
+  font-weight: 500;
+}
+
+.source-score {
+  color: #909399;
+  font-size: 11px;
+}
+
+.source-snippet {
+  color: #606266;
+  margin-top: 4px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .chat-time {
   font-size: 11px;
   color: var(--t3);
@@ -424,5 +577,26 @@ onMounted(() => {
 .chat-input input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.chat-input input.recording-input {
+  border-color: #f56c6c;
+  background: #fef0f0;
+}
+
+/* 录音脉冲动画 */
+.recording-pulse {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
 }
 </style>

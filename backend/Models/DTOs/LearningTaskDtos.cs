@@ -30,6 +30,8 @@ public class TaskListItemDto
     public string? TargetOrgName { get; set; }
     public DateTime Deadline { get; set; }
     public int ContentCount { get; set; }
+    public int? ExamPaperId { get; set; }
+    public string? ExamPaperName { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 
@@ -41,6 +43,8 @@ public class TaskDetailDto
     public int TargetOrgId { get; set; }
     public string? TargetOrgName { get; set; }
     public DateTime Deadline { get; set; }
+    public int? ExamPaperId { get; set; }
+    public string? ExamPaperName { get; set; }
     public List<ContentListItemDto> Contents { get; set; } = new();
     public DateTime CreatedAt { get; set; }
 }
@@ -58,6 +62,9 @@ public class CreateTaskRequest
     [Required(ErrorMessage = "截止时间不能为空")]
     public DateTime Deadline { get; set; }
 
+    /// <summary>关联试卷ID（可选）</summary>
+    public int? ExamPaperId { get; set; }
+
     public List<int> ContentIds { get; set; } = new();
 }
 
@@ -69,6 +76,7 @@ public class UpdateTaskRequest
     public string TaskName { get; set; } = string.Empty;
     public int TargetOrgId { get; set; }
     public DateTime Deadline { get; set; }
+    public int? ExamPaperId { get; set; }
     public List<int> ContentIds { get; set; } = new();
 }
 
@@ -81,4 +89,14 @@ public class TaskCompletionDetailDto
     public int CompletedContents { get; set; }
     public double CompletionRate { get; set; }
     public int TotalLearningSeconds { get; set; }
+}
+
+/// <summary>催办结果</summary>
+public class TaskUrgeResultDto
+{
+    public int TaskId { get; set; }
+    public string TaskName { get; set; } = string.Empty;
+    public int TotalMembers { get; set; }
+    public int NotifiedCount { get; set; }
+    public List<string> NotifiedMembers { get; set; } = new();
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Helpers;
@@ -18,12 +18,14 @@ public class ExamService : IExamService
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUser;
+    private readonly INotificationService _notification;
 
-    public ExamService(AppDbContext context, IMapper mapper, ICurrentUserService currentUser)
+    public ExamService(AppDbContext context, IMapper mapper, ICurrentUserService currentUser, INotificationService notification)
     {
         _context = context;
         _mapper = mapper;
         _currentUser = currentUser;
+        _notification = notification;
     }
 
     // ===== 试卷 =====
@@ -186,6 +188,26 @@ public class ExamService : IExamService
 
         _context.ExamTests.Add(test);
         await _context.SaveChangesAsync();
+
+        // 发布考试时自动给目标支部党员发通知
+        var members = await _context.PartyMembers
+            .Where(m => m.OrganizationId == request.TargetOrgId && m.IsEnabled)
+            .ToListAsync();
+        foreach (var member in members)
+        {
+            try
+            {
+                await _notification.SendAsync(new SendNotificationRequest
+                {
+                    PartyMemberId = member.Id,
+                    Type = NotificationType.ExamReminder,
+                    Title = "新测验发布",
+                    Content = $"支部发布了新测验「{paper.Name}」，截止时间 {request.Deadline:yyyy-MM-dd HH:mm}，请及时参加。"
+                });
+            }
+            catch { }
+        }
+
         return _mapper.Map<ExamTestListItemDto>(test);
     }
 
@@ -237,6 +259,40 @@ public class ExamService : IExamService
             PassRate = passRate,
             Records = _mapper.Map<List<MemberTestRecordDto>>(
                 recordList.OrderByDescending(r => r.Score).ToList())
+        };
+    }
+
+    // ===== 专项练习：随机抽题 =====
+    public async Task<PracticePaperDto> GeneratePracticeAsync(string? category, int count)
+    {
+        var query = _context.Questions.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            // 按分类名称匹配
+            var cat = await _context.QuestionCategories
+                .FirstOrDefaultAsync(c => c.Name.Contains(category));
+            if (cat != null)
+                query = query.Where(q => q.CategoryId == cat.Id);
+        }
+
+        var allQuestions = await query.ToListAsync();
+        if (allQuestions.Count == 0)
+            throw new BusinessException("题库中没有匹配的题目", 404);
+
+        // 随机打乱并取前count道
+        var random = new Random();
+        var shuffled = allQuestions.OrderBy(_ => random.Next()).Take(Math.Min(count, allQuestions.Count)).ToList();
+
+        var totalScore = shuffled.Sum(q => q.Score);
+
+        return new PracticePaperDto
+        {
+            PracticeId = $"practice_{DateTime.Now:yyyyMMddHHmmss}_{random.Next(1000, 9999)}",
+            Title = string.IsNullOrWhiteSpace(category) ? "专项练习" : $"{category}专项练习",
+            QuestionCount = shuffled.Count,
+            TotalScore = totalScore,
+            Questions = shuffled.Select(q => _mapper.Map<QuestionListItemDto>(q)).ToList()
         };
     }
 }

@@ -65,6 +65,18 @@ const routes = [
         name: 'Rectification',
         component: () => import('@/views/Rectification.vue'),
         meta: { title: '整改闭环' }
+      },
+      {
+        path: 'party-development',
+        name: 'PartyDevelopment',
+        component: () => import('@/views/PartyDevelopment.vue'),
+        meta: { title: '党员发展台账' }
+      },
+      {
+        path: 'dashboard-fullscreen',
+        name: 'FullScreenDashboard',
+        component: () => import('@/views/FullScreenDashboard.vue'),
+        meta: { title: '数字驾驶舱' }
       }
     ]
   }

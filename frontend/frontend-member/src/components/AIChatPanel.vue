@@ -1605,7 +1605,7 @@ const startSummary =
 
       const response =
         await fetch(
-          "http://localhost:3000/api/ai/analyze-learning",
+          "/api/v1/ai-knowledge/query",
           {
             method:"POST",
             headers:{
@@ -1947,7 +1947,7 @@ const sendMessage =
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/ai/chat",
+        "/api/v1/ai-knowledge/query",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1962,7 +1962,7 @@ const sendMessage =
     } catch (error) {
       chatMessages.value.push({
         role: "assistant",
-        content: "网络错误，请检查AI后端是否启动（端口3000）。"
+        content: "网络错误，请检查后端服务是否启动。"
       })
     }
   }
@@ -1986,7 +1986,7 @@ const startAnalysis =
         .join("\n")
 
       const response = await fetch(
-        "http://localhost:3000/api/ai/question-help",
+        "/api/v1/ai-knowledge/query",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -2038,7 +2038,7 @@ const analyzeWrongQuestion =
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/ai/question-help",
+        "/api/v1/ai-knowledge/query",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

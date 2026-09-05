@@ -47,8 +47,11 @@ public class AiService : IAiService
         var member = await _context.PartyMembers.FindAsync(memberId);
         var orgId = member != null ? member.OrganizationId : 0;
 
-        // 获取该党员的薄弱知识点（从历史错题标签池取）
-        var weaknessTags = new List<string> { "党史", "党章", "四个意识" };
+        // 获取该党员的薄弱知识点（从真实错题数据动态生成）
+        var realErrorStats = await CalculateRealErrorStatsAsync(memberId);
+        var weaknessTags = realErrorStats.WeakTags.Count > 0
+            ? realErrorStats.WeakTags
+            : new List<string> { "党史", "党章", "四个意识" };
 
         // 获取支部紧迫任务
         var urgentTaskContentIds = await _context.TaskContents
@@ -72,8 +75,12 @@ public class AiService : IAiService
                 .Where(ct => ct.Tag != null)
                 .Select(ct => ct.Tag.Name)
                 .ToList();
-            double errorMatch = weaknessTags.Any(t => contentTags.Contains(t)) ? 1.0 : 0.2;
-            double similarity = new Random(c.Id).NextDouble() * 0.5 + 0.3;
+            double errorMatch = weaknessTags.Any(t => contentTags.Contains(t) || (c.Category != null && c.Category.Name.Contains(t))) ? 1.0 : 0.2;
+            // 真实相似度：内容标签与薄弱标签的匹配比例 + 分类匹配度
+            var matchedTags = contentTags.Count(t => weaknessTags.Any(w => t.Contains(w) || w.Contains(t)));
+            double tagSim = contentTags.Count > 0 ? (double)matchedTags / contentTags.Count : 0;
+            double catSim = c.Category != null && weaknessTags.Any(w => c.Category.Name.Contains(w) || w.Contains(c.Category.Name)) ? 0.8 : 0.3;
+            double similarity = Math.Round(tagSim * 0.6 + catSim * 0.4, 4);
             double urgency = urgentTaskContentIds.Contains(c.Id) ? 1.0 : 0.1;
             double total = errorMatch * 0.6 + similarity * 0.3 + urgency * 0.1;
 
@@ -120,8 +127,8 @@ public class AiService : IAiService
             try
             {
                 var userPrompt =
-                    "【实时数据快照】\n" + snapshot +
-                    "\n\n【用户问题】\n" + question +
+                    "【实时数据快照】\n" + MaskSensitiveBeforeAi(snapshot) +
+                    "\n\n【用户问题】\n" + MaskSensitiveBeforeAi(question) +
                     "\n\n请基于数据快照回答。只输出 JSON，不要任何多余文字。";
 
                 var raw = await _qwen.ChatAsync(
@@ -158,7 +165,8 @@ public class AiService : IAiService
         double durationScore = NormalizeDuration(overview.TotalLearningMinutes);
         double completionScore = overview.TaskCompletionRate;
         double examScore = Math.Min(overview.AverageExamScore, 100);
-        double errorScore = NormalizeErrorCount(overview.CompletedExamCount);
+        var errorStats = await CalculateRealErrorStatsAsync(memberId);
+        double errorScore = errorStats.TotalAnswered > 0 ? Math.Round((1 - (double)errorStats.TotalWrong / errorStats.TotalAnswered) * 100, 1) : 50;
 
         var dimensions = new List<AiDimensionDto>
         {
@@ -262,7 +270,7 @@ public class AiService : IAiService
                 var prompt =
                     "请基于以下某党组织的真实考核数据，撰写一份完整、专业、可落地的党建工作季度考核报告，包含四部分：" +
                     "一、总体评价；二、各维度分析（学习情况、任务完成、测验成绩、组织生活）；三、存在的突出问题；四、下阶段改进建议。\n" +
-                    "要求：语言专业客观，数据必须来自给定数据，不要编造，直接输出报告正文（不要JSON、不要Markdown标题符号）。\n\n" + snapshot;
+                    "要求：语言专业客观，数据必须来自给定数据，不要编造，直接输出报告正文（不要JSON、不要Markdown标题符号）。\n\n" + MaskSensitiveBeforeAi(snapshot.ToString());
                 var qwenReport = await _qwen.ChatAsync(
                     "你是党校党建考核专家，擅长撰写客观、专业、结构清晰的中文考核报告。",
                     prompt,
@@ -474,8 +482,9 @@ public class AiService : IAiService
         try
         {
             var dimText = string.Join("；", dims.Select(d => $"{d.Name}:{d.Score}分({d.Comment})"));
+            var maskedName = MaskSensitiveBeforeAi(name);
             var userPrompt =
-                $"党员姓名：{name}\n综合得分：{overall}（等级：{level}）\n各维度：{dimText}\n" +
+                $"党员姓名：{maskedName}\n综合得分：{overall}（等级：{level}）\n各维度：{dimText}\n" +
                 $"学习总时长：{overview.TotalLearningMinutes}分钟；任务完成{overview.CompletedTaskCount}/{overview.TotalTaskCount}；" +
                 $"考试次数：{overview.CompletedExamCount}；平均分：{overview.AverageExamScore}。\n\n" +
                 "请只输出 JSON：{\"summary\":\"一段150字以内的鼓励式个人学习总结（称呼同志，语气亲和专业）\",\"suggestions\":[\"3条具体可执行的改进建议\"]}";
@@ -533,8 +542,9 @@ public class AiService : IAiService
         try
         {
             var titles = string.Join("、", weighted.Take(5).Select(w => w.Content.Title));
+            var maskedMemberName = MaskSensitiveBeforeAi(memberName ?? "该同志");
             var userPrompt =
-                $"党员{memberName ?? "该同志"}的薄弱点：党史、党章、四个意识。" +
+                $"党员{maskedMemberName}的薄弱点：党史、党章、四个意识。" +
                 $"\n本次推荐内容：{titles}。\n\n请用一句不超过60字的中文说明推荐理由（结合薄弱点和支部任务），不要输出 JSON，直接给文本。";
             var reason = await _qwen.ChatAsync("你是党建学习平台的智能推荐助手。", userPrompt, temperature: 0.7, maxTokens: 120);
             return reason?.Trim() ?? string.Empty;
@@ -604,7 +614,21 @@ public class AiService : IAiService
                 .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
             var totalMinutes = totalSeconds / 60.0;
             if (totalMinutes <= 0) continue;
-            var idleRate = new Random(member.Id).NextDouble() * 0.3;
+            // 真实闲置率：从防挂机验证记录计算失败率，无记录时按学习时长估算
+            var antiCheatRecords = await _context.AntiCheatRecords
+                .Where(r => r.PartyMemberId == member.Id)
+                .ToListAsync();
+            double idleRate;
+            if (antiCheatRecords.Count > 0)
+            {
+                var failCount = antiCheatRecords.Count(r => !r.IsPass);
+                idleRate = Math.Min((double)failCount / antiCheatRecords.Count, 0.5);
+            }
+            else
+            {
+                // 无防挂机记录时，按学习时长估算：时长越短闲置率越高
+                idleRate = totalMinutes < 60 ? 0.25 : totalMinutes < 180 ? 0.15 : 0.08;
+            }
             var idleMinutes = totalMinutes * idleRate;
             byMember[member.Id] = idleMinutes;
             totalIdleMinutes += idleMinutes;
@@ -912,6 +936,122 @@ public class AiService : IAiService
         return 40;
     }
 
+    /// <summary>调用千问前的数据脱敏：姓名→姓*，手机号→前3后4中间*</summary>
+    private static string MaskSensitiveBeforeAi(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        var result = input;
+        // 手机号脱敏：11位数字
+        result = System.Text.RegularExpressions.Regex.Replace(result, @"(?<!\d)(1[3-9]\d)(\d{4})(\d{4})(?!\d)", "$1****$3");
+        // 姓名脱敏：2-4个中文字（常见姓名）
+        result = System.Text.RegularExpressions.Regex.Replace(result, @"([\u4e00-\u9fa5])([\u4e00-\u9fa5]{1,2})(?=[\s，。、；：""'）)】]|$)", m =>
+        {
+            var name = m.Value;
+            if (name.Length == 2) return name[0] + "*";
+            if (name.Length == 3) return name[0] + "*" + name[2];
+            if (name.Length >= 4) return name[0] + "**" + name[^1];
+            return name;
+        });
+        return result;
+    }
+
+    /// <summary>真实错题统计：从考试记录解析答案，逐题判题</summary>
+    private async Task<(int TotalAnswered, int TotalWrong, List<string> WeakTags)> CalculateRealErrorStatsAsync(int memberId)
+    {
+        var records = await _context.MemberTestRecords
+            .Where(r => r.MemberId == memberId)
+            .Include(r => r.Test).ThenInclude(t => t.Paper)
+            .ToListAsync();
+
+        var qidToAnswers = new Dictionary<int, List<(string Answer, DateTime Time)>>();
+        var qidSet = new HashSet<int>();
+        foreach (var rec in records)
+        {
+            var qids = ParseQuestionIdsSafe(rec.Test?.Paper?.QuestionIds);
+            foreach (var qid in qids) qidSet.Add(qid);
+            var answerDict = ParseAnswersSafe(rec.Answers);
+            foreach (var kv in answerDict)
+            {
+                qidSet.Add(kv.Key);
+                if (!qidToAnswers.ContainsKey(kv.Key))
+                    qidToAnswers[kv.Key] = new List<(string, DateTime)>();
+                qidToAnswers[kv.Key].Add((kv.Value, rec.SubmittedAt));
+            }
+        }
+
+        var questions = await _context.Questions
+            .Where(q => qidSet.Contains(q.Id))
+            .Include(q => q.Category)
+            .ToListAsync();
+
+        int totalAnswered = 0, totalWrong = 0;
+        var errorByTag = new Dictionary<string, int>();
+
+        foreach (var q in questions)
+        {
+            if (!qidToAnswers.TryGetValue(q.Id, out var attempts) || attempts.Count == 0) continue;
+            var latest = attempts.OrderByDescending(a => a.Time).First().Answer;
+            totalAnswered++;
+            var isCorrect = CheckAnswerReal(q, latest);
+            if (!isCorrect)
+            {
+                totalWrong++;
+                var tag = q.Category?.Name ?? "综合知识";
+                if (!errorByTag.ContainsKey(tag)) errorByTag[tag] = 0;
+                errorByTag[tag]++;
+            }
+        }
+
+        var weakTags = errorByTag.OrderByDescending(kv => kv.Value).Take(3).Select(kv => kv.Key).ToList();
+        return (totalAnswered, totalWrong, weakTags);
+    }
+
+    private static List<int> ParseQuestionIdsSafe(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return new List<int>();
+        try { return System.Text.Json.JsonSerializer.Deserialize<List<int>>(raw) ?? new List<int>(); }
+        catch { return new List<int>(); }
+    }
+
+    private static Dictionary<int, string> ParseAnswersSafe(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return new Dictionary<int, string>();
+        try
+        {
+            var list = System.Text.Json.JsonSerializer.Deserialize<List<SubmitAnswerItem>>(raw);
+            if (list != null) return list.ToDictionary(a => a.QuestionId, a => a.Answer);
+        }
+        catch { }
+        try
+        {
+            var old = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(raw);
+            if (old != null) return old.ToDictionary(kv => int.Parse(kv.Key), kv => kv.Value);
+        }
+        catch { }
+        return new Dictionary<int, string>();
+    }
+
+    private static bool CheckAnswerReal(PartySchoolApi.Models.Entities.Question question, string userAnswer)
+    {
+        if (string.IsNullOrWhiteSpace(userAnswer)) return false;
+        switch (question.QuestionType)
+        {
+            case PartySchoolApi.Models.Common.QuestionType.SingleChoice:
+            case PartySchoolApi.Models.Common.QuestionType.TrueFalse:
+                return string.Equals(userAnswer.Trim(), question.CorrectAnswer.Trim(), StringComparison.OrdinalIgnoreCase);
+            case PartySchoolApi.Models.Common.QuestionType.MultiChoice:
+                try
+                {
+                    var userSet = System.Text.Json.JsonSerializer.Deserialize<List<string>>(userAnswer)?.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    var correctSet = System.Text.Json.JsonSerializer.Deserialize<List<string>>(question.CorrectAnswer)?.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    return userSet != null && correctSet != null && userSet.SetEquals(correctSet);
+                }
+                catch { return false; }
+            default:
+                return false;
+        }
+    }
+
     private string GetDurationComment(double s) =>
         s >= 80 ? "学习时长充足，投入度高" : s >= 60 ? "学习时长基本达标" : "学习时长不足，建议增加投入";
     private string GetCompletionComment(double s) =>
@@ -1015,13 +1155,35 @@ public class AiService : IAiService
                     new() { Name = "weaknessImprovement", Score = Math.Round(weaknessScore, 1), Weight = weights.WeaknessImprovement, Comment = "薄弱点改善" },
                     new() { Name = "points", Score = Math.Round(pointsScore, 1), Weight = weights.Points, Comment = $"积分{m.PointTotal}" }
                 },
-                AiReason = request.IncludeReason ? $"{m.Name}同志综合表现突出，学习投入充足、任务完成良好、测验成绩优异，建议作为学习标兵表彰。" : null
+                AiReason = null
             });
         }
 
         var topMembers = items.OrderByDescending(i => i.TotalScore).Take(topN).ToList();
         for (int i = 0; i < topMembers.Count; i++)
             topMembers[i].Rank = i + 1;
+
+        // 为前5名标兵用千问生成个性化评语（基于真实统计数据）
+        if (request.IncludeReason && _qwen.IsConfigured)
+        {
+            foreach (var tm in topMembers.Take(5))
+            {
+                try
+                {
+                    var dimSummary = string.Join("、", tm.Dimensions.Select(d => $"{d.Name}:{d.Score}分"));
+                    var reasonPrompt = $"党员{MaskSensitiveBeforeAi(tm.MemberName)}的学习标兵数据：综合得分{tm.TotalScore}分，等级{tm.Level}，各维度（{dimSummary}）。请用一句不超过80字的中文生成个性化表彰评语，突出其优点，不要输出JSON，直接给文本。";
+                    var aiReason = await _qwen.ChatAsync("你是党校党建表彰文案专家，擅长根据真实数据生成温暖专业的表彰评语。", reasonPrompt, temperature: 0.6, maxTokens: 150);
+                    if (!string.IsNullOrWhiteSpace(aiReason))
+                        tm.AiReason = aiReason.Trim();
+                    else
+                        tm.AiReason = $"{tm.MemberName}同志综合表现突出，学习投入充足、任务完成良好、测验成绩优异，建议作为学习标兵表彰。";
+                }
+                catch
+                {
+                    tm.AiReason = $"{tm.MemberName}同志综合表现突出，学习投入充足、任务完成良好、测验成绩优异，建议作为学习标兵表彰。";
+                }
+            }
+        }
 
         return new StarMemberResponse
         {
@@ -1046,7 +1208,14 @@ public class AiService : IAiService
 
         var periodDays = Math.Clamp(request.PeriodDays, 7, 90);
         var target = request.Target ?? "提升党建理论水平";
-        var focusTags = request.FocusTags ?? new List<string> { "党史", "党章", "四个意识" };
+
+        // 从真实错题数据获取薄弱标签
+        var roadmapErrorStats = await CalculateRealErrorStatsAsync(memberId);
+        var focusTags = request.FocusTags != null && request.FocusTags.Count > 0
+            ? request.FocusTags
+            : (roadmapErrorStats.WeakTags.Count > 0
+                ? roadmapErrorStats.WeakTags
+                : new List<string> { "党史", "党章", "四个意识" });
 
         // 推导当前水平
         var totalSeconds = await _context.MemberLearningProgress
@@ -1055,12 +1224,31 @@ public class AiService : IAiService
         var totalMinutes = totalSeconds / 60;
         var currentLevel = totalMinutes >= 1200 ? "冲刺" : totalMinutes >= 300 ? "进阶" : "入门";
 
-        // 从学习内容库选内容
-        var contents = await _context.LearningContents
+        // 依据薄弱点筛选内容：优先匹配薄弱标签和分类
+        var allContents = await _context.LearningContents
+            .Include(c => c.ContentTags).ThenInclude(ct => ct.Tag)
+            .Include(c => c.Category)
             .Where(c => c.IsPublic)
-            .OrderByDescending(c => c.CreatedAt)
-            .Take(15)
             .ToListAsync();
+
+        var scoredContents = allContents.Select(c =>
+        {
+            var tags = c.ContentTags.Where(ct => ct.Tag != null).Select(ct => ct.Tag.Name).ToList();
+            var matchCount = focusTags.Count(t =>
+                tags.Any(ct => ct.Contains(t, StringComparison.OrdinalIgnoreCase)) ||
+                (c.Category != null && c.Category.Name.Contains(t, StringComparison.OrdinalIgnoreCase)));
+            return new { Content = c, MatchScore = matchCount };
+        }).ToList();
+
+        var weakRelated = scoredContents.Where(x => x.MatchScore > 0)
+            .OrderByDescending(x => x.MatchScore)
+            .Select(x => x.Content)
+            .ToList();
+        var others = scoredContents.Where(x => x.MatchScore == 0)
+            .OrderByDescending(x => x.Content.CreatedAt)
+            .Select(x => x.Content)
+            .ToList();
+        var contents = weakRelated.Concat(others).Take(15).ToList();
 
         var stageDays = periodDays / 3;
         var stages = new List<RoadmapStageDto>

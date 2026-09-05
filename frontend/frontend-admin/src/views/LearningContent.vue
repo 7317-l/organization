@@ -252,6 +252,11 @@
             value-format="YYYY-MM-DD HH:mm:ss"
           />
         </el-form-item>
+        <el-form-item label="关联试卷">
+          <el-select v-model="taskForm.examPaperId" clearable filterable placeholder="可选关联试卷（任务完成后可参加）" style="width:100%">
+            <el-option v-for="p in paperOptions" :key="p.id" :label="p.name" :value="p.id" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="关联内容">
           <el-select v-model="taskForm.contentIds" multiple filterable placeholder="请选择学习内容" style="width:100%">
             <el-option v-for="c in allContentOptions" :key="c.id" :label="c.title" :value="c.id" />
@@ -321,6 +326,14 @@ const contentForm = reactive({
 const categoryTree = ref([])
 const tagList = ref([])
 const allContentOptions = ref([])
+const paperOptions = ref([])
+
+async function loadPapers() {
+  try {
+    const res = await fetch('/api/v1/exam-papers').then(r => r.json())
+    paperOptions.value = res.data || res.items || []
+  } catch (e) { /* */ }
+}
 
 async function loadCategories() {
   try {
@@ -428,7 +441,7 @@ const taskTotal = ref(0)
 const taskQuery = reactive({ page: 1, size: 10, keyword: '', status: '' })
 const taskDialogVisible = ref(false)
 const taskSubmitting = ref(false)
-const taskForm = reactive({ id: null, taskName: '', targetOrgId: null, deadline: '', contentIds: [] })
+const taskForm = reactive({ id: null, taskName: '', targetOrgId: null, deadline: '', contentIds: [], examPaperId: null })
 const orgTree = ref([])
 const completionVisible = ref(false)
 const completionLoading = ref(false)
@@ -493,10 +506,10 @@ function openTaskDialog(row) {
   if (row) {
     Object.assign(taskForm, {
       id: row.id, taskName: row.taskName, targetOrgId: row.targetOrgId,
-      deadline: row.deadline, contentIds: row.contentIds || []
+      deadline: row.deadline, contentIds: row.contentIds || [], examPaperId: row.examPaperId || null
     })
   } else {
-    Object.assign(taskForm, { id: null, taskName: '', targetOrgId: null, deadline: '', contentIds: [] })
+    Object.assign(taskForm, { id: null, taskName: '', targetOrgId: null, deadline: '', contentIds: [], examPaperId: null })
   }
   taskDialogVisible.value = true
 }
@@ -509,7 +522,8 @@ async function submitTask() {
   try {
     const payload = {
       taskName: taskForm.taskName, targetOrgId: taskForm.targetOrgId,
-      deadline: taskForm.deadline, contentIds: taskForm.contentIds
+      deadline: taskForm.deadline, contentIds: taskForm.contentIds,
+      examPaperId: taskForm.examPaperId || null
     }
     if (taskForm.id) {
       await updateTask(taskForm.id, payload)

@@ -127,6 +127,22 @@ public class BattleService : IBattleService
             ? (await _db.PartyMembers.FindAsync(game.OpponentId))?.Name ?? ""
             : (await _db.PartyMembers.FindAsync(game.ChallengerId))?.Name ?? "";
 
+        // status=0：等待应战，不返回题目
+        if (game.Status == 0)
+        {
+            return new BattleCurrentQuestionResponse
+            {
+                GameId = gameId,
+                Index = 0,
+                Total = qids.Count,
+                Question = null,
+                MyScore = 0,
+                OpponentScore = 0,
+                OpponentName = opponentName,
+                WaitingForOpponent = true
+            };
+        }
+
         if (game.Status == 2 || game.CurrentQuestionIndex >= qids.Count)
         {
             return new BattleCurrentQuestionResponse
@@ -177,19 +193,13 @@ public class BattleService : IBattleService
     {
         var game = await _db.BattleGames.FindAsync(gameId);
         if (game == null) throw new BusinessException("对局不存在");
-        // 挑战者可在待应战状态(status=0)直接开始答题；应战者需status=1
-        var isChallenger = game.ChallengerId == memberId;
-        if (game.Status == 0 && !isChallenger)
-            throw new BusinessException("对局未开始，请先应战");
-        if (game.Status >= 2)
-            throw new BusinessException("对局已结束");
+        // 只有status=1（进行中）才能答题，status=0时等待对方应战
+        if (game.Status == 0)
+            throw new BusinessException("等待对方应战，暂不能答题");
+        if (game.Status != 1)
+            throw new BusinessException("对局状态不允许答题");
 
-        // 挑战者首次答题自动开始
-        if (game.Status == 0 && isChallenger)
-        {
-            game.Status = 1;
-            game.StartedAt = DateTime.Now;
-        }
+        var isChallenger = game.ChallengerId == memberId;
 
         var qids = JsonSerializer.Deserialize<List<int>>(game.QuestionIds) ?? new();
         if (game.CurrentQuestionIndex >= qids.Count)

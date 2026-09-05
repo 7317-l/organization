@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PartySchoolApi.Models.Entities;
@@ -26,6 +26,13 @@ public class LearningTask
 
     [Column("deadline")]
     public DateTime Deadline { get; set; }
+
+    /// <summary>关联试卷ID（可选）</summary>
+    [Column("exam_paper_id")]
+    public int? ExamPaperId { get; set; }
+
+    [ForeignKey(nameof(ExamPaperId))]
+    public ExamPaper? ExamPaper { get; set; }
 
     public ICollection<TaskContent> TaskContents { get; set; } = new List<TaskContent>();
 

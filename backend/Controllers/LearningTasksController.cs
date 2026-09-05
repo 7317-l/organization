@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
@@ -70,5 +70,14 @@ public class LearningTasksController : ControllerBase
     {
         var details = await _service.GetCompletionDetailsAsync(id);
         return ApiResponse.Success(details);
+    }
+
+    /// <summary>催办：给未完成党员发送通知</summary>
+    [HttpPost("{id}/urge")]
+    [Authorize(Roles = "SystemAdmin,BranchSecretary")]
+    public async Task<ApiResponse> Urge(int id)
+    {
+        var result = await _service.UrgeAsync(id);
+        return ApiResponse.Success(result, $"已催办 {result.NotifiedCount} 人");
     }
 }

@@ -207,7 +207,36 @@ public class PartyDevelopmentService : IPartyDevelopmentService
         var content = request.ReportContent ?? process.ReportContent ?? "";
         var stage = request.Stage ?? (int)process.Stage;
 
-        // 规则式评分
+        // 千问真正分析思想汇报（优先），失败时回退规则式评分
+        if (_qwen.IsConfigured && !string.IsNullOrWhiteSpace(content))
+        {
+            try
+            {
+                var stageName = ((PartyDevelopmentStage)stage).ToString();
+                var prompt = $"请分析以下党员思想汇报（当前阶段：{stageName}），从内容充实度、理论深度、实践结合、自我反思四个维度评分（0-100），并给出优点和改进建议。\n\n思想汇报内容：\n{content}\n\n请只输出JSON：{{\"overallScore\":数字,\"dimensions\":[{{\"name\":\"维度名\",\"score\":数字,\"comment\":\"评语\"}}],\"strengths\":[\"优点1\",\"优点2\"],\"suggestions\":[\"建议1\",\"建议2\"]}}";
+                var aiResult = await _qwen.ChatAsync("你是党建工作专家，擅长分析党员思想汇报并给出专业评价。只输出JSON。", prompt, temperature: 0.5, maxTokens: 800, jsonMode: true);
+                if (!string.IsNullOrWhiteSpace(aiResult))
+                {
+                    var parsed = ParseReportSuggestionJson(aiResult);
+                    if (parsed.HasValue)
+                    {
+                        var v = parsed.Value;
+                        return new ReportSuggestionResponse
+                        {
+                            ProcessId = id,
+                            OverallScore = v.OverallScore,
+                            Dimensions = v.Dimensions,
+                            Strengths = v.Strengths,
+                            Suggestions = v.Suggestions,
+                            RewrittenExcerpt = content.Length > 100 ? content[..100] + "..." : content
+                        };
+                    }
+                }
+            }
+            catch { /* 回退规则式 */ }
+        }
+
+        // 规则式评分（回退）
         var dimensions = new List<ReportSuggestionDimensionDto>();
         var lengthScore = Math.Min(content.Length / 50.0, 100);
         dimensions.Add(new() { Name = "内容充实度", Score = Math.Round(lengthScore, 1), Comment = content.Length < 500 ? "内容偏短，建议充实" : "内容充实" });
@@ -261,6 +290,40 @@ public class PartyDevelopmentService : IPartyDevelopmentService
 
         var missing = required.Where(r => !submittedNonEmpty.Any(s => s.Contains(r, StringComparison.OrdinalIgnoreCase))).ToList();
         var isComplete = missing.Count == 0;
+
+        // 千问真正分析材料（优先），失败时回退规则式
+        string aiSuggestion = null;
+        if (_qwen.IsConfigured && submittedNonEmpty.Count > 0)
+        {
+            try
+            {
+                var materialsText = string.Join("\n", submittedNonEmpty.Select((m, i) => $"材料{i + 1}：{m}"));
+                var prompt = $"请检查以下党员发展材料（当前阶段：{stageEnum}）。必需材料清单：{string.Join("、", required)}。\n\n已提交材料：\n{materialsText}\n\n请分析：1.哪些必需材料缺失；2.已提交材料是否符合要求；3.总体建议。只输出JSON：{{\"missingMaterials\":[\"缺失项\"],\"issues\":[{{\"material\":\"材料名\",\"status\":\"ok或missing\",\"checkResult\":\"检查结果\",\"suggestion\":\"建议\"}}],\"score\":数字,\"suggestion\":\"总体建议\"}}";
+                var aiResult = await _qwen.ChatAsync("你是党建工作专家，负责审核党员发展材料是否齐全合规。只输出JSON。", prompt, temperature: 0.3, maxTokens: 600, jsonMode: true);
+                if (!string.IsNullOrWhiteSpace(aiResult))
+                {
+                    var aiParsed = ParseMaterialCheckJson(aiResult);
+                    if (aiParsed.HasValue)
+                    {
+                        var v = aiParsed.Value;
+                        return new MaterialCheckResponse
+                        {
+                            ProcessId = id,
+                            Stage = stage,
+                            StageName = stageEnum.ToString(),
+                            IsComplete = v.MissingMaterials.Count == 0,
+                            RequiredMaterials = required,
+                            MissingMaterials = v.MissingMaterials,
+                            Issues = v.Issues,
+                            Score = v.Score,
+                            Suggestion = v.Suggestion,
+                            CheckedAt = DateTime.Now
+                        };
+                    }
+                }
+            }
+            catch { /* 回退规则式 */ }
+        }
 
         var issues = new List<MaterialCheckIssueDto>();
         foreach (var mat in required)
@@ -461,5 +524,74 @@ public class PartyDevelopmentService : IPartyDevelopmentService
             .ToListAsync();
 
         return (items, total);
+    }
+
+    private static (double OverallScore, List<ReportSuggestionDimensionDto> Dimensions, List<string> Strengths, List<string> Suggestions)? ParseReportSuggestionJson(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var start = raw.IndexOf('{');
+        var end = raw.LastIndexOf('}');
+        if (start < 0 || end <= start) return null;
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(raw.Substring(start, end - start + 1));
+            var root = doc.RootElement;
+            var overall = root.TryGetProperty("overallScore", out var os) ? os.GetDouble() : 0;
+            var dims = new List<ReportSuggestionDimensionDto>();
+            if (root.TryGetProperty("dimensions", out var dimArr) && dimArr.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+                foreach (var d in dimArr.EnumerateArray())
+                {
+                    dims.Add(new ReportSuggestionDimensionDto
+                    {
+                        Name = d.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "",
+                        Score = d.TryGetProperty("score", out var s) ? s.GetDouble() : 0,
+                        Comment = d.TryGetProperty("comment", out var c) ? c.GetString() ?? "" : ""
+                    });
+                }
+            }
+            var strengths = new List<string>();
+            if (root.TryGetProperty("strengths", out var stArr) && stArr.ValueKind == System.Text.Json.JsonValueKind.Array)
+                strengths = stArr.EnumerateArray().Select(x => x.GetString() ?? "").Where(x => x.Length > 0).ToList();
+            var suggestions = new List<string>();
+            if (root.TryGetProperty("suggestions", out var sgArr) && sgArr.ValueKind == System.Text.Json.JsonValueKind.Array)
+                suggestions = sgArr.EnumerateArray().Select(x => x.GetString() ?? "").Where(x => x.Length > 0).ToList();
+            return (overall, dims, strengths, suggestions);
+        }
+        catch { return null; }
+    }
+
+    private static (List<string> MissingMaterials, List<MaterialCheckIssueDto> Issues, double Score, string Suggestion)? ParseMaterialCheckJson(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var start = raw.IndexOf('{');
+        var end = raw.LastIndexOf('}');
+        if (start < 0 || end <= start) return null;
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(raw.Substring(start, end - start + 1));
+            var root = doc.RootElement;
+            var missing = new List<string>();
+            if (root.TryGetProperty("missingMaterials", out var mmArr) && mmArr.ValueKind == System.Text.Json.JsonValueKind.Array)
+                missing = mmArr.EnumerateArray().Select(x => x.GetString() ?? "").Where(x => x.Length > 0).ToList();
+            var issues = new List<MaterialCheckIssueDto>();
+            if (root.TryGetProperty("issues", out var issArr) && issArr.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+                foreach (var i in issArr.EnumerateArray())
+                {
+                    issues.Add(new MaterialCheckIssueDto
+                    {
+                        Material = i.TryGetProperty("material", out var m) ? m.GetString() ?? "" : "",
+                        Status = i.TryGetProperty("status", out var st) ? st.GetString() ?? "ok" : "ok",
+                        CheckResult = i.TryGetProperty("checkResult", out var cr) ? cr.GetString() ?? "" : "",
+                        Suggestion = i.TryGetProperty("suggestion", out var sg) ? sg.GetString() ?? "" : ""
+                    });
+                }
+            }
+            var score = root.TryGetProperty("score", out var sc) ? sc.GetDouble() : 80;
+            var suggestion = root.TryGetProperty("suggestion", out var sug) ? sug.GetString() ?? "" : "";
+            return (missing, issues, score, suggestion);
+        }
+        catch { return null; }
     }
 }

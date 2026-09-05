@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using PartySchoolApi.Models.Common;
 
 namespace PartySchoolApi.Models.Entities;
@@ -31,6 +31,25 @@ public class MeetingActivity
     /// <summary>AI总结内容</summary>
     [MaxLength(4000)]
     public string? AiSummaryContent { get; set; }
+
+    /// <summary>活动状态：0=草稿，1=待审核，2=已归档，3=已上报</summary>
+    public int Status { get; set; } = 0;
+
+    /// <summary>审核人ID</summary>
+    public int? ReviewerId { get; set; }
+
+    /// <summary>审核时间</summary>
+    public DateTime? ReviewedAt { get; set; }
+
+    /// <summary>审核意见</summary>
+    [MaxLength(1000)]
+    public string? ReviewComment { get; set; }
+
+    /// <summary>归档时间</summary>
+    public DateTime? ArchivedAt { get; set; }
+
+    /// <summary>上报时间</summary>
+    public DateTime? ReportedAt { get; set; }
 
     public List<ActivityHeart> ActivityHearts { get; set; } = new();
 }

@@ -68,6 +68,14 @@
             <el-icon><CircleCheck /></el-icon>
             <span>整改闭环</span>
           </el-menu-item>
+          <el-menu-item index="/party-development">
+            <el-icon><User /></el-icon>
+            <span>党员发展</span>
+          </el-menu-item>
+          <el-menu-item index="/dashboard-fullscreen">
+            <el-icon><DataAnalysis /></el-icon>
+            <span>数字驾驶舱</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
 

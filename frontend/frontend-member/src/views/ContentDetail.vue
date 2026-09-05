@@ -108,6 +108,36 @@
         </el-tag>
       </div>
     </div>
+
+    <!-- 防挂机验证弹窗 -->
+    <el-dialog
+      v-model="antiCheatVisible"
+      title="防挂机验证"
+      width="500px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <div v-loading="antiCheatLoading">
+        <p style="color:#666;margin-bottom:16px">学习时长超过2分钟，请完成验证以继续计时：</p>
+        <div v-if="antiCheatQuestion" class="anti-cheat-question">{{ antiCheatQuestion }}</div>
+        <el-radio-group v-model="antiCheatSelected" class="anti-cheat-options">
+          <el-radio
+            v-for="(opt, idx) in antiCheatOptions"
+            :key="idx"
+            :label="opt.key !== undefined ? opt.key : idx"
+            class="anti-cheat-option"
+          >
+            {{ opt.text || opt }}
+          </el-radio>
+        </el-radio-group>
+        <div v-if="antiCheatCountdown > 0" style="color:#999;font-size:12px;margin-top:12px">
+          倒计时：{{ antiCheatCountdown }}秒
+        </div>
+      </div>
+      <template #footer>
+        <el-button type="primary" :loading="antiCheatLoading" @click="submitAntiCheatAnswer">提交验证</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -120,6 +150,7 @@ import { getContentDetail, reportProgress } from '@/api/content'
 import { completeTask as apiCompleteTask } from '@/api/task'
 import { getRecommendations } from '@/api/mobile'
 import { formatDate, isVideoContent } from '@/utils/format'
+import request from '@/api/request'
 
 const route = useRoute()
 const router = useRouter()
@@ -137,6 +168,17 @@ const videoRef = ref(null)
 let progressTimer = null
 let articleTimer = null
 let lastReportedTime = 0
+
+// 防挂机相关
+const antiCheatVisible = ref(false)
+const antiCheatQuestion = ref('')
+const antiCheatOptions = ref([])
+const antiCheatRecordId = ref(null)
+const antiCheatSelected = ref(null)
+const antiCheatLoading = ref(false)
+const antiCheatCountdown = ref(60)
+let antiCheatTimer = null
+let pendingReportData = null
 
 /** 是否为视频内容（兼容 contentType 数字和 type 字符串） */
 const isVideo = computed(() => isVideoContent(content.value))
@@ -157,6 +199,15 @@ const parsedTags = computed(() => {
     return String(t)
   }).filter(Boolean)
 })
+
+// 防挂机API
+async function getAntiCheatChallenge(cid) {
+  return request.get('/anti-cheat/challenge-v2', { params: { contentId: cid } })
+}
+
+async function verifyAntiCheat(data) {
+  return request.post('/anti-cheat/verify-v2', data)
+}
 
 async function loadContent() {
   loading.value = true
@@ -222,28 +273,105 @@ async function autoReportProgress(durationSeconds, isCompleted) {
       isCompleted
     })
   } catch {
-    // 静默处理自动上报错误
+    // 静默处理自动上报错误（可能触发防挂机403）
+  }
+}
+
+/** 打开防挂机验证弹窗 */
+async function openAntiCheatDialog() {
+  antiCheatLoading.value = true
+  antiCheatSelected.value = null
+  antiCheatCountdown.value = 60
+  try {
+    const res = await getAntiCheatChallenge(contentId.value)
+    const data = res.data || res
+    antiCheatQuestion.value = data.question || data.stem || ''
+    antiCheatOptions.value = data.options || []
+    antiCheatRecordId.value = data.recordId || data.id
+    antiCheatVisible.value = true
+    startAntiCheatCountdown()
+  } catch (e) {
+    ElMessage.error('获取验证题目失败')
+  } finally {
+    antiCheatLoading.value = false
+  }
+}
+
+function startAntiCheatCountdown() {
+  if (antiCheatTimer) clearInterval(antiCheatTimer)
+  antiCheatTimer = setInterval(() => {
+    antiCheatCountdown.value--
+    if (antiCheatCountdown.value <= 0) {
+      clearInterval(antiCheatTimer)
+      ElMessage.warning('验证超时，请重新验证')
+      openAntiCheatDialog()
+    }
+  }, 1000)
+}
+
+/** 提交防挂机验证答案 */
+async function submitAntiCheatAnswer() {
+  if (antiCheatSelected.value === null || antiCheatSelected.value === undefined) {
+    ElMessage.warning('请选择答案')
+    return
+  }
+  antiCheatLoading.value = true
+  try {
+    const res = await verifyAntiCheat({
+      recordId: antiCheatRecordId.value,
+      answer: String(antiCheatSelected.value)
+    })
+    const data = res.data || res
+    if (data.isPass || data.passed || data.success) {
+      ElMessage.success('验证通过')
+      antiCheatVisible.value = false
+      if (antiCheatTimer) clearInterval(antiCheatTimer)
+      antiCheatSelected.value = null
+      // 验证通过后继续上报进度
+      if (pendingReportData) {
+        await doReportProgress(pendingReportData)
+        pendingReportData = null
+      }
+    } else {
+      ElMessage.error('验证失败，请重新答题')
+      await openAntiCheatDialog()
+    }
+  } catch (e) {
+    ElMessage.error('验证提交失败')
+  } finally {
+    antiCheatLoading.value = false
+  }
+}
+
+/** 实际执行进度上报 */
+async function doReportProgress(data) {
+  reporting.value = true
+  try {
+    await reportProgress(data)
+    reported.value = true
+    progressHint.value = data.isCompleted ? '学习进度已上报，任务完成' : '学习进度已上报'
+    ElMessage.success(data.isCompleted ? '学习进度已上报，任务完成' : '学习进度已上报')
+  } catch (e) {
+    // 如果返回403，说明需要防挂机验证
+    if (e?.response?.status === 403 || e?.status === 403) {
+      pendingReportData = data
+      await openAntiCheatDialog()
+    }
+  } finally {
+    reporting.value = false
   }
 }
 
 async function reportLearningProgress() {
-  reporting.value = true
-  try {
-    const durationSeconds = videoRef.value ? Math.floor(videoRef.value.currentTime) : (currentProgress.value >= 100 ? 600 : 0)
-    const isCompleted = currentProgress.value >= 100
-    await reportProgress({
-      contentId: contentId.value,
-      durationSeconds,
-      isCompleted
-    })
-    reported.value = true
-    progressHint.value = isCompleted ? '学习进度已上报，任务完成' : '学习进度已上报'
-    ElMessage.success(isCompleted ? '学习进度已上报，任务完成' : '学习进度已上报')
-  } catch {
-    // 错误已由拦截器处理
-  } finally {
-    reporting.value = false
+  const durationSeconds = videoRef.value ? Math.floor(videoRef.value.currentTime) : (currentProgress.value >= 100 ? 600 : 0)
+  const isCompleted = currentProgress.value >= 100
+  const data = {
+    contentId: contentId.value,
+    durationSeconds,
+    isCompleted
   }
+  // 学习时长超过120秒时，先尝试上报，若返回403则弹出防挂机验证
+  await doReportProgress(data)
 }
 
 async function completeTask() {
@@ -282,6 +410,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (progressTimer) clearInterval(progressTimer)
   if (articleTimer) clearTimeout(articleTimer)
+  if (antiCheatTimer) clearInterval(antiCheatTimer)
 })
 </script>
 
@@ -452,6 +581,33 @@ onBeforeUnmount(() => {
   color: var(--t3);
   margin-top: 10px;
   line-height: 1.6;
+}
+
+/* 防挂机验证 */
+.anti-cheat-question {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.anti-cheat-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.anti-cheat-option {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.anti-cheat-option:hover {
+  border-color: #C8161D;
+  background: #fef0f0;
 }
 
 /* AI 解读 */

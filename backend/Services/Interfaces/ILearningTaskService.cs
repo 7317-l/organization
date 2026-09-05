@@ -1,4 +1,4 @@
-﻿using PartySchoolApi.Models.Common;
+using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
 
 namespace PartySchoolApi.Services.Interfaces;
@@ -11,4 +11,5 @@ public interface ILearningTaskService
     Task UpdateAsync(int id, UpdateTaskRequest request);
     Task DeleteAsync(int id);
     Task<List<TaskCompletionDetailDto>> GetCompletionDetailsAsync(int taskId);
+    Task<TaskUrgeResultDto> UrgeAsync(int taskId);
 }

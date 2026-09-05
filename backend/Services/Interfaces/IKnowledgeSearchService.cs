@@ -8,11 +8,15 @@ public class KnowledgeDocument
     public string Id { get; set; } = string.Empty;
     public string File { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
+    /// <summary>BM25相关性分数</summary>
+    public double Score { get; set; }
+    /// <summary>匹配片段（用于前端显示引用来源）</summary>
+    public string? Snippet { get; set; }
 }
 
 /// <summary>
 /// 本地党建知识库检索服务：加载 knowledge/documents 下的 .txt/.md 文档，
-/// 按关键词打分召回与问题最相关的片段（与千问 RAG 问答配合使用）。
+/// 按 BM25 算法召回与问题最相关的片段（与千问 RAG 问答配合使用）。
 /// </summary>
 public interface IKnowledgeSearchService
 {

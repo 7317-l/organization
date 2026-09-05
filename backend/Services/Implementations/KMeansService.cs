@@ -95,22 +95,42 @@ public class KMeansService : IKMeansService
             }
         }
 
-        // 5. 构造聚类：按知识点错误次数降序，严重度 = 该知识点错误率
-        var clusterCount = request.ClusterCount > 0 ? request.ClusterCount : 3;
-        var clusters = errorByTag
-            .Select(kv => new KMeansClusterDto
+        // 5. 构造特征向量：每个知识点 = [错误率, 错误次数, 答题次数]
+        var featureVectors = errorByTag.Select(kv =>
+        {
+            var total = totalByTag.TryGetValue(kv.Key, out var t) ? t : 1;
+            return new
             {
-                ClusterName = kv.Key,
-                KnowledgeTags = new List<string> { kv.Key },
+                Tag = kv.Key,
+                Features = new double[] { (double)kv.Value / total, kv.Value, total },
                 ErrorCount = kv.Value,
-                Severity = totalByTag.TryGetValue(kv.Key, out var total) && total > 0
-                    ? Math.Round((double)kv.Value / total, 2)
-                    : 0.5
-            })
-            .OrderByDescending(c => c.Severity)
-            .ThenByDescending(c => c.ErrorCount)
-            .Take(clusterCount)
-            .ToList();
+                Total = total
+            };
+        }).ToList();
+
+        var clusterCount = Math.Min(request.ClusterCount > 0 ? request.ClusterCount : 3, featureVectors.Count);
+        if (clusterCount < 1) clusterCount = 1;
+
+        // 真正的KMeans聚类
+        var (labels, centroids, iterations) = RunKMeans(featureVectors.Select(f => f.Features).ToArray(), clusterCount, maxIterations: 50);
+
+        // 按簇聚合，每个簇取平均错误率作为严重度
+        var clusters = new List<KMeansClusterDto>();
+        for (int c = 0; c < clusterCount; c++)
+        {
+            var clusterItems = featureVectors.Where((_, i) => labels[i] == c).ToList();
+            if (clusterItems.Count == 0) continue;
+            var avgErrorRate = clusterItems.Average(x => x.Features[0]);
+            var totalErrors = clusterItems.Sum(x => x.ErrorCount);
+            clusters.Add(new KMeansClusterDto
+            {
+                ClusterName = $"薄弱簇{c + 1}（{string.Join("、", clusterItems.Select(x => x.Tag).Take(3))}）",
+                KnowledgeTags = clusterItems.Select(x => x.Tag).ToList(),
+                ErrorCount = totalErrors,
+                Severity = Math.Round(avgErrorRate, 2)
+            });
+        }
+        clusters = clusters.OrderByDescending(c => c.Severity).ToList();
 
         // 若没有任何错题，兜底按答题情况给出无薄弱结论
         if (clusters.Count == 0)
@@ -262,5 +282,98 @@ public class KMeansService : IKMeansService
     {
         try { return JsonSerializer.Deserialize<List<string>>(question.Options) ?? new List<string>(); }
         catch { return new List<string>(); }
+    }
+
+    // ============ 真正的KMeans聚类算法 ============
+
+    /// <summary>
+    /// 真正的KMeans聚类：K-means++初始化 + 欧氏距离 + 迭代更新质心 + 收敛判断
+    /// </summary>
+    private static (int[] Labels, double[][] Centroids, int Iterations) RunKMeans(double[][] data, int k, int maxIterations = 50)
+    {
+        int n = data.Length;
+        int dim = data[0].Length;
+        var rng = new Random(42);
+
+        // K-means++ 初始化质心
+        var centroids = new double[k][];
+        centroids[0] = (double[])data[rng.Next(n)].Clone();
+        for (int c = 1; c < k; c++)
+        {
+            var distances = new double[n];
+            for (int i = 0; i < n; i++)
+            {
+                double minDist = double.MaxValue;
+                for (int j = 0; j < c; j++)
+                {
+                    double d = EuclideanDistance(data[i], centroids[j]);
+                    if (d < minDist) minDist = d;
+                }
+                distances[i] = minDist * minDist;
+            }
+            double sum = distances.Sum();
+            double r = rng.NextDouble() * sum;
+            int selected = 0;
+            for (int i = 0; i < n; i++)
+            {
+                r -= distances[i];
+                if (r <= 0) { selected = i; break; }
+            }
+            centroids[c] = (double[])data[selected].Clone();
+        }
+
+        var labels = new int[n];
+        int iterations = 0;
+        bool converged = false;
+
+        while (!converged && iterations < maxIterations)
+        {
+            iterations++;
+            converged = true;
+
+            // 分配样本到最近质心
+            for (int i = 0; i < n; i++)
+            {
+                int nearest = 0;
+                double minDist = double.MaxValue;
+                for (int c = 0; c < k; c++)
+                {
+                    double d = EuclideanDistance(data[i], centroids[c]);
+                    if (d < minDist)
+                    {
+                        minDist = d;
+                        nearest = c;
+                    }
+                }
+                if (labels[i] != nearest)
+                {
+                    labels[i] = nearest;
+                    converged = false;
+                }
+            }
+
+            // 更新质心为簇均值
+            for (int c = 0; c < k; c++)
+            {
+                var clusterPoints = data.Where((_, i) => labels[i] == c).ToList();
+                if (clusterPoints.Count > 0)
+                {
+                    var newCentroid = new double[dim];
+                    for (int d = 0; d < dim; d++)
+                        newCentroid[d] = clusterPoints.Average(p => p[d]);
+                    centroids[c] = newCentroid;
+                }
+            }
+        }
+
+        return (labels, centroids, iterations);
+    }
+
+    private static double EuclideanDistance(double[] a, double[] b)
+    {
+        double sum = 0;
+        for (int i = 0; i < a.Length; i++)
+            sum += (a[i] - b[i]) * (a[i] - b[i]);
+        return Math.Sqrt(sum);
     }
 }

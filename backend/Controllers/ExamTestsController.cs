@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Helpers;
 using PartySchoolApi.Models.Common;
@@ -63,6 +63,14 @@ public class ExamTestsController : ControllerBase
     public async Task<ApiResponse> GetResults(int id, [FromQuery] int? orgId = null)
     {
         var result = await _service.GetTestResultAsync(id, orgId);
+        return ApiResponse.Success(result);
+    }
+
+    /// <summary>专项练习：按分类随机抽题生成练习卷</summary>
+    [HttpGet("practice")]
+    public async Task<ApiResponse> GeneratePractice([FromQuery] string? category = null, [FromQuery] int count = 20)
+    {
+        var result = await _service.GeneratePracticeAsync(category, count);
         return ApiResponse.Success(result);
     }
 }

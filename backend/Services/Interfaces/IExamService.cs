@@ -1,4 +1,4 @@
-﻿using PartySchoolApi.Models.Common;
+using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
 
 namespace PartySchoolApi.Services.Interfaces;
@@ -18,4 +18,7 @@ public interface IExamService
     Task<ExamTestListItemDto> CreateTestAsync(CreateExamTestRequest request, int publisherId);
     Task DeleteTestAsync(int id);
     Task<ExamTestResultDto> GetTestResultAsync(int testId, int? orgId);
+
+    // 专项练习：随机抽题
+    Task<PracticePaperDto> GeneratePracticeAsync(string? category, int count);
 }

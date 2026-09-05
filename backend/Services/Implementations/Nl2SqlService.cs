@@ -570,6 +570,9 @@ public class Nl2SqlService : INl2SqlService
         var trimmed = upper.TrimStart();
         if (!trimmed.StartsWith("SELECT"))
             return (false, "仅允许 SELECT 只读查询");
+        // 禁止 SELECT *
+        if (System.Text.RegularExpressions.Regex.IsMatch(sql, @"SELECT\s+\*\s+FROM", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+            return (false, "禁止使用 SELECT *，请明确指定查询字段");
         foreach (var keyword in DangerousKeywords)
         {
             if (upper.Contains(keyword))

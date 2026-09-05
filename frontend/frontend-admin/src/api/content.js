@@ -39,3 +39,13 @@ export function getContentTags() {
 export function createContentTag(data) {
   return request.post('/contents/tags', data)
 }
+
+// 获取内容详情（党员端）
+export function getContentDetail(contentId) {
+  return request.get(`/mobile/contents/${contentId}`)
+}
+
+// 上报学习进度（党员端）
+export function reportProgress(data) {
+  return request.post('/mobile/progress', data)
+}

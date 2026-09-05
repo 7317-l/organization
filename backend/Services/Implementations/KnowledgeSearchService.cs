@@ -6,19 +6,39 @@ using PartySchoolApi.Services.Interfaces;
 namespace PartySchoolApi.Services.Implementations;
 
 /// <summary>
-/// 本地党建知识库检索服务实现。
-/// 文档目录：项目根 knowledge/documents（.txt / .md），与千问 AI 模块共用同一份知识库。
-/// 检索算法与 Express 版 knowledge.js 保持一致：整词匹配×2 + 连续4字子串匹配。
+/// 本地党建知识库检索服务实现（BM25算法版）。
+/// 文档目录：项目根 knowledge/documents（.txt / .md）。
+/// 检索算法：BM25（TF + IDF + 文档长度归一化），K1=1.5, B=0.75。
+/// 中文采用 bigram 分词，英文按词分词。
 /// </summary>
 public class KnowledgeSearchService : IKnowledgeSearchService
 {
+    private const double K1 = 1.5;
+    private const double B = 0.75;
+
     private readonly ILogger<KnowledgeSearchService> _logger;
     private readonly IReadOnlyList<KnowledgeDocument> _documents;
+    private readonly Dictionary<string, List<string>> _docTokens;
+    private readonly Dictionary<string, int> _docLengths;
+    private readonly double _avgDocLength;
 
     public KnowledgeSearchService(ILogger<KnowledgeSearchService> logger)
     {
         _logger = logger;
         _documents = LoadDocuments();
+        _docTokens = new Dictionary<string, List<string>>();
+        _docLengths = new Dictionary<string, int>();
+
+        foreach (var doc in _documents)
+        {
+            var tokens = Tokenize(doc.Content);
+            _docTokens[doc.Id] = tokens;
+            _docLengths[doc.Id] = tokens.Count;
+        }
+
+        _avgDocLength = _docLengths.Values.Count > 0
+            ? _docLengths.Values.Average()
+            : 1.0;
     }
 
     public int DocumentCount => _documents.Count;
@@ -28,12 +48,54 @@ public class KnowledgeSearchService : IKnowledgeSearchService
         if (string.IsNullOrWhiteSpace(query) || _documents.Count == 0)
             return Array.Empty<KnowledgeDocument>();
 
-        return _documents
-            .Select(d => new { Doc = d, Score = CalculateScore(query, d.Content) })
-            .Where(x => x.Score > 0)
+        var queryTerms = Tokenize(query).Distinct().ToList();
+        if (queryTerms.Count == 0)
+            return Array.Empty<KnowledgeDocument>();
+
+        // 计算文档频率 DF
+        var df = new Dictionary<string, int>();
+        foreach (var term in queryTerms)
+        {
+            df[term] = _docTokens.Count(kv => kv.Value.Contains(term));
+        }
+
+        // 计算每个文档的 BM25 分数
+        var results = new List<(KnowledgeDocument Doc, double Score)>();
+        foreach (var doc in _documents)
+        {
+            var tokens = _docTokens[doc.Id];
+            int dl = _docLengths[doc.Id];
+            double score = 0;
+
+            foreach (var term in queryTerms)
+            {
+                int tf = tokens.Count(t => t == term);
+                if (tf == 0) continue;
+
+                int n = df.ContainsKey(term) ? df[term] : 0;
+                // IDF
+                double idf = Math.Log((_documents.Count - n + 0.5) / (n + 0.5) + 1);
+                // BM25 term score
+                double termScore = idf * (tf * (K1 + 1)) / (tf + K1 * (1 - B + B * dl / _avgDocLength));
+                score += termScore;
+            }
+
+            if (score > 0)
+            {
+                results.Add((doc, score));
+            }
+        }
+
+        // 按 BM25 分数降序重排
+        return results
             .OrderByDescending(x => x.Score)
             .Take(limit)
-            .Select(x => x.Doc)
+            .Select(x =>
+            {
+                x.Doc.Score = Math.Round(x.Score, 4);
+                x.Doc.Snippet = ExtractSnippet(x.Doc.Content, queryTerms);
+                return x.Doc;
+            })
             .ToList();
     }
 
@@ -55,6 +117,86 @@ public class KnowledgeSearchService : IKnowledgeSearchService
     }
 
     // ---------- 私有 ----------
+
+    /// <summary>
+    /// 分词：中文按 bigram（相邻两字），英文按词。
+    /// </summary>
+    private static List<string> Tokenize(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return new List<string>();
+        var tokens = new List<string>();
+        var lower = text.ToLowerInvariant();
+
+        // 英文/数字按标点和空格切分
+        var words = Regex.Split(lower, @"[\s，。！？、；：,.!?;:（）()【】\[\]《》""'']+")
+            .Where(w => w.Length > 0);
+        foreach (var word in words)
+        {
+            // 纯英文/数字词
+            if (Regex.IsMatch(word, @"^[a-z0-9]+$"))
+            {
+                if (word.Length > 1) tokens.Add(word);
+            }
+            else
+            {
+                // 包含中文，添加 bigram
+                for (int i = 0; i < word.Length - 1; i++)
+                {
+                    if (IsChinese(word[i]) && IsChinese(word[i + 1]))
+                    {
+                        tokens.Add(word.Substring(i, 2));
+                    }
+                    else if (char.IsLetterOrDigit(word[i]) && char.IsLetterOrDigit(word[i + 1]))
+                    {
+                        tokens.Add(word.Substring(i, 2).ToLowerInvariant());
+                    }
+                }
+                // 单字也加入（长度为1的中文）
+                if (word.Length == 1 && IsChinese(word[0]))
+                {
+                    tokens.Add(word);
+                }
+            }
+        }
+
+        return tokens;
+    }
+
+    private static bool IsChinese(char c)
+    {
+        return c >= '\u4e00' && c <= '\u9fff';
+    }
+
+    /// <summary>
+    /// 提取匹配片段：找到第一个匹配词的位置，前后各取50字。
+    /// </summary>
+    private static string ExtractSnippet(string content, List<string> queryTerms, int length = 100)
+    {
+        if (string.IsNullOrEmpty(content)) return "";
+
+        int bestPos = -1;
+        foreach (var term in queryTerms)
+        {
+            int pos = content.IndexOf(term, StringComparison.OrdinalIgnoreCase);
+            if (pos >= 0 && (bestPos < 0 || pos < bestPos))
+            {
+                bestPos = pos;
+            }
+        }
+
+        if (bestPos < 0)
+        {
+            return content.Length > length
+                ? content.Substring(0, length) + "..."
+                : content;
+        }
+
+        int start = Math.Max(0, bestPos - 30);
+        int end = Math.Min(content.Length, start + length);
+        var prefix = start > 0 ? "..." : "";
+        var suffix = end < content.Length ? "..." : "";
+        return prefix + content.Substring(start, end - start) + suffix;
+    }
 
     private IReadOnlyList<KnowledgeDocument> LoadDocuments()
     {
@@ -97,17 +239,12 @@ public class KnowledgeSearchService : IKnowledgeSearchService
 
     private static string? ResolveKnowledgeDirectory()
     {
-        // 候选路径（自上而下优先）：
-        // 1) 当前工作目录下 knowledge/documents（后端在项目根运行时）
-        // 2) 后端目录上一级 knowledge/documents（dotnet run 从 backend/ 启动）
-        // 3) 程序基目录逐级向上找
         var candidates = new List<string>
         {
             Path.Combine(Environment.CurrentDirectory, "knowledge", "documents"),
             Path.Combine(Environment.CurrentDirectory, "..", "knowledge", "documents"),
         };
 
-        // 从程序基目录向上查找（最多上溯 5 层）
         var baseDir = new DirectoryInfo(AppContext.BaseDirectory);
         var dir = baseDir;
         for (var i = 0; i < 6 && dir != null; i++)
@@ -160,26 +297,5 @@ public class KnowledgeSearchService : IKnowledgeSearchService
         }
 
         return chunks;
-    }
-
-    private static int CalculateScore(string query, string content)
-    {
-        var q = query.ToLowerInvariant();
-        var target = content.ToLowerInvariant();
-
-        // 1. 整词匹配（按标点切分后的词，长度>1）
-        var words = Regex.Split(q, @"[\s，。！？、；：,.!?;:]+")
-            .Where(w => w.Length > 1);
-        var score = words.Count(w => target.Contains(w)) * 2;
-
-        // 2. 连续4字子串匹配
-        const int n = 4;
-        for (var i = 0; i <= q.Length - n; i++)
-        {
-            var sub = q.Substring(i, n);
-            if (target.Contains(sub)) score += 1;
-        }
-
-        return score;
     }
 }

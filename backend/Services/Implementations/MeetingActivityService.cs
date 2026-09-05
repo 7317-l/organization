@@ -62,7 +62,9 @@ public class MeetingActivityService : IMeetingActivityService
             Title = a.Title,
             ActivityTime = a.ActivityTime,
             IsAiSummaryGenerated = a.IsAiSummaryGenerated,
-            HeartCount = a.ActivityHearts.Count
+            HeartCount = a.ActivityHearts.Count,
+            Status = a.Status,
+            StatusName = GetStatusName(a.Status)
         }).ToList();
 
         return PagedResponse.Ok(dtos, query.Page, query.Size, total);
@@ -88,6 +90,12 @@ public class MeetingActivityService : IMeetingActivityService
             ActivityTime = a.ActivityTime,
             IsAiSummaryGenerated = a.IsAiSummaryGenerated,
             AiSummaryContent = a.AiSummaryContent,
+            Status = a.Status,
+            StatusName = GetStatusName(a.Status),
+            ReviewedAt = a.ReviewedAt,
+            ReviewComment = a.ReviewComment,
+            ArchivedAt = a.ArchivedAt,
+            ReportedAt = a.ReportedAt,
             Hearts = a.ActivityHearts.Select(h => new ActivityHeartDto
             {
                 Id = h.Id,
@@ -363,5 +371,84 @@ public class MeetingActivityService : IMeetingActivityService
         {
             return null;
         }
+    }
+
+    private static string GetStatusName(int status) => status switch
+    {
+        0 => "草稿",
+        1 => "待审核",
+        2 => "已归档",
+        3 => "已上报",
+        _ => "未知"
+    };
+
+    /// <summary>编辑活动内容（仅草稿/待审核状态）</summary>
+    public async Task<MeetingActivityDetailDto> UpdateAsync(int id, UpdateMeetingActivityRequest request)
+    {
+        var activity = await _context.MeetingActivities.FindAsync(id);
+        if (activity == null) throw new BusinessException("活动不存在", 404);
+        if (activity.Status >= 2) throw new BusinessException("已归档/已上报的活动不可编辑", 400);
+
+        if (request.Type.HasValue) activity.Type = request.Type.Value;
+        if (!string.IsNullOrWhiteSpace(request.Title)) activity.Title = request.Title;
+        if (request.Description != null) activity.Description = request.Description;
+        if (request.ActivityTime.HasValue) activity.ActivityTime = request.ActivityTime.Value;
+        if (request.AiSummaryContent != null)
+        {
+            activity.AiSummaryContent = request.AiSummaryContent;
+            activity.IsAiSummaryGenerated = true;
+        }
+        await _context.SaveChangesAsync();
+        return await GetByIdAsync(id);
+    }
+
+    /// <summary>审核活动（通过→归档，驳回→草稿）</summary>
+    public async Task<MeetingActivityDetailDto> ReviewAsync(int id, ReviewMeetingActivityRequest request)
+    {
+        var activity = await _context.MeetingActivities.FindAsync(id);
+        if (activity == null) throw new BusinessException("活动不存在", 404);
+        if (activity.Status != 1) throw new BusinessException("仅待审核状态可审核", 400);
+
+        activity.ReviewerId = _currentUser.UserId;
+        activity.ReviewedAt = DateTime.Now;
+        activity.ReviewComment = request.Comment;
+
+        if (request.Approved)
+        {
+            activity.Status = 2; // 已归档
+            activity.ArchivedAt = DateTime.Now;
+        }
+        else
+        {
+            activity.Status = 0; // 驳回→草稿
+        }
+        await _context.SaveChangesAsync();
+        return await GetByIdAsync(id);
+    }
+
+    /// <summary>归档活动（待审核→已归档）</summary>
+    public async Task<MeetingActivityDetailDto> ArchiveAsync(int id)
+    {
+        var activity = await _context.MeetingActivities.FindAsync(id);
+        if (activity == null) throw new BusinessException("活动不存在", 404);
+        if (activity.Status != 1) throw new BusinessException("仅待审核状态可归档", 400);
+
+        activity.Status = 2;
+        activity.ArchivedAt = DateTime.Now;
+        await _context.SaveChangesAsync();
+        return await GetByIdAsync(id);
+    }
+
+    /// <summary>上报活动（已归档→已上报，真实写入数据库）</summary>
+    public async Task<MeetingActivityDetailDto> ReportAsync(int id)
+    {
+        var activity = await _context.MeetingActivities.FindAsync(id);
+        if (activity == null) throw new BusinessException("活动不存在", 404);
+        if (activity.Status != 2) throw new BusinessException("仅已归档状态可上报", 400);
+
+        activity.Status = 3;
+        activity.ReportedAt = DateTime.Now;
+        await _context.SaveChangesAsync();
+        return await GetByIdAsync(id);
     }
 }

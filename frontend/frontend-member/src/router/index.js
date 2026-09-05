@@ -61,6 +61,18 @@ const routes = [
         meta: { title: '党史PK', icon: 'battle' }
       },
       {
+        path: 'org-life',
+        name: 'OrgLife',
+        component: () => import('@/views/OrgLife.vue'),
+        meta: { title: '组织生活', icon: 'org' }
+      },
+      {
+        path: 'education-sites',
+        name: 'EducationSites',
+        component: () => import('@/views/EducationSites.vue'),
+        meta: { title: '红色基地', icon: 'site' }
+      },
+      {
         path: 'pair-help',
         name: 'PairHelp',
         component: () => import('@/views/PairHelp.vue'),

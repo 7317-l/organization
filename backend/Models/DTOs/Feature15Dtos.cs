@@ -397,6 +397,8 @@ public class BattleCurrentQuestionResponse
     public int MyScore { get; set; }
     public int OpponentScore { get; set; }
     public string OpponentName { get; set; } = string.Empty;
+    /// <summary>是否等待对方应战（status=0）</summary>
+    public bool WaitingForOpponent { get; set; }
 }
 
 public class BattleAnswerRequest

@@ -14,23 +14,26 @@ public class MobileService : IMobileService
 {
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IAntiCheatService _antiCheat;
 
-    public MobileService(AppDbContext context, IMapper mapper)
+    private const int AntiCheatThresholdSeconds = 120;
+    private const int AntiCheatValidMinutes = 30;
+
+    public MobileService(AppDbContext context, IMapper mapper, IAntiCheatService antiCheat)
     {
         _context = context;
         _mapper = mapper;
+        _antiCheat = antiCheat;
     }
 
     public async Task<PagedResponse> GetMyContentsAsync(int memberId, int orgId, int page, int size, string? type, string? keyword, string? sort)
     {
-        // 公共内容
         var publicQuery = _context.LearningContents
             .Include(c => c.Category)
             .Include(c => c.ContentTags).ThenInclude(ct => ct.Tag)
             .Where(c => c.IsPublic)
             .AsQueryable();
 
-        // 所属支部任务中的内容
         var taskContentIds = await _context.LearningTasks
             .Where(t => t.TargetOrgId == orgId)
             .SelectMany(t => t.TaskContents.Select(tc => tc.ContentId))
@@ -43,21 +46,17 @@ public class MobileService : IMobileService
             .Where(c => taskContentIds.Contains(c.Id))
             .AsQueryable();
 
-        // 分别物化两个查询，避免在 IQueryable 上做 Concat+GroupBy 导致 EF Core 无法翻译集合导航属性投影
         var publicContents = await publicQuery.ToListAsync();
         var taskContents = await taskQuery.ToListAsync();
 
-        // 在内存中合并去重（按 Id）
         var allContents = publicContents
             .Concat(taskContents)
             .GroupBy(c => c.Id)
             .Select(g => g.First())
             .ToList();
 
-        // 筛选
         if (!string.IsNullOrWhiteSpace(type))
         {
-            // type 可能是 "video"/"doc" 或枚举值
             if (Enum.TryParse<ContentType>(type, true, out var contentType))
                 allContents = allContents.Where(c => c.ContentType == contentType).ToList();
         }
@@ -68,16 +67,14 @@ public class MobileService : IMobileService
                 c.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
-        // 排序
         allContents = sort?.ToLower() switch
         {
-            "hot" => allContents.OrderByDescending(c => c.CreatedAt).ToList(), // 简化：用创建时间代替热度
+            "hot" => allContents.OrderByDescending(c => c.CreatedAt).ToList(),
             _ => allContents.OrderByDescending(c => c.CreatedAt).ToList()
         };
 
         var total = allContents.Count;
 
-        // 获取本人所有进度记录
         var myProgresses = await _context.MemberLearningProgress
             .Where(p => p.MemberId == memberId)
             .ToListAsync();
@@ -92,7 +89,6 @@ public class MobileService : IMobileService
             var progress = myProgresses.FirstOrDefault(p => p.ContentId == c.Id);
             var isCompleted = progress?.IsCompleted ?? false;
             var durationSeconds = progress?.DurationSeconds ?? 0;
-            // 简化进度计算：已完成=100，有学习记录但未完成=50，无记录=0
             var progressPercent = isCompleted ? 100 : (durationSeconds > 0 ? 50 : 0);
             var status = isCompleted ? "done" : (durationSeconds > 0 ? "learning" : "new");
 
@@ -134,7 +130,21 @@ public class MobileService : IMobileService
         if (content == null)
             throw new BusinessException("内容不存在", 404);
 
-        // 查找已有进度记录
+        // 防挂机验证：单次上报时长超过阈值时，检查最近是否有通过的防挂机验证
+        if (request.DurationSeconds > AntiCheatThresholdSeconds)
+        {
+            var validSince = DateTime.Now.AddMinutes(-AntiCheatValidMinutes);
+            var hasValidVerification = await _context.AntiCheatRecords
+                .AnyAsync(r => r.PartyMemberId == memberId
+                    && r.IsPass
+                    && r.VerifiedAt >= validSince);
+
+            if (!hasValidVerification)
+            {
+                throw new BusinessException("需要先通过防挂机验证，请完成验证后再继续学习", 403);
+            }
+        }
+
         var progress = await _context.MemberLearningProgress
             .FirstOrDefaultAsync(p => p.MemberId == memberId
                 && p.ContentId == request.ContentId
@@ -240,7 +250,6 @@ public class MobileService : IMobileService
 
     public async Task<PagedResponse> GetMyExamsAsync(int memberId, int orgId, int page, int size, string? status)
     {
-        // 获取所有目标为本支部的测验（包括已截止的历史测验）
         var tests = await _context.ExamTests
             .Include(t => t.Paper)
             .Where(t => t.TargetOrgId == orgId)
@@ -280,7 +289,6 @@ public class MobileService : IMobileService
             });
         }
 
-        // 按 status 筛选
         if (!string.IsNullOrWhiteSpace(status))
         {
             allExams = allExams.Where(e => e.Status.Equals(status, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -344,7 +352,6 @@ public class MobileService : IMobileService
         if (test == null)
             throw new BusinessException("测验不存在", 404);
 
-        // 检查是否已提交
         if (await _context.MemberTestRecords.AnyAsync(r => r.MemberId == memberId && r.TestId == request.TestId))
             throw new BusinessException("您已提交过该测验", 400);
 
@@ -353,7 +360,6 @@ public class MobileService : IMobileService
             .Where(q => questionIds.Contains(q.Id))
             .ToDictionaryAsync(q => q.Id);
 
-        // 将前端提交的答案列表转为字典便于判题
         var answerDict = request.Answers.ToDictionary(a => a.QuestionId, a => a.Answer);
 
         int totalScore = 0;
@@ -391,9 +397,6 @@ public class MobileService : IMobileService
         };
     }
 
-    /// <summary>
-    /// 判题逻辑（兼容前端「字母 / 索引」与题库「选项文本 / JSON」两种答案格式）
-    /// </summary>
     private bool CheckAnswer(Question question, string userAnswer)
     {
         if (string.IsNullOrWhiteSpace(userAnswer)) return false;
@@ -417,34 +420,28 @@ public class MobileService : IMobileService
         }
     }
 
-    /// <summary>把「字母 / 索引 / 选项文本 / 对错词」统一归一化为选项文本</summary>
     private string NormalizeSingleAnswer(Question question, string raw)
     {
         if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
         var text = raw.Trim();
         var options = GetQuestionOptions(question);
 
-        // 已是完整选项文本
         if (options.Contains(text, StringComparer.OrdinalIgnoreCase)) return text;
 
-        // 字母：A / B / C ...
         if (text.Length == 1 && char.IsLetter(text[0]))
         {
             var idx = char.ToUpper(text[0]) - 'A';
             if (idx >= 0 && idx < options.Count) return options[idx];
         }
 
-        // 数字索引
         if (int.TryParse(text, out var num) && num >= 0 && num < options.Count) return options[num];
 
-        // 判断题 true/false/对/错 → 正确/错误
         if (string.Equals(text, "true", StringComparison.OrdinalIgnoreCase) || text == "对") return "正确";
         if (string.Equals(text, "false", StringComparison.OrdinalIgnoreCase) || text == "错") return "错误";
 
         return text;
     }
 
-    /// <summary>把「JSON字符串数组 / JSON索引数组 / 逗号分隔文本」解析为归一化选项文本集合</summary>
     private HashSet<string>? ParseMultiAnswer(Question question, string raw)
     {
         if (string.IsNullOrWhiteSpace(raw)) return null;
@@ -500,7 +497,6 @@ public class MobileService : IMobileService
         if (record == null)
             throw new BusinessException("未找到考试记录", 404);
 
-        // 兼容两种答案存储格式：新格式 List<SubmitAnswerItem> 和旧格式 Dictionary<string,string>
         var answerDict = new Dictionary<int, string>();
         try
         {
@@ -607,7 +603,6 @@ public class MobileService : IMobileService
             ? Math.Round((double)completedTaskCount / tasks.Count * 100, 2)
             : 0;
 
-        // 计算整体学习进度：已完成内容数 / 可学内容总数（简化估算）
         var totalLearnableContents = await _context.LearningContents
             .CountAsync(c => c.IsPublic)
             + tasks.SelectMany(t => t.TaskContents).Select(tc => tc.ContentId).Distinct().Count();
