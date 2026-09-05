@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>党建学习系统 - 功能技术文书</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; background: #f5f5f5; color: #333; line-height: 1.8; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+  h1 { text-align: center; color: #C8161D; font-size: 32px; margin-bottom: 8px; padding-bottom: 16px; border-bottom: 3px solid #C8161D; }
+  .subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 40px; }
+  h2 { color: #C8161D; font-size: 22px; margin: 36px 0 16px; padding-left: 12px; border-left: 4px solid #C8161D; }
+  h3 { color: #333; font-size: 17px; margin: 20px 0 10px; }
+  .card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 20px 0; }
+  .stat-card { background: linear-gradient(135deg, #C8161D, #e74c3c); color: #fff; border-radius: 8px; padding: 20px; text-align: center; }
+  .stat-card .num { font-size: 36px; font-weight: bold; }
+  .stat-card .label { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th { background: #C8161D; color: #fff; padding: 10px 12px; text-align: left; font-weight: 500; }
+  td { padding: 9px 12px; border-bottom: 1px solid #eee; }
+  tr:hover { background: #fef5f5; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; }
+  .tag-get { background: #e8f5e9; color: #2e7d32; }
+  .tag-post { background: #e3f2fd; color: #1565c0; }
+  .tag-put { background: #fff3e0; color: #e65100; }
+  .tag-delete { background: #ffebee; color: #c62828; }
+  .tag-ai { background: #f3e5f5; color: #7b1fa2; }
+  .tag-base { background: #e0f7fa; color: #00695c; }
+  .module-section { margin-bottom: 16px; }
+  .module-title { font-weight: bold; color: #C8161D; font-size: 15px; margin-bottom: 6px; }
+  .endpoint { font-family: 'Consolas', monospace; font-size: 13px; color: #555; }
+  .desc { color: #666; font-size: 13px; }
+  .arch-diagram { background: #fff; border-radius: 8px; padding: 30px; text-align: center; margin: 16px 0; }
+  .arch-layer { background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; padding: 14px; margin: 8px 0; position: relative; }
+  .arch-layer .layer-name { font-weight: bold; color: #C8161D; margin-bottom: 6px; }
+  .arch-layer .layer-content { font-size: 13px; color: #555; }
+  .arrow { color: #C8161D; font-size: 20px; margin: 4px 0; }
+  .feature-list { columns: 2; column-gap: 24px; }
+  .feature-item { break-inside: avoid; margin-bottom: 10px; padding-left: 16px; position: relative; font-size: 14px; }
+  .feature-item::before { content: '✓'; position: absolute; left: 0; color: #C8161D; font-weight: bold; }
+  .footer { text-align: center; color: #999; font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }
+  @media (max-width: 768px) { .overview-grid { grid-template-columns: repeat(2, 1fr); } .feature-list { columns: 1; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>党建学习系统</h1>
+<p class="subtitle">功能技术文书 &nbsp;|&nbsp; 版本 v2.0 &nbsp;|&nbsp; 2026年9月</p>
+
+<!-- 系统概览 -->
+<div class="card">
+<h2>一、系统概览</h2>
+<p>党建学习系统是一套面向基层党组织的数字化学习管理平台，采用前后端分离架构，为管理员提供党务管理、数据统计、AI分析能力，为党员提供在线学习、考试、组织生活、互动对战等功能。系统深度集成千问大模型，实现AI知识问答、个性化推荐、智能分析等智能化能力。</p>
+<div class="overview-grid">
+  <div class="stat-card"><div class="num">25</div><div class="label">后端业务模块</div></div>
+  <div class="stat-card"><div class="num">174</div><div class="label">API接口端点</div></div>
+  <div class="stat-card"><div class="num">26</div><div class="label">前端功能页面</div></div>
+  <div class="stat-card"><div class="num">32</div><div class="label">数据库业务表</div></div>
+</div>
+</div>
+
+<!-- 技术架构 -->
+<div class="card">
+<h2>二、技术架构</h2>
+<div class="arch-diagram">
+  <div class="arch-layer">
+    <div class="layer-name">表现层（前端）</div>
+    <div class="layer-content">管理端 Vue3 + Element Plus（端口5173） &nbsp;|&nbsp; 党员端 Vue3 + Element Plus（端口5174） &nbsp;|&nbsp; ECharts 数据可视化 &nbsp;|&nbsp; Web Speech API 语音输入</div>
+  </div>
+  <div class="arrow">▼</div>
+  <div class="arch-layer">
+    <div class="layer-name">接口层（REST API）</div>
+    <div class="layer-content">ASP.NET Core Web API &nbsp;|&nbsp; JWT 身份认证 &nbsp;|&nbsp; 角色权限控制 &nbsp;|&nbsp; 数据权限分级 &nbsp;|&nbsp; NL2SQL 安全过滤</div>
+  </div>
+  <div class="arrow">▼</div>
+  <div class="arch-layer">
+    <div class="layer-name">业务服务层</div>
+    <div class="layer-content">25个业务Service &nbsp;|&nbsp; 千问大模型集成 &nbsp;|&nbsp; BM25检索引擎 &nbsp;|&nbsp; K-Means聚类 &nbsp;|&nbsp; 防挂机检测 &nbsp;|&nbsp; 通知推送</div>
+  </div>
+  <div class="arrow">▼</div>
+  <div class="arch-layer">
+    <div class="layer-name">数据层</div>
+    <div class="layer-content">MySQL 8.0 &nbsp;|&nbsp; EF Core ORM &nbsp;|&nbsp; 32张业务表 &nbsp;|&nbsp; Code First 迁移</div>
+  </div>
+</div>
+<h3>技术栈</h3>
+<table>
+  <tr><th>层级</th><th>技术</th><th>版本</th></tr>
+  <tr><td>后端框架</td><td>ASP.NET Core</td><td>.NET 8</td></tr>
+  <tr><td>ORM</td><td>Entity Framework Core</td><td>8.0</td></tr>
+  <tr><td>数据库</td><td>MySQL</td><td>8.0</td></tr>
+  <tr><td>前端框架</td><td>Vue.js</td><td>3.x</td></tr>
+  <tr><td>UI组件库</td><td>Element Plus</td><td>2.x</td></tr>
+  <tr><td>图表库</td><td>Apache ECharts</td><td>5.x</td></tr>
+  <tr><td>AI大模型</td><td>通义千问（DashScope）</td><td>qwen-plus</td></tr>
+  <tr><td>构建工具</td><td>Vite</td><td>5.x</td></tr>
+</table>
+</div>
+
+<!-- 后端功能 -->
+<div class="card">
+<h2>三、后端功能模块（25个Controller / 174个端点）</h2>
+
+<div class="module-section">
+<h3><span class="tag tag-base">认证</span> AuthController — 身份认证</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/auth/login</td><td>手机号+密码登录，返回JWT Token</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/auth/refresh</td><td>刷新Token</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/auth/change-password</td><td>修改密码</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/auth/me</td><td>获取当前用户信息</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">人员</span> PartyMembersController — 党员管理</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/members</td><td>党员分页列表（支持组织/关键词筛选，数据权限分级）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/members</td><td>新增党员</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/members/{id}</td><td>党员详情</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/members/{id}</td><td>编辑党员</td></tr>
+  <tr><td><span class="tag tag-delete">DELETE</span></td><td class="endpoint">/api/v1/members/{id}</td><td>删除党员</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/members/{id}/role</td><td>调整角色（党员/书记/管理员）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/members/import</td><td>Excel批量导入（ClosedXML解析，错误提示）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/members/export</td><td>Excel批量导出</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">组织</span> OrganizationsController — 组织架构</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/organizations</td><td>组织列表</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/organizations</td><td>新增组织（总支/支部）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/organizations/tree</td><td>组织树形结构（总支→支部层级）</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/organizations/{id}</td><td>编辑组织</td></tr>
+  <tr><td><span class="tag tag-delete">DELETE</span></td><td class="endpoint">/api/v1/organizations/{id}</td><td>删除组织</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/organizations/{id}/stats</td><td>组织统计（递归汇总下级支部）</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">学习</span> LearningContentsController — 学习内容</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/contents</td><td>内容分页列表（分类/标签筛选）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/contents</td><td>新增学习内容（文章/视频）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/contents/{id}</td><td>内容详情</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/contents/{id}</td><td>编辑内容</td></tr>
+  <tr><td><span class="tag tag-delete">DELETE</span></td><td class="endpoint">/api/v1/contents/{id}</td><td>删除内容</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/contents/categories/tree</td><td>分类树形结构</td></tr>
+  <tr><td colspan="3" class="desc">分类CRUD、标签CRUD完整支持</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">学习</span> LearningTasksController — 学习任务派发</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/tasks</td><td>任务列表</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/tasks</td><td>创建任务（选素材→选支部→截止时间→关联试卷，自动发通知）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/tasks/{id}</td><td>任务详情</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/tasks/{id}</td><td>编辑任务</td></tr>
+  <tr><td><span class="tag tag-delete">DELETE</span></td><td class="endpoint">/api/v1/tasks/{id}</td><td>删除任务</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/tasks/{id}/completion</td><td>任务完成情况统计</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/tasks/{id}/urge</td><td>催办（自动发送站内通知给未完成党员）</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">考试</span> ExamPapersController + ExamTestsController — 题库与考试</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/exam-papers</td><td>试卷列表</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/exam-papers</td><td>创建试卷</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/exam-tests</td><td>考试发布列表</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/exam-tests</td><td>发布考试（自动发通知，关联支部+截止时间）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/exam-tests/{id}/results</td><td>考试成绩统计</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/exam-tests/practice</td><td>专项练习随机抽题（按分类）</td></tr>
+  <tr><td colspan="3" class="desc">QuestionsController：题目CRUD、分类管理、Excel导入</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">组织生活</span> MeetingActivityController — 三会一课</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/meeting-activities</td><td>活动列表</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/meeting-activities</td><td>发布活动（支部主题党日/党课/组织生活会/民主评议）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/meeting-activities/{id}/signup</td><td>党员报名</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/meeting-activities/{id}/checkin</td><td>党员签到</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/meeting-activities/{id}/my-status</td><td>我的报名/签到状态</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/meeting-activities/hearts</td><td>提交心得</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/meeting-activities/{id}/ai-summary</td><td>AI活动总结（千问生成）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/meeting-activities/{id}/review</td><td>审核总结</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/meeting-activities/{id}/archive</td><td>归档</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/meeting-activities/{id}/report</td><td>上报（真实写入数据库）</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">发展</span> PartyDevelopmentController — 党员发展台账</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/party-development</td><td>发展记录列表（含所属支部、审核人）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/party-development</td><td>创建发展记录</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/party-development/{id}/submit</td><td>提交审核</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/party-development/{id}/review</td><td>审核（通过/驳回+评语，记录审核人）</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/party-development/{id}/advance</td><td>阶段推进（积极分子→发展对象→预备党员→正式党员）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/party-development/{id}/ai-check</td><td>AI材料校验（千问分析材料完整性）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/party-development/{id}/report-suggestion</td><td>思想汇报AI建议（千问四维评分+改写建议）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/party-development/{id}/material-check</td><td>材料检查（千问真正分析）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/party-development/reminders/list</td><td>到期提醒列表（预备期满/材料缺失/汇报到期）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/party-development/reminders/trigger</td><td>触发提醒（自动发通知）</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">通知</span> NotificationController — 消息通知中心</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/notifications/all</td><td>全部通知（分页）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/notifications/unread</td><td>未读通知（红点计数）</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/notifications/{id}/read</td><td>标记已读</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/notifications/read-all</td><td>全部已读</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/notifications/targeted-send</td><td>精准分层推送（按组织/角色/身份筛选+预演模式）</td></tr>
+  <tr><td colspan="3" class="desc">自动触发场景：任务创建、考试发布、学习预警、发展到期、对战邀请</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">统计</span> StatisticsController — 数据统计与驾驶舱</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/statistics/dashboard</td><td>工作台统计概览</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/statistics/dashboard-largescreen</td><td>全屏数字驾驶舱（党员数/支部排名/完成率/考试趋势/薄弱知识/预警）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/statistics/learning</td><td>学习趋势（组织递归汇总）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/statistics/exam</td><td>考试趋势</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/statistics/branch/{orgId}</td><td>支部统计（递归汇总下级）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/statistics/anti-cheat</td><td>防挂机统计</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">积分</span> PointController — 积分体系</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/points/records</td><td>积分明细（数据权限控制）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/points/my</td><td>我的积分</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/points/ranking</td><td>积分排行榜（周/月/支部榜）</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">打卡</span> CheckInController + EducationSiteController — 签到与红色基地</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/check-in/my</td><td>我的签到记录</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/check-in/ai-background</td><td>AI签到背景知识</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/education-sites</td><td>红色教育基地列表（11个基地）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/education-sites</td><td>新增基地</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/education-sites/{id}/checkin</td><td>基地打卡（积分奖励）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/education-sites/my-checkins</td><td>我的打卡记录</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">互动</span> BattleController + PairHelpController — 党史PK与结对帮扶</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/battle/create</td><td>创建对战</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/battle/pending</td><td>待应战列表</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/battle/{id}/accept</td><td>应战（状态机：0→1进行中）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/battle/{id}/question</td><td>获取当前题目（status=0返回等待提示）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/battle/{id}/answer</td><td>提交答案（仅status=1可答）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/battle/{id}/forfeit</td><td>弃权退出（不卡死）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/battle/{id}/result</td><td>对战结果</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/pair-help/recommend</td><td>AI薄弱点互助推荐</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/pair-help/request</td><td>发起结对申请</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/pair-help/requests/{id}/accept</td><td>接受结对</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/pair-help/my</td><td>我的结对</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/pair-help/records/{id}/complete</td><td>完成帮扶</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">安全</span> AntiCheatController — 防挂机主动验证</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/anti-cheat/challenge-v2</td><td>获取验证题（从真实题库随机抽取）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/anti-cheat/verify-v2</td><td>提交验证答案</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/anti-cheat/stats-overview</td><td>防挂机统计概览</td></tr>
+  <tr><td colspan="3" class="desc">学习超120秒自动触发验证，验证失败不计入有效时长；MobileService已接入防挂机检测</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">整改</span> RectificationController — 支部整改闭环</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/rectifications</td><td>整改项列表</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/rectifications</td><td>创建整改项（AI评级自动生成）</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/rectifications/{id}/complete</td><td>完成整改</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td class="endpoint">/api/v1/rectifications/{id}/status</td><td>更新整改状态</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-ai">AI</span> AiController — AI核心服务</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai/query</td><td>AI通用对话（千问，调用前数据脱敏）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/recommendations</td><td>个性化学习推荐（薄弱标签+内容匹配度加权）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/mobile/report/ai-assessment</td><td>AI个人学习报告（真实错题率+千问总结）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai/organization-report</td><td>AI支部季度考核报告（评级+问题+整改建议）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai/star-members</td><td>AI学习标兵评选（五维评分+千问个性化评语）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai/roadmap</td><td>AI学习路线图（三阶段+薄弱点筛选内容+KPI）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/ai/learning-warnings</td><td>AI学习预警检测（4类异常，真实防挂机数据）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai/learning-warnings/trigger</td><td>触发预警通知</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-ai">AI</span> AiKnowledgeController + Nl2SqlController + KMeansController — AI智能分析</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai-knowledge/query</td><td>RAG党建知识问答（BM25两级检索+来源引用）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/nl2sql/query</td><td>自然语言查数据（禁SELECT * +字段白名单+敏感脱敏+LIMIT限制）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/nl2sql/history</td><td>查询历史（多轮会话）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/kmeans/cluster</td><td>错题K-Means聚类（K-means++质心+欧氏距离+迭代收敛）</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-ai">AI</span> AiContentGenerationController — AI内容生成</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai-content/generate</td><td>AI生成（题目/文章/宣讲稿/知识卡片）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai-content/upload</td><td>文件上传解析（txt/md/pdf/docx文本提取）</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai-content/approve-question</td><td>审核通过→题目入库</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/ai-content/approve-content</td><td>审核通过→学习内容入库</td></tr>
+</table>
+</div>
+
+<div class="module-section">
+<h3><span class="tag tag-base">移动端</span> MobileController — 党员端接口</h3>
+<table>
+  <tr><th>方法</th><th>端点</th><th>说明</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/contents</td><td>学习内容列表（公共素材/支部任务分层）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/contents/{id}</td><td>内容详情</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/mobile/progress</td><td>上报学习进度（防挂机检测，5秒后100%）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/tasks/pending</td><td>待办任务</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/tasks/completed</td><td>已完成任务</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/mobile/tasks/complete</td><td>完成任务</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/exams</td><td>考试列表（待考/历史）</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/exams/{id}/start</td><td>开始考试</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td class="endpoint">/api/v1/mobile/exams/submit</td><td>提交答卷</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/exams/{id}/result</td><td>考试结果</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td class="endpoint">/api/v1/mobile/overview</td><td>个人中心概览（学习/考试/积分/消息）</td></tr>
+</table>
+</div>
+
+</div>
+
+<!-- 管理端功能 -->
+<div class="card">
+<h2>四、管理端功能页面（12个页面，端口5173）</h2>
+<table>
+  <tr><th>页面</th><th>路由</th><th>核心功能</th></tr>
+  <tr><td>工作台</td><td>/dashboard</td><td>统计概览、学习趋势、预警提醒、快捷操作（三栏并列）</td></tr>
+  <tr><td>组织人员</td><td>/organization</td><td>党员管理（增删改查/角色调整/批量导入导出）、组织架构树</td></tr>
+  <tr><td>学习内容</td><td>/learning-content</td><td>素材管理、学习任务派发（关联试卷+催办）、分类标签管理</td></tr>
+  <tr><td>题库测验</td><td>/exam-management</td><td>题目管理、试卷管理、考试发布与成绩统计</td></tr>
+  <tr><td>组织生活</td><td>/org-life</td><td>活动发布、AI活动总结、审核归档上报（三会简报整合于此）</td></tr>
+  <tr><td>数据智能分析</td><td>/data-analysis</td><td>NL2SQL自然语言查询、AI数据分析助手、统计图表</td></tr>
+  <tr><td>学习标兵</td><td>/star-members</td><td>AI五维评分、雷达图、排名榜单（组织递归汇总）</td></tr>
+  <tr><td>红色基地</td><td>/education-sites</td><td>基地管理、打卡记录查看</td></tr>
+  <tr><td>整改闭环</td><td>/rectification</td><td>整改项管理、状态跟踪、完成确认</td></tr>
+  <tr><td>党员发展</td><td>/party-development</td><td>发展台账（创建/提交/审核/阶段推进/AI材料校验/思想汇报建议）</td></tr>
+  <tr><td>数字驾驶舱</td><td>/dashboard-fullscreen</td><td>全屏暗色主题、支部完成率柱状图、薄弱知识饼图、考试趋势折线图、预警名单</td></tr>
+  <tr><td>登录</td><td>/login</td><td>管理员登录</td></tr>
+</table>
+</div>
+
+<!-- 党员端功能 -->
+<div class="card">
+<h2>五、党员端功能页面（14个页面，端口5174）</h2>
+<table>
+  <tr><th>页面</th><th>路由</th><th>核心功能</th></tr>
+  <tr><td>首页</td><td>/home</td><td>待办任务、学习进度、总积分、AI推荐、积分排行前三、待办提醒</td></tr>
+  <tr><td>学习中心</td><td>/learning-center</td><td>公共素材、支部任务、AI定制学习路线、党史PK（四标签页）</td></tr>
+  <tr><td>内容详情</td><td>/content-detail</td><td>文章/视频学习、学习进度上报（5秒后100%）、防挂机验证弹窗</td></tr>
+  <tr><td>考试中心</td><td>/exam-center</td><td>待考、历史成绩、错题本、专项练习（随机抽题）</td></tr>
+  <tr><td>答题页</td><td>/quiz</td><td>在线答题、计时、提交</td></tr>
+  <tr><td>学习报告</td><td>/report</td><td>AI个人综合学习报告（量化评分+千问建议）</td></tr>
+  <tr><td>学习路线图</td><td>/roadmap</td><td>AI三阶段路线规划、KPI指标、内容推荐</td></tr>
+  <tr><td>党史PK</td><td>/battle</td><td>创建对战、应战、答题、计分、弃权退出、结果展示</td></tr>
+  <tr><td>结对互助</td><td>/pair-help</td><td>AI薄弱点推荐、结对申请、帮扶记录、完成确认</td></tr>
+  <tr><td>组织生活</td><td>/org-life</td><td>活动列表、报名、签到、提交心得</td></tr>
+  <tr><td>红色基地</td><td>/education-sites</td><td>基地浏览、打卡、我的打卡记录</td></tr>
+  <tr><td>AI对话</td><td>/ai-chat</td><td>RAG知识问答、语音输入（Web Speech API）、来源引用</td></tr>
+  <tr><td>个人中心</td><td>/profile</td><td>学习记录、考试记录、打卡、积分、消息通知（已读红点）、账号设置</td></tr>
+  <tr><td>登录</td><td>/login</td><td>党员登录</td></tr>
+</table>
+</div>
+
+<!-- AI功能详解 -->
+<div class="card">
+<h2>六、AI功能详解（15项智能化能力）</h2>
+<table>
+  <tr><th>#</th><th>功能</th><th>实现方式</th><th>技术要点</th></tr>
+  <tr><td>1</td><td>AI党建知识问答</td><td>RAG两级检索+千问生成</td><td>BM25算法（TF+IDF+长度归一化，k1=1.5,b=0.75），一级召回20条+重排，返回引用来源</td></tr>
+  <tr><td>2</td><td>错题K-Means聚类</td><td>真正K-Means算法</td><td>K-means++质心初始化、欧氏距离、迭代分配+更新质心、收敛判断，特征=[错误率,错误次数,答题次数]</td></tr>
+  <tr><td>3</td><td>个性化学习推荐</td><td>加权推荐算法</td><td>薄弱标签从真实错题category动态生成，相似度用内容标签匹配度，非伪随机</td></tr>
+  <tr><td>4</td><td>AI学习路线图</td><td>三阶段规划+薄弱点筛选</td><td>基础夯实→强化提升→冲刺巩固，内容按薄弱标签匹配度排序，每阶段3个KPI</td></tr>
+  <tr><td>5</td><td>AI个人学习报告</td><td>真实数据+千问总结</td><td>从考试记录逐题判题计算真实错题率，千问生成总结建议</td></tr>
+  <tr><td>6</td><td>NL2SQL自然语言查询</td><td>双层安全过滤</td><td>禁止SELECT *、危险关键字拦截、字段白名单、敏感字段脱敏、LIMIT≤100、多轮会话记忆</td></tr>
+  <tr><td>7</td><td>AI数据脱敏</td><td>全链路保护</td><td>调用千问前对姓名/手机号脱敏（张*、138****xxxx），4处调用点全覆盖</td></tr>
+  <tr><td>8</td><td>AI内容生成</td><td>千问生成+审核入库</td><td>支持题目/文章/宣讲稿/知识卡片，文件上传解析（pdf/docx），审核后一键入库</td></tr>
+  <tr><td>9</td><td>AI组织生活总结</td><td>签到+心得→AI简报</td><td>千问生成简报，支持编辑/审核/归档/上报全流程，上报真实写库</td></tr>
+  <tr><td>10</td><td>AI支部季度考核</td><td>综合评级+整改闭环</td><td>任务完成率/考试/活跃度/参与度→A/B/C/D评级，自动创建整改项</td></tr>
+  <tr><td>11</td><td>党员发展AI辅助</td><td>千问真正分析</td><td>材料校验（千问分析非文件名规则）、思想汇报四维评分+改写建议、三类到期提醒</td></tr>
+  <tr><td>12</td><td>AI学习预警</td><td>4类异常检测</td><td>连续低正确率/任务逾期/长期未学习/时长异常，真实防挂机数据，触发通知</td></tr>
+  <tr><td>13</td><td>AI辅助互助匹配</td><td>薄弱点智能推荐</td><td>识别党员薄弱知识点，匹配优势党员结对</td></tr>
+  <tr><td>14</td><td>AI学习标兵评选</td><td>五维加权+千问评语</td><td>学习时长/完成率/成绩/薄弱改进/积分，前5名千问生成个性化评语</td></tr>
+  <tr><td>15</td><td>AI语音输入</td><td>Web Speech API</td><td>webkitSpeechRecognition，lang=zh-CN，interimResults实时显示，不支持时文本兜底</td></tr>
+</table>
+</div>
+
+<!-- 数据库设计 -->
+<div class="card">
+<h2>七、数据库设计（32张业务表）</h2>
+<h3>核心业务表</h3>
+<div class="feature-list">
+  <div class="feature-item">partymembers — 党员信息（22条种子数据）</div>
+  <div class="feature-item">organizations — 组织架构（总支+支部，7个组织）</div>
+  <div class="feature-item">learningcontents — 学习内容（文章/视频）</div>
+  <div class="feature-item">learning_tasks — 学习任务派发</div>
+  <div class="feature-item">member_learning_progress — 党员学习进度</div>
+  <div class="feature-item">questions — 题库</div>
+  <div class="feature-item">exam_papers — 试卷</div>
+  <div class="feature-item">examtests — 考试发布</div>
+  <div class="feature-item">member_test_records — 考试记录</div>
+  <div class="feature-item">meetingactivities — 组织生活活动</div>
+  <div class="feature-item">activityhearts — 活动心得</div>
+  <div class="feature-item">partydevelopmentprocesses — 党员发展记录</div>
+  <div class="feature-item">party_development_reminders — 发展到期提醒</div>
+  <div class="feature-item">messagenotifications — 消息通知（81条）</div>
+  <div class="feature-item">checkinrecords — 签到记录</div>
+  <div class="feature-item">learningpoints — 积分明细</div>
+  <div class="feature-item">education_sites — 红色教育基地（11个）</div>
+  <div class="feature-item">battle_games — 党史PK对局（13场）</div>
+  <div class="feature-item">battlerecords — 对战记录（15条）</div>
+  <div class="feature-item">pair_help_requests — 互助申请</div>
+  <div class="feature-item">pairhelprecords — 帮扶记录（15条）</div>
+  <div class="feature-item">anticheat_records — 防挂机验证记录</div>
+  <div class="feature-item">nl2sql_sessions — NL2SQL多轮会话</div>
+  <div class="feature-item">org_rectifications — 支部整改项（12条）</div>
+  <div class="feature-item">organization_quarterly_ratings — 支部季度评级</div>
+  <div class="feature-item">organizationquarterlyreports — 季度报告</div>
+  <div class="feature-item">memberlearningreports — 党员学习报告</div>
+  <div class="feature-item">content_categories — 内容分类</div>
+  <div class="feature-item">content_tags — 内容标签</div>
+  <div class="feature-item">question_categories — 题目分类</div>
+  <div class="feature-item">tags — 标签</div>
+  <div class="feature-item">task_contents — 任务内容关联</div>
+</div>
+</div>
+
+<!-- 数据权限与安全 -->
+<div class="card">
+<h2>八、数据权限与安全机制</h2>
+<table>
+  <tr><th>机制</th><th>说明</th></tr>
+  <tr><td>身份认证</td><td>JWT Token，登录后所有接口需携带Authorization头</td></tr>
+  <tr><td>角色权限</td><td>三级角色：SystemAdmin（全部）、BranchSecretary（本支部及下级）、Member（本人）</td></tr>
+  <tr><td>数据权限分级</td><td>党员强制用JWT UserId，书记限定本支部orgId，管理员全部；PointController/MobileController/PartyMemberService已应用</td></tr>
+  <tr><td>组织递归汇总</td><td>选择总支时自动汇总下级所有支部数据（StatisticsService/AiService/NotificationService）</td></tr>
+  <tr><td>NL2SQL安全</td><td>禁SELECT *、危险关键字拦截、字段白名单、LIMIT≤100、结果脱敏</td></tr>
+  <tr><td>AI数据脱敏</td><td>调用千问前对姓名/手机号脱敏，最小必要数据原则</td></tr>
+  <tr><td>防挂机</td><td>学习超120秒触发随机答题验证，验证失败不计有效时长</td></tr>
+  <tr><td>密码安全</td><td>bcrypt哈希存储，默认密码123456</td></tr>
+</table>
+</div>
+
+<!-- 部署说明 -->
+<div class="card">
+<h2>九、部署与运行</h2>
+<h3>环境要求</h3>
+<table>
+  <tr><th>组件</th><th>版本要求</th></tr>
+  <tr><td>.NET SDK</td><td>8.0+</td></tr>
+  <tr><td>Node.js</td><td>18+</td></tr>
+  <tr><td>MySQL</td><td>8.0+</td></tr>
+</table>
+<h3>启动步骤</h3>
+<div style="background:#f9f9f9;padding:16px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;line-height:2;">
+# 1. 配置数据库连接<br>
+# 编辑 backend/appsettings.json，修改 ConnectionStrings.DefaultConnection<br><br>
+# 2. 配置千问API<br>
+# 在 backend/.env 中设置 DASHSCOPE_API_KEY=你的密钥<br><br>
+# 3. 启动后端（端口5091）<br>
+cd backend<br>
+dotnet run<br><br>
+# 4. 启动管理端（端口5173）<br>
+cd frontend/frontend-admin<br>
+npm install<br>
+npm run dev<br><br>
+# 5. 启动党员端（端口5174）<br>
+cd frontend/frontend-member<br>
+npm install<br>
+npm run dev
+</div>
+<h3>测试账号</h3>
+<table>
+  <tr><th>角色</th><th>手机号</th><th>密码</th></tr>
+  <tr><td>系统管理员</td><td>13800000000</td><td>123456</td></tr>
+  <tr><td>党员（钱学员·第一支部）</td><td>13800000002</td><td>123456</td></tr>
+</table>
+</div>
+
+<div class="footer">
+  党建学习系统功能技术文书 &nbsp;|&nbsp; 生成时间：2026年9月 &nbsp;|&nbsp; 代码仓库：github.com/7317-l/organization
+</div>
+
+</div>
+</body>
+</html>
