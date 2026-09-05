@@ -79,7 +79,7 @@ async function loadActivities() {
   loading.value = true
   try {
     const res = await request.get('/meeting-activities', { params: { page: 1, size: 50 } })
-    const list = res.items || res.data || []
+    const list = Array.isArray(res) ? res : (res.items || res.data || [])
     activities.value = list.map(item => ({
       ...item,
       hasSignedUp: false,

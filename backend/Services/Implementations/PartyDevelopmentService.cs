@@ -54,22 +54,33 @@ public class PartyDevelopmentService : IPartyDevelopmentService
             q = q.Where(p => p.Status == query.Status.Value);
 
         var total = await q.LongCountAsync();
-        var items = await q
+        var rawItems = await q
             .OrderByDescending(p => p.CreatedAt)
             .Skip((query.Page - 1) * query.Size)
             .Take(query.Size)
-            .Select(p => new PartyDevelopmentListItemDto
-            {
-                Id = p.Id,
-                PartyMemberId = p.PartyMemberId,
-                MemberName = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
-                StageName = p.Stage.ToString(),
-                StatusName = p.Status.ToString(),
-                SubmittedAt = p.SubmittedAt,
-                ReviewedAt = p.ReviewedAt,
-                IsReminderSent = p.IsReminderSent
-            })
+            .Include(p => p.PartyMember)
+            .ThenInclude(pm => pm!.Organization)
             .ToListAsync();
+
+        // 批量查询审核人姓名
+        var reviewerIds = rawItems.Where(p => p.ReviewerId.HasValue).Select(p => p.ReviewerId!.Value).Distinct().ToList();
+        var reviewerNames = await _context.PartyMembers
+            .Where(m => reviewerIds.Contains(m.Id))
+            .ToDictionaryAsync(m => m.Id, m => m.Name);
+
+        var items = rawItems.Select(p => new PartyDevelopmentListItemDto
+        {
+            Id = p.Id,
+            PartyMemberId = p.PartyMemberId,
+            MemberName = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
+            OrganizationName = p.PartyMember?.Organization?.Name,
+            StageName = p.Stage.ToString(),
+            StatusName = p.Status.ToString(),
+            SubmittedAt = p.SubmittedAt,
+            ReviewedAt = p.ReviewedAt,
+            ReviewerName = p.ReviewerId.HasValue && reviewerNames.TryGetValue(p.ReviewerId.Value, out var rname) ? rname : null,
+            IsReminderSent = p.IsReminderSent
+        }).ToList();
 
         return (items, total);
     }
@@ -78,14 +89,25 @@ public class PartyDevelopmentService : IPartyDevelopmentService
     {
         var p = await _context.PartyDevelopmentProcesses
             .Include(x => x.PartyMember)
+            .ThenInclude(pm => pm!.Organization)
             .FirstOrDefaultAsync(x => x.Id == id);
         if (p == null) return null;
+
+        string? reviewerName = null;
+        if (p.ReviewerId.HasValue)
+        {
+            reviewerName = await _context.PartyMembers
+                .Where(m => m.Id == p.ReviewerId.Value)
+                .Select(m => m.Name)
+                .FirstOrDefaultAsync();
+        }
 
         return new PartyDevelopmentDetailDto
         {
             Id = p.Id,
             PartyMemberId = p.PartyMemberId,
             MemberName = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
+            OrganizationName = p.PartyMember?.Organization?.Name,
             Stage = p.Stage,
             StageName = p.Stage.ToString(),
             Status = p.Status,
@@ -95,6 +117,7 @@ public class PartyDevelopmentService : IPartyDevelopmentService
             SubmittedAt = p.SubmittedAt,
             ReviewComment = p.ReviewComment,
             ReviewedAt = p.ReviewedAt,
+            ReviewerName = reviewerName,
             IsReminderSent = p.IsReminderSent
         };
     }
@@ -135,6 +158,7 @@ public class PartyDevelopmentService : IPartyDevelopmentService
 
         p.Status = request.IsApproved ? ProcessStatus.Approved : ProcessStatus.Rejected;
         p.ReviewComment = request.ReviewComment;
+        p.ReviewerId = _currentUser.UserId;
         p.ReviewedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
         return (await GetByIdAsync(id))!;
@@ -153,6 +177,7 @@ public class PartyDevelopmentService : IPartyDevelopmentService
         p.Status = ProcessStatus.PendingSubmit;
         p.SubmittedAt = null;
         p.ReviewComment = null;
+        p.ReviewerId = null;
         p.ReviewedAt = null;
         await _context.SaveChangesAsync();
         return (await GetByIdAsync(id))!;
@@ -173,6 +198,7 @@ public class PartyDevelopmentService : IPartyDevelopmentService
         var oneYearAgo = DateTime.UtcNow.AddYears(-1);
         var reminders = await _context.PartyDevelopmentProcesses
             .Include(p => p.PartyMember)
+            .ThenInclude(pm => pm!.Organization)
             .Where(p => p.Stage == PartyDevelopmentStage.ProbationaryMember
                 && p.Status == ProcessStatus.Approved
                 && p.ReviewedAt.HasValue
@@ -185,6 +211,7 @@ public class PartyDevelopmentService : IPartyDevelopmentService
             Id = p.Id,
             PartyMemberId = p.PartyMemberId,
             MemberName = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
+            OrganizationName = p.PartyMember?.Organization?.Name,
             StageName = p.Stage.ToString(),
             StatusName = p.Status.ToString(),
             SubmittedAt = p.SubmittedAt,

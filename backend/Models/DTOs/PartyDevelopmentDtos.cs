@@ -1,4 +1,4 @@
-﻿using PartySchoolApi.Models.Common;
+using PartySchoolApi.Models.Common;
 
 namespace PartySchoolApi.Models.DTOs;
 
@@ -14,10 +14,12 @@ public class PartyDevelopmentListItemDto
     public int Id { get; set; }
     public int PartyMemberId { get; set; }
     public string MemberName { get; set; } = string.Empty;
+    public string? OrganizationName { get; set; }
     public string StageName { get; set; } = string.Empty;
     public string StatusName { get; set; } = string.Empty;
     public DateTime? SubmittedAt { get; set; }
     public DateTime? ReviewedAt { get; set; }
+    public string? ReviewerName { get; set; }
     public bool IsReminderSent { get; set; }
 }
 
@@ -26,6 +28,7 @@ public class PartyDevelopmentDetailDto
     public int Id { get; set; }
     public int PartyMemberId { get; set; }
     public string MemberName { get; set; } = string.Empty;
+    public string? OrganizationName { get; set; }
     public PartyDevelopmentStage Stage { get; set; }
     public string StageName { get; set; } = string.Empty;
     public ProcessStatus Status { get; set; }
@@ -35,6 +38,7 @@ public class PartyDevelopmentDetailDto
     public DateTime? SubmittedAt { get; set; }
     public string? ReviewComment { get; set; }
     public DateTime? ReviewedAt { get; set; }
+    public string? ReviewerName { get; set; }
     public bool IsReminderSent { get; set; }
 }
 

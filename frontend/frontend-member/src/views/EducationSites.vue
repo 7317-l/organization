@@ -106,7 +106,7 @@ async function loadSites() {
   loading.value = true
   try {
     const res = await request.get('/education-sites', { params: { page: 1, size: 50 } })
-    sites.value = res.items || res.data || []
+    sites.value = Array.isArray(res) ? res : (res.items || res.data || [])
   } catch (e) {
     ElMessage.error('加载基地列表失败')
   } finally {
@@ -117,7 +117,7 @@ async function loadSites() {
 async function loadMyCheckins() {
   try {
     const res = await request.get('/education-sites/my-checkins', { params: { page: 1, size: 20 } })
-    myCheckins.value = res.items || res.data?.items || []
+    myCheckins.value = Array.isArray(res) ? res : (res.items || res.data?.items || res.data || [])
   } catch (e) { /* */ }
 }
 

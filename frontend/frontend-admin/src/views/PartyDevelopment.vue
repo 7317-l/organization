@@ -35,7 +35,7 @@
           <el-tag :type="statusTagType(row.status)">{{ row.statusName }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="submitDate" label="提交时间" width="170" />
+      <el-table-column prop="submittedAt" label="提交时间" width="170" />
       <el-table-column prop="reviewerName" label="审核人" width="100" />
       <el-table-column label="操作" width="380" fixed="right">
         <template #default="{ row }">
@@ -186,8 +186,8 @@ async function loadList() {
 
 async function loadMembers() {
   try {
-    const res = await request.get('/party-members', { params: { page: 1, size: 500 } })
-    memberOptions.value = res.items || res.data || []
+    const res = await request.get('/members', { params: { page: 1, size: 500 } })
+    memberOptions.value = res.items || res.data || res || []
   } catch (e) { /* */ }
 }
 

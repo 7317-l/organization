@@ -88,8 +88,15 @@ async function loadData() {
   try {
     const res = await request.get('/statistics/dashboard-largescreen')
     const data = res.data || res
-    stats.value = data.stats || data
-    warningList.value = data.warnings || data.warningList || []
+    // 映射后端字段到前端结构
+    const ov = data.overview || {}
+    stats.value = {
+      totalMembers: ov.totalMembers || 0,
+      totalOrgs: (data.branchRankings || []).length || 0,
+      monthlyLearningHours: ov.totalLearningHours || 0,
+      examPassRate: ov.averageExamScore || ov.overallCompletionRate || 0
+    }
+    warningList.value = data.warnings || data.warningList || (data.earlyWarnings || [])
     await nextTick()
     initCharts(data)
   } catch (e) {
@@ -109,8 +116,8 @@ function initCharts(data) {
   // 柱状图 - 支部完成率
   if (barChartRef.value) {
     barChart = echarts.init(barChartRef.value)
-    const branches = data?.branchCompletion?.map(b => b.name) || ['第一支部', '第二支部', '第三支部', '第四支部', '第五支部']
-    const rates = data?.branchCompletion?.map(b => b.rate) || [85, 72, 90, 68, 78]
+    const branches = data?.branchRankings?.map(b => b.orgName) || ['第一支部', '第二支部', '第三支部', '第四支部', '第五支部']
+    const rates = data?.branchRankings?.map(b => b.completionRate) || [85, 72, 90, 68, 78]
     barChart.setOption({
       backgroundColor: 'transparent',
       tooltip: { trigger: 'axis' },
@@ -129,7 +136,7 @@ function initCharts(data) {
   // 饼图 - 薄弱知识分布
   if (pieChartRef.value) {
     pieChart = echarts.init(pieChartRef.value)
-    const weakData = data?.weakKnowledge || [
+    const weakData = data?.weaknessHeatmap?.map(w => ({ name: w.tag, value: w.errorCount })) || [
       { name: '党史', value: 35 }, { name: '党章', value: 25 },
       { name: '党规党纪', value: 20 }, { name: '党的理论', value: 20 }
     ]
@@ -152,8 +159,8 @@ function initCharts(data) {
   // 折线图 - 考试趋势
   if (lineChartRef.value) {
     lineChart = echarts.init(lineChartRef.value)
-    const months = data?.examTrend?.map(t => t.month) || ['4月', '5月', '6月', '7月', '8月', '9月']
-    const scores = data?.examTrend?.map(t => t.score) || [72, 75, 78, 80, 82, 85]
+    const months = data?.examTrends?.map(t => t.month) || data?.examTrend?.map(t => t.month) || ['4月', '5月', '6月', '7月', '8月', '9月']
+    const scores = data?.examTrends?.map(t => t.averageScore || t.score) || data?.examTrend?.map(t => t.score) || [72, 75, 78, 80, 82, 85]
     lineChart.setOption({
       backgroundColor: 'transparent',
       tooltip: { trigger: 'axis' },

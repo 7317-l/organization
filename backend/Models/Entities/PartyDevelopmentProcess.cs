@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using PartySchoolApi.Models.Common;
 
 namespace PartySchoolApi.Models.Entities;
@@ -28,6 +28,8 @@ public class PartyDevelopmentProcess
 
     [MaxLength(1000)]
     public string? ReviewComment { get; set; }
+
+    public int? ReviewerId { get; set; }
 
     public DateTime? ReviewedAt { get; set; }
 
