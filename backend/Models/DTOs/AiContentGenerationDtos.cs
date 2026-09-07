@@ -45,3 +45,51 @@ public class AiGenerateContentResponse
     public string Summary { get; set; } = string.Empty;
     public AiGeneratedContentDto? Content { get; set; }
 }
+
+/// <summary>结合党员数据生成宣讲稿的请求</summary>
+public class SpeechGenerateRequest
+{
+    /// <summary>目标组织（支部）Id</summary>
+    public int OrganizationId { get; set; }
+
+    /// <summary>宣讲主题，不传则使用默认党建主题</summary>
+    public string? Topic { get; set; }
+
+    /// <summary>目标时长（分钟），默认 15</summary>
+    public int? DurationMinutes { get; set; }
+
+    /// <summary>风格，默认 正式</summary>
+    public string? Tone { get; set; }
+
+    /// <summary>字数上限，默认 2500</summary>
+    public int? MaxWords { get; set; }
+}
+
+/// <summary>结合党员数据生成宣讲稿的响应</summary>
+public class SpeechGenerateResponse
+{
+    public string Summary { get; set; } = string.Empty;
+    public AiGeneratedContentDto? Content { get; set; }
+
+    /// <summary>宣讲稿引用的党员数据摘要</summary>
+    public SpeechDataSummaryDto? DataSummary { get; set; }
+}
+
+/// <summary>宣讲稿引用的党员数据摘要</summary>
+public class SpeechDataSummaryDto
+{
+    public string OrganizationName { get; set; } = string.Empty;
+    public int MemberCount { get; set; }
+    public int FormalCount { get; set; }
+    public int ProbationaryCount { get; set; }
+    public double TotalLearningHours { get; set; }
+    public double? TaskCompletionRate { get; set; }
+    public double? AvgExamScore { get; set; }
+    public int IdleCount { get; set; }
+
+    /// <summary>学习时长 Top 党员（如 "张三(12.5小时)"）</summary>
+    public List<string> TopLearners { get; set; } = new();
+
+    /// <summary>需重点关注党员（挂机/低分，如 "李四(挂机2次,平均分62)"）</summary>
+    public List<string> WarningMembers { get; set; } = new();
+}
