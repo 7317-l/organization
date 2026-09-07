@@ -1,8 +1,12 @@
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PartySchoolApi.Data;
 using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
+using PartySchoolApi.Models.Entities;
 using PartySchoolApi.Services.Interfaces;
 
 namespace PartySchoolApi.Services.Implementations;
@@ -16,6 +20,7 @@ public class AiContentGenerationService : IAiContentGenerationService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<AiContentGenerationService> _logger;
     private readonly IKnowledgeSearchService _knowledge;
+    private readonly AppDbContext _db;
 
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
@@ -27,12 +32,14 @@ public class AiContentGenerationService : IAiContentGenerationService
         IQwenService qwen,
         IHttpClientFactory httpClientFactory,
         ILogger<AiContentGenerationService> logger,
-        IKnowledgeSearchService knowledge)
+        IKnowledgeSearchService knowledge,
+        AppDbContext db)
     {
         _qwen = qwen;
         _httpClientFactory = httpClientFactory;
         _logger = logger;
         _knowledge = knowledge;
+        _db = db;
     }
 
     public async Task<AiGenerateContentResponse> GenerateAsync(AiGenerateContentRequest request)
@@ -45,6 +52,233 @@ public class AiContentGenerationService : IAiContentGenerationService
         }
 
         return await GenerateContentAsync(request, contentType);
+    }
+
+    /// <summary>
+    /// 结合指定组织（支部）的真实党员数据生成党建宣讲稿。
+    /// 数据包括：党员总数/身份构成、累计学习时长、任务完成率、测验平均分、挂机情况、学习先进与需重点关注党员。
+    /// </summary>
+    public async Task<SpeechGenerateResponse> GenerateSpeechWithDataAsync(SpeechGenerateRequest request)
+    {
+        var topic = string.IsNullOrWhiteSpace(request.Topic)
+            ? "学习贯彻习近平新时代中国特色社会主义思想"
+            : request.Topic.Trim();
+        var durationMinutes = request.DurationMinutes ?? 15;
+        var maxWords = request.MaxWords ?? 2500;
+        var tone = string.IsNullOrWhiteSpace(request.Tone) ? "正式" : request.Tone.Trim();
+
+        var org = await _db.Organizations.AsNoTracking()
+            .FirstOrDefaultAsync(o => o.Id == request.OrganizationId);
+        var orgName = org?.Name ?? $"组织{request.OrganizationId}";
+
+        var members = await _db.PartyMembers.AsNoTracking()
+            .Where(m => m.OrganizationId == request.OrganizationId && m.Role == UserRole.PartyMember)
+            .ToListAsync();
+        var memberIds = members.Select(m => m.Id).ToList();
+
+        var formalCount = members.Count(m => m.MemberType == "正式党员");
+        var probationaryCount = members.Count(m => m.MemberType != "正式党员");
+
+        // 累计学习时长（秒）
+        long totalSeconds = 0;
+        if (memberIds.Count > 0)
+        {
+            totalSeconds = await _db.MemberLearningProgress.AsNoTracking()
+                .Where(p => memberIds.Contains(p.MemberId))
+                .SumAsync(p => (long)p.DurationSeconds);
+        }
+
+        // 学习任务完成率
+        double? completionRate = null;
+        if (memberIds.Count > 0)
+        {
+            var progresses = await _db.MemberLearningProgress.AsNoTracking()
+                .Where(p => memberIds.Contains(p.MemberId))
+                .Select(p => p.IsCompleted)
+                .ToListAsync();
+            if (progresses.Count > 0)
+                completionRate = Math.Round(progresses.Count(x => x) * 100.0 / progresses.Count, 1);
+        }
+
+        // 测验平均分
+        double? avgScore = null;
+        if (memberIds.Count > 0)
+        {
+            avgScore = await _db.MemberTestRecords.AsNoTracking()
+                .Where(r => memberIds.Contains(r.MemberId))
+                .AverageAsync(r => (double?)r.Score);
+        }
+
+        // 挂机人次
+        var idleCount = 0;
+        if (memberIds.Count > 0)
+        {
+            idleCount = await _db.AntiCheatRecords.AsNoTracking()
+                .CountAsync(a => memberIds.Contains(a.PartyMemberId) && !a.IsPass);
+        }
+
+        // 学习时长 Top 党员
+        var topLearners = new List<string>();
+        if (memberIds.Count > 0)
+        {
+            var byMember = await _db.MemberLearningProgress.AsNoTracking()
+                .Where(p => memberIds.Contains(p.MemberId))
+                .GroupBy(p => p.MemberId)
+                .Select(g => new { MemberId = g.Key, Seconds = g.Sum(p => (long)p.DurationSeconds) })
+                .OrderByDescending(x => x.Seconds)
+                .Take(3)
+                .ToListAsync();
+            var nameMap = members.ToDictionary(m => m.Id, m => m.Name);
+            foreach (var item in byMember)
+            {
+                if (item.Seconds <= 0) continue;
+                var name = nameMap.TryGetValue(item.MemberId, out var n) ? n : $"党员{item.MemberId}";
+                topLearners.Add($"{name}({Math.Round(item.Seconds / 3600.0, 1)}小时)");
+            }
+        }
+
+        // 需重点关注党员（挂机 / 平均分过低）
+        var warningMembers = new List<string>();
+        if (memberIds.Count > 0)
+        {
+            var idleByMember = await _db.AntiCheatRecords.AsNoTracking()
+                .Where(a => memberIds.Contains(a.PartyMemberId) && !a.IsPass)
+                .GroupBy(a => a.PartyMemberId)
+                .Select(g => new { MemberId = g.Key, Count = g.Count() })
+                .ToListAsync();
+            var scoreByMember = await _db.MemberTestRecords.AsNoTracking()
+                .Where(r => memberIds.Contains(r.MemberId))
+                .GroupBy(r => r.MemberId)
+                .Select(g => new { MemberId = g.Key, Avg = g.Average(r => (double)r.Score) })
+                .ToListAsync();
+            var idleMap = idleByMember.ToDictionary(x => x.MemberId, x => x.Count);
+            var scoreMap = scoreByMember.ToDictionary(x => x.MemberId, x => x.Avg);
+            var nameMap2 = members.ToDictionary(m => m.Id, m => m.Name);
+            foreach (var m in members)
+            {
+                var reasons = new List<string>();
+                if (idleMap.TryGetValue(m.Id, out var ic) && ic > 0) reasons.Add($"挂机{ic}次");
+                if (scoreMap.TryGetValue(m.Id, out var sc) && sc < 60) reasons.Add($"平均分{Math.Round(sc)}");
+                if (reasons.Count > 0)
+                {
+                    var name = nameMap2.TryGetValue(m.Id, out var nn) ? nn : $"党员{m.Id}";
+                    warningMembers.Add($"{name}({string.Join("、", reasons)})");
+                }
+                if (warningMembers.Count >= 5) break;
+            }
+        }
+
+        var dataSummary = new SpeechDataSummaryDto
+        {
+            OrganizationName = orgName,
+            MemberCount = members.Count,
+            FormalCount = formalCount,
+            ProbationaryCount = probationaryCount,
+            TotalLearningHours = Math.Round(totalSeconds / 3600.0, 1),
+            TaskCompletionRate = completionRate,
+            AvgExamScore = avgScore.HasValue ? Math.Round(avgScore.Value, 1) : null,
+            IdleCount = idleCount,
+            TopLearners = topLearners,
+            WarningMembers = warningMembers
+        };
+
+        // 组装喂给大模型的数据上下文
+        var dataText = new StringBuilder();
+        dataText.AppendLine(
+            $"【本组织党员数据】组织名称：{orgName}；党员总数：{members.Count}人（正式党员{formalCount}人、预备/其他{probationaryCount}人）；" +
+            $"累计学习时长：{Math.Round(totalSeconds / 3600.0, 1)}小时" +
+            (completionRate.HasValue ? $"；学习任务完成率：{completionRate.Value}%" : "") +
+            (avgScore.HasValue ? $"；测验平均分：{Math.Round(avgScore.Value, 1)}" : "") +
+            $"；挂机人次：{idleCount}");
+        if (topLearners.Count > 0)
+            dataText.AppendLine($"学习表现突出党员：{string.Join("、", topLearners)}");
+        if (warningMembers.Count > 0)
+            dataText.AppendLine($"需重点关注党员：{string.Join("、", warningMembers)}");
+
+        // 千问生成，失败回退内置模板
+        AiGeneratedContentDto? content = null;
+        if (_qwen.IsConfigured)
+        {
+            try
+            {
+                content = await GenerateSpeechWithDataQwenAsync(topic, tone, maxWords, durationMinutes, dataText.ToString(), orgName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "结合党员数据生成宣讲稿失败，回退内置模板。");
+            }
+        }
+
+        content ??= GenerateSpeechWithDataFallback(topic, orgName, durationMinutes, dataText.ToString());
+
+        return new SpeechGenerateResponse
+        {
+            Summary = $"已结合「{orgName}」党员数据生成关于「{topic}」的宣讲稿（约{content.EstimatedMinutes ?? durationMinutes}分钟），可在宣讲稿正文中引用相关数据。",
+            Content = content,
+            DataSummary = dataSummary
+        };
+    }
+
+    private async Task<AiGeneratedContentDto?> GenerateSpeechWithDataQwenAsync(
+        string topic, string tone, int maxWords, int durationMinutes, string dataText, string orgName)
+    {
+        var system =
+            "你是党校党建宣讲稿创作专家。请面向具体支部党员，结合给定的党员学习数据，撰写一篇有针对性的党建宣讲稿，只输出 JSON 对象。\n" +
+            "JSON结构：{\"title\":\"标题\",\"text\":\"正文（分段用\\n\\n，含开场称呼、主体、结语）\",\"outline\":[\"小标题1\",\"小标题2\"],\"keyPoints\":[\"要点1\",\"要点2\"],\"sections\":[{\"heading\":\"段落标题\",\"minutes\":5,\"content\":\"段落内容\"}]}\n" +
+            "要求：1) 正文中自然融入给定的党员数据（如党员总数、完成率、平均分、优秀党员、需要提升的方面），让宣讲有的放矢；" +
+            "2) 对数据表现好的方面给予肯定和表扬，对存在挂机、低分等问题的方面提出期望与要求；" +
+            "3) 语言正式、有感染力，符合党建语境；4) 只引用给定数据，不得编造数据以外的具体人名、事迹。";
+
+        var user =
+            $"宣讲主题：{topic}\n目标时长：{durationMinutes}分钟（按180-220字/分钟折算）\n风格：{tone}\n字数上限：{maxWords}\n\n" +
+            dataText +
+            "\n\n请据此撰写面向该支部党员的宣讲稿。";
+
+        var raw = await _qwen.ChatAsync(system, user, temperature: 0.6, jsonMode: true, maxTokens: 8192);
+        var content = ParseContentRaw(raw);
+        if (content != null)
+        {
+            content.TargetAudience = orgName + "全体党员";
+            content.WordCount = content.Text.Length;
+            content.EstimatedMinutes = durationMinutes;
+        }
+        return content;
+    }
+
+    private static AiGeneratedContentDto GenerateSpeechWithDataFallback(
+        string topic, string orgName, int durationMinutes, string dataText)
+    {
+        var text = $"同志们：\n\n今天，我们围绕「{topic}」这一主题，结合本支部党员学习情况开展宣讲交流。\n\n" +
+                   $"一、充分认识{topic}的重要意义\n{topic}是加强党的建设的现实需要，是每名党员锤炼党性、提升能力的重要抓手。\n\n" +
+                   $"二、立足实际，看到成绩\n过去一段时间，本支部党员总体学习状态良好" +
+                   (dataText.Length > 0 ? "，" + ExtractBriefData(dataText) : "") +
+                   "，涌现出一批学习先进，值得大家学习。\n\n" +
+                   "三、正视差距，补齐短板\n我们也要看到部分党员在学习和参与中还存在不足，要主动向先进看齐，相互帮助、共同提高。\n\n" +
+                   $"四、踔厉奋发，再启新程\n让我们以更饱满的热情投入学习和工作，把{topic}的要求落实到具体行动中，为支部建设贡献力量！";
+
+        return new AiGeneratedContentDto
+        {
+            Title = $"关于{topic}的宣讲稿",
+            Text = text,
+            Outline = new List<string> { "重要意义", "成绩与亮点", "问题与改进", "展望与号召" },
+            KeyPoints = new List<string> { $"深刻领会{topic}的核心要义", "总结本支部党员学习成效", "正视不足、精准发力" },
+            TargetAudience = orgName + "全体党员",
+            WordCount = text.Length,
+            EstimatedMinutes = durationMinutes,
+            Sections = new List<AiContentSectionDto>
+            {
+                new() { Heading = "开场", Minutes = 2, Content = $"同志们：今天我们围绕「{topic}」结合支部实际开展宣讲。" },
+                new() { Heading = "主体", Minutes = durationMinutes - 4, Content = text },
+                new() { Heading = "总结", Minutes = 2, Content = "让我们共同推进学习走深走实，以实际行动践行初心使命！" }
+            }
+        };
+    }
+
+    private static string ExtractBriefData(string dataText)
+    {
+        var line = dataText.Split('\n').FirstOrDefault(l => l.Contains("党员数据") || l.Contains("党员总数"))
+                   ?? dataText;
+        return line.Trim();
     }
 
     private async Task<AiGenerateContentResponse> GenerateQuestionsAsync(AiGenerateContentRequest request)
