@@ -31,16 +31,21 @@ public class AiContentGenerationController : ControllerBase
         return ApiResponse.Success(await _service.GenerateAsync(request), "生成成功");
     }
 
+    /// <summary>结合指定支部的党员数据生成党建宣讲稿</summary>
+    [HttpPost("speech-with-data")]
+    public async Task<ApiResponse> GenerateSpeechWithData([FromBody] SpeechGenerateRequest request)
+    {
+        return ApiResponse.Success(await _service.GenerateSpeechWithDataAsync(request), "宣讲稿生成成功");
+    }
+
     /// <summary>文件上传提取文本（支持txt/md，PDF/Word尝试提取）</summary>
     [HttpPost("upload")]
     public async Task<ApiResponse> Upload(IFormFile file)
     {
         if (file == null || file.Length == 0)
             return ApiResponse.Fail("请选择文件");
-
         var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
         string text = string.Empty;
-
         if (ext == ".txt" || ext == ".md" || ext == ".csv")
         {
             using var reader = new StreamReader(file.OpenReadStream(), System.Text.Encoding.UTF8);
@@ -66,7 +71,6 @@ public class AiContentGenerationController : ControllerBase
         {
             return ApiResponse.Fail("不支持的文件格式，请上传txt/md/pdf/docx文件");
         }
-
         return ApiResponse.Success(new
         {
             fileName = file.FileName,
@@ -82,7 +86,6 @@ public class AiContentGenerationController : ControllerBase
     {
         var category = await _context.QuestionCategories.FirstOrDefaultAsync(c => c.Name == request.Category || c.Id == request.CategoryId);
         var categoryId = category?.Id;
-
         var question = new Question
         {
             CategoryId = categoryId,
@@ -104,7 +107,6 @@ public class AiContentGenerationController : ControllerBase
     {
         var category = await _context.ContentCategories.FirstOrDefaultAsync(c => c.Name == request.Category || c.Id == request.CategoryId);
         var categoryId = category?.Id;
-
         var content = new LearningContent
         {
             CategoryId = categoryId,
