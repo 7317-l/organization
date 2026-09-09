@@ -45,3 +45,7 @@ debug*.png
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# 临时token文件
+admin_token.txt
+member_token.txt
