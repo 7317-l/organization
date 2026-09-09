@@ -424,6 +424,11 @@ onMounted(() => {
   right: auto !important;
   transform: translateX(-50%) !important;
   padding: 0 16px !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+}
+.mobile-view .body-container {
+  margin-top: 56px !important;
 }
 .mobile-view .sidebar {
   display: none;
