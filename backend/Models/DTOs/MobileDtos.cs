@@ -28,6 +28,19 @@ public class MobileTaskDto
     public int CompletedContents { get; set; }
     public double CompletionRate { get; set; }
     public bool IsCompleted => CompletedContents >= TotalContents && TotalContents > 0;
+
+    // 前端兼容字段
+    public string Title => TaskName;
+    public string Name => TaskName;
+    public string? Publisher { get; set; }
+    public string? CreatorName { get; set; }
+    public int ContentCount => TotalContents;
+    public int Progress => (int)Math.Round(CompletionRate);
+    public int? ContentId { get; set; }
+    public DateTime? CompletedAt { get; set; }
+    public DateTime? EndTime => Deadline;
+    public DateTime? FinishTime => CompletedAt;
+    public string TaskType => "branch";
 }
 
 /// <summary>移动端内容列表项（含个人学习进度）</summary>

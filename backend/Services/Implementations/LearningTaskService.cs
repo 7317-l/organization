@@ -98,6 +98,7 @@ public class LearningTaskService : ILearningTaskService
             TargetOrgId = request.TargetOrgId,
             Deadline = request.Deadline,
             ExamPaperId = request.ExamPaperId,
+            CreatorId = _currentUser.UserId,
             CreatedAt = DateTime.Now
         };
 

@@ -34,6 +34,13 @@ public class LearningTask
     [ForeignKey(nameof(ExamPaperId))]
     public ExamPaper? ExamPaper { get; set; }
 
+    /// <summary>创建人ID</summary>
+    [Column("creator_id")]
+    public int? CreatorId { get; set; }
+
+    [ForeignKey(nameof(CreatorId))]
+    public PartyMember? Creator { get; set; }
+
     public ICollection<TaskContent> TaskContents { get; set; } = new List<TaskContent>();
 
     [Column("created_at")]

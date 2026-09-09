@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="home-page">
     <!-- 欢迎语 -->
     <div class="welcome">

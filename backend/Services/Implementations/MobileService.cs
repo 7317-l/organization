@@ -186,6 +186,7 @@ public class MobileService : IMobileService
 
         var tasks = await _context.LearningTasks
             .Include(t => t.TaskContents)
+            .Include(t => t.Creator)
             .Where(t => t.TargetOrgId == member.OrganizationId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
@@ -202,6 +203,20 @@ public class MobileService : IMobileService
 
             if (completed == isAllCompleted)
             {
+                // 取第一个关联内容的ID用于跳转学习
+                var firstContentId = task.TaskContents.FirstOrDefault()?.ContentId;
+
+                // 取该任务下最后完成的进度记录时间
+                DateTime? completedAt = null;
+                if (isAllCompleted)
+                {
+                    completedAt = await _context.MemberLearningProgress
+                        .Where(p => p.MemberId == memberId && p.TaskId == task.Id && p.IsCompleted)
+                        .OrderByDescending(p => p.CompletedAt)
+                        .Select(p => p.CompletedAt)
+                        .FirstOrDefaultAsync();
+                }
+
                 result.Add(new MobileTaskDto
                 {
                     Id = task.Id,
@@ -209,7 +224,11 @@ public class MobileService : IMobileService
                     Deadline = task.Deadline,
                     TotalContents = totalContents,
                     CompletedContents = completedContents,
-                    CompletionRate = totalContents > 0 ? Math.Round((double)completedContents / totalContents * 100, 2) : 0
+                    CompletionRate = totalContents > 0 ? Math.Round((double)completedContents / totalContents * 100, 2) : 0,
+                    Publisher = task.Creator?.Name ?? "支部书记",
+                    CreatorName = task.Creator?.Name ?? "支部书记",
+                    ContentId = firstContentId,
+                    CompletedAt = completedAt
                 });
             }
         }
