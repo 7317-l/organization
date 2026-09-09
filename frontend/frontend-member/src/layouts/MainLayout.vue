@@ -485,6 +485,23 @@ onMounted(() => {
 .mobile-view :deep(.ai-floating-button .ai-text) {
   font-size: 14px !important;
 }
+/* 个人中心卡片：手机视图下纵向布局，避免进度条溢出 */
+.mobile-view :deep(.profile-card) {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 16px !important;
+  padding: 16px !important;
+}
+.mobile-view :deep(.profile-stats) {
+  margin-left: 0 !important;
+  justify-content: space-around !important;
+  gap: 16px !important;
+}
+.mobile-view :deep(.profile-progress) {
+  width: 100% !important;
+  max-width: 120px !important;
+  margin: 4px auto 0 auto !important;
+}
 .arrow-icon {
   color: #fff;
   font-size: 14px;
