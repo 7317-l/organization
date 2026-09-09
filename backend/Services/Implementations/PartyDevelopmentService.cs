@@ -73,12 +73,18 @@ public class PartyDevelopmentService : IPartyDevelopmentService
             Id = p.Id,
             PartyMemberId = p.PartyMemberId,
             MemberName = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
+            Name = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
+            Phone = p.PartyMember?.Phone,
             OrganizationName = p.PartyMember?.Organization?.Name,
+            Stage = (int)p.Stage,
             StageName = GetStageName(p.Stage),
+            Status = (int)p.Status,
             StatusName = GetStatusName(p.Status),
             SubmittedAt = p.SubmittedAt,
+            SubmitTime = p.SubmittedAt,
             ReviewedAt = p.ReviewedAt,
             ReviewerName = p.ReviewerId.HasValue && reviewerNames.TryGetValue(p.ReviewerId.Value, out var rname) ? rname : null,
+            Progress = CalcProgress(p.Stage),
             IsReminderSent = p.IsReminderSent
         }).ToList();
 
@@ -638,5 +644,14 @@ public class PartyDevelopmentService : IPartyDevelopmentService
         ProcessStatus.Approved => "已通过",
         ProcessStatus.Rejected => "已驳回",
         _ => "未知"
+    };
+
+    private static int CalcProgress(PartyDevelopmentStage stage) => stage switch
+    {
+        PartyDevelopmentStage.Activist => 30,
+        PartyDevelopmentStage.DevelopmentTarget => 55,
+        PartyDevelopmentStage.ProbationaryMember => 80,
+        PartyDevelopmentStage.FullMember => 100,
+        _ => 0
     };
 }

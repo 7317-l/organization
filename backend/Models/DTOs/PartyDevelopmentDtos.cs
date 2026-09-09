@@ -14,12 +14,18 @@ public class PartyDevelopmentListItemDto
     public int Id { get; set; }
     public int PartyMemberId { get; set; }
     public string MemberName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string? Phone { get; set; }
     public string? OrganizationName { get; set; }
+    public int Stage { get; set; }
     public string StageName { get; set; } = string.Empty;
+    public int Status { get; set; }
     public string StatusName { get; set; } = string.Empty;
     public DateTime? SubmittedAt { get; set; }
+    public DateTime? SubmitTime { get; set; }
     public DateTime? ReviewedAt { get; set; }
     public string? ReviewerName { get; set; }
+    public int Progress { get; set; }
     public bool IsReminderSent { get; set; }
 }
 
