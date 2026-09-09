@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PartySchoolApi.Helpers;
 using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
 using PartySchoolApi.Services.Interfaces;
@@ -15,23 +16,36 @@ namespace PartySchoolApi.Controllers;
 public class PartyMembersController : ControllerBase
 {
     private readonly IPartyMemberService _service;
+    private readonly ICurrentUserService _currentUser;
+    private readonly IDataPermissionService _dataPermission;
 
-    public PartyMembersController(IPartyMemberService service)
+    public PartyMembersController(IPartyMemberService service, ICurrentUserService currentUser, IDataPermissionService dataPermission)
     {
         _service = service;
+        _currentUser = currentUser;
+        _dataPermission = dataPermission;
     }
 
-    /// <summary>分页查询党员列表</summary>
+    /// <summary>分页查询党员列表（数据权限：书记仅本支部及下级）</summary>
     [HttpGet]
     public async Task<PagedResponse> GetList([FromQuery] MemberQueryParams query)
     {
+        if (_currentUser.Role == UserRole.BranchSecretary)
+        {
+            var accessibleOrgIds = await _dataPermission.GetAccessibleOrgIdsAsync(
+                (int)_currentUser.Role, _currentUser.OrganizationId, query.OrganizationId);
+            query.OrganizationId = null;
+            query.OrganizationIdList = accessibleOrgIds;
+        }
         return await _service.GetPagedAsync(query);
     }
 
-    /// <summary>获取党员详情</summary>
+    /// <summary>获取党员详情（数据权限校验）</summary>
     [HttpGet("{id}")]
     public async Task<ApiResponse> GetById(int id)
     {
+        if (!await _dataPermission.CanAccessMemberAsync(id, (int)_currentUser.Role, _currentUser.OrganizationId, _currentUser.UserId))
+            return ApiResponse.Fail("无权访问该党员数据");
         var member = await _service.GetByIdAsync(id);
         return ApiResponse.Success(member);
     }

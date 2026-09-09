@@ -1,4 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using PartySchoolApi.Data;
 using PartySchoolApi.Models.DTOs;
 using PartySchoolApi.Services.Interfaces;
@@ -123,18 +124,44 @@ public class StatisticsService : IStatisticsService
             });
         }
 
-        // 薄弱知识点热力图（模拟数据）
-        var weaknessTags = new List<string>
+        // 薄弱知识点热力图（从真实考试记录计算）
+        var allTestRecords = await _context.MemberTestRecords
+            .Include(r => r.Test).ThenInclude(t => t.Paper)
+            .ToListAsync();
+        var qidToAnswers = new Dictionary<int, List<string>>();
+        var qidSet = new HashSet<int>();
+        foreach (var rec in allTestRecords)
         {
-            "党史", "党章", "党规党纪", "四个意识", "四个自信",
-            "两个维护", "不忘初心", "三会一课", "民主集中制", "廉洁自律"
-        };
-        var random = new Random(42);
-        var heatmap = weaknessTags.Select(t => new WeaknessHeatmapDto
+            var answerDict = ParseAnswersSafe(rec.Answers);
+            foreach (var kv in answerDict)
+            {
+                qidSet.Add(kv.Key);
+                if (!qidToAnswers.ContainsKey(kv.Key))
+                    qidToAnswers[kv.Key] = new List<string>();
+                qidToAnswers[kv.Key].Add(kv.Value);
+            }
+        }
+        var allQuestions = await _context.Questions
+            .Where(q => qidSet.Contains(q.Id))
+            .Include(q => q.Category)
+            .ToListAsync();
+        var errorByTag = new Dictionary<string, int>();
+        foreach (var q in allQuestions)
         {
-            Tag = t,
-            ErrorCount = random.Next(5, 50),
-            Intensity = Math.Round(random.NextDouble() * 0.7 + 0.3, 2)
+            if (!qidToAnswers.TryGetValue(q.Id, out var attempts) || attempts.Count == 0) continue;
+            var tag = q.Category?.Name ?? "综合知识";
+            if (!errorByTag.ContainsKey(tag)) errorByTag[tag] = 0;
+            foreach (var ans in attempts)
+            {
+                if (!CheckAnswerReal(q, ans)) errorByTag[tag]++;
+            }
+        }
+        var maxError = errorByTag.Values.DefaultIfEmpty(1).Max();
+        var heatmap = errorByTag.Select(kv => new WeaknessHeatmapDto
+        {
+            Tag = kv.Key,
+            ErrorCount = kv.Value,
+            Intensity = Math.Round((double)kv.Value / maxError, 2)
         }).OrderByDescending(h => h.ErrorCount).ToList();
 
         // 学习趋势（近7天）
@@ -203,15 +230,16 @@ public class StatisticsService : IStatisticsService
                 .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
 
             var totalMinutes = totalSeconds / 60.0;
-            double idleRate = 0;
-            double idleMinutes = 0;
-            double validMinutes = 0;
-            if (totalMinutes > 0)
-            {
-                idleRate = new Random(member.Id).NextDouble() * 0.3;
-                idleMinutes = Math.Round(totalMinutes * idleRate, 2);
-                validMinutes = Math.Round(totalMinutes - idleMinutes, 2);
-            }
+            // 从真实防挂机验证记录计算
+            var records = await _context.AntiCheatRecords
+                .Where(r => r.PartyMemberId == member.Id)
+                .ToListAsync();
+            var passCount = records.Count(r => r.IsPass);
+            var failCount = records.Count(r => !r.IsPass);
+            var totalVerifications = passCount + failCount;
+            double idleRate = totalVerifications > 0 ? (double)failCount / totalVerifications : 0;
+            double idleMinutes = Math.Round(totalMinutes * idleRate, 2);
+            double validMinutes = Math.Round(totalMinutes - idleMinutes, 2);
 
             result.Add(new AntiCheatStatsDto
             {
@@ -222,8 +250,8 @@ public class StatisticsService : IStatisticsService
                 ValidLearningMinutes = validMinutes,
                 IdleMinutes = idleMinutes,
                 IdleRate = Math.Round(idleRate * 100, 2),
-                PassCount = new Random(member.Id).Next(5, 20),
-                FailCount = new Random(member.Id).Next(0, 3)
+                PassCount = passCount,
+                FailCount = failCount
             });
         }
 
@@ -611,5 +639,51 @@ public class StatisticsService : IStatisticsService
             ExamPassRate = examPassRate,
             TopLearners = topLearners.OrderByDescending(t => t.LearningMinutes).Take(10).ToList()
         };
+    }
+
+    private static Dictionary<int, string> ParseAnswersSafe(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return new Dictionary<int, string>();
+        try
+        {
+            var list = JsonSerializer.Deserialize<List<SubmitAnswerItem>>(raw);
+            if (list != null) return list.ToDictionary(a => a.QuestionId, a => a.Answer);
+        }
+        catch { }
+        try
+        {
+            var old = JsonSerializer.Deserialize<Dictionary<string, string>>(raw);
+            if (old != null) return old.ToDictionary(kv => int.Parse(kv.Key), kv => kv.Value);
+        }
+        catch { }
+        return new Dictionary<int, string>();
+    }
+
+    private static bool CheckAnswerReal(PartySchoolApi.Models.Entities.Question question, string userAnswer)
+    {
+        if (string.IsNullOrWhiteSpace(userAnswer)) return false;
+        switch (question.QuestionType)
+        {
+            case PartySchoolApi.Models.Common.QuestionType.SingleChoice:
+            case PartySchoolApi.Models.Common.QuestionType.TrueFalse:
+                return userAnswer.Trim() == question.CorrectAnswer.Trim();
+            case PartySchoolApi.Models.Common.QuestionType.MultiChoice:
+                try
+                {
+                    var user = JsonSerializer.Deserialize<List<int>>(userAnswer)?.OrderBy(x => x).ToList();
+                    var correct = JsonSerializer.Deserialize<List<int>>(question.CorrectAnswer)?.OrderBy(x => x).ToList();
+                    if (user == null || correct == null || user.Count != correct.Count) return false;
+                    return user.SequenceEqual(correct);
+                }
+                catch { return false; }
+            default:
+                return userAnswer.Trim() == question.CorrectAnswer.Trim();
+        }
+    }
+
+    private class SubmitAnswerItem
+    {
+        public int QuestionId { get; set; }
+        public string Answer { get; set; } = string.Empty;
     }
 }

@@ -234,7 +234,15 @@ public class AntiCheatService : IAntiCheatService
                 .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
 
             var totalMinutes = totalSeconds / 60.0;
-            var idleRate = new Random(member.Id).NextDouble() * 0.3;
+
+            // 从真实防挂机验证记录计算
+            var records = await _context.AntiCheatRecords
+                .Where(r => r.PartyMemberId == member.Id)
+                .ToListAsync();
+            var passCount = records.Count(r => r.IsPass);
+            var failCount = records.Count(r => !r.IsPass);
+            var totalVerifications = passCount + failCount;
+            var idleRate = totalVerifications > 0 ? (double)failCount / totalVerifications : 0;
             var idleMinutes = Math.Round(totalMinutes * idleRate, 2);
             var validMinutes = Math.Round(totalMinutes - idleMinutes, 2);
 
@@ -247,8 +255,8 @@ public class AntiCheatService : IAntiCheatService
                 ValidLearningMinutes = validMinutes,
                 IdleMinutes = idleMinutes,
                 IdleRate = Math.Round(idleRate * 100, 2),
-                PassCount = new Random(member.Id).Next(5, 20),
-                FailCount = new Random(member.Id).Next(0, 3)
+                PassCount = passCount,
+                FailCount = failCount
             });
         }
 

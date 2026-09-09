@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <!-- AI 悬浮按钮 -->
   <div v-if="!visible" class="admin-ai-fab" @click="visible = true" title="AI功能中心">
     <el-icon :size="26"><Search /></el-icon>
@@ -73,6 +73,7 @@ import StarMembersPanel from './ai-panel/StarMembersPanel.vue'
 import PairHelpPanel from './ai-panel/PairHelpPanel.vue'
 import './ai-panel/panel-style.css'
 
+const API_BASE = '/api/v1'
 const visible = ref(false)
 const activeNav = ref('knowledge')
 

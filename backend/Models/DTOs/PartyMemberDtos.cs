@@ -22,6 +22,9 @@ public class MemberQueryParams : PagedQueryParams
 
     public UserRole? Role { get; set; }
     public bool? IsEnabled { get; set; }
+
+    /// <summary>组织ID列表（数据权限过滤用，内部设置）</summary>
+    public List<int>? OrganizationIdList { get; set; }
 }
 
 /// <summary>党员列表项</summary>

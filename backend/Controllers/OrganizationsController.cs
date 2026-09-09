@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PartySchoolApi.Helpers;
 using PartySchoolApi.Models.Common;
 using PartySchoolApi.Models.DTOs;
 using PartySchoolApi.Services.Interfaces;
@@ -15,18 +16,29 @@ namespace PartySchoolApi.Controllers;
 public class OrganizationsController : ControllerBase
 {
     private readonly IOrganizationService _service;
+    private readonly ICurrentUserService _currentUser;
+    private readonly IDataPermissionService _dataPermission;
 
-    public OrganizationsController(IOrganizationService service)
+    public OrganizationsController(IOrganizationService service, ICurrentUserService currentUser, IDataPermissionService dataPermission)
     {
         _service = service;
+        _currentUser = currentUser;
+        _dataPermission = dataPermission;
     }
 
-    /// <summary>获取组织树</summary>
+    /// <summary>获取组织树（书记仅可见本支部及下级）</summary>
     [HttpGet("tree")]
     public async Task<ApiResponse> GetTree()
     {
-        var tree = await _service.GetTreeAsync();
-        return ApiResponse.Success(tree);
+        if (_currentUser.Role == UserRole.BranchSecretary)
+        {
+            var accessibleIds = await _dataPermission.GetAccessibleOrgIdsAsync(
+                (int)_currentUser.Role, _currentUser.OrganizationId);
+            var tree = await _service.GetTreeAsync(accessibleIds);
+            return ApiResponse.Success(tree);
+        }
+        var fullTree = await _service.GetTreeAsync();
+        return ApiResponse.Success(fullTree);
     }
 
     /// <summary>创建组织</summary>
@@ -56,10 +68,13 @@ public class OrganizationsController : ControllerBase
         return ApiResponse.Success(null, "删除成功");
     }
 
-    /// <summary>获取组织统计概览</summary>
+    /// <summary>获取组织统计概览（数据权限校验）</summary>
     [HttpGet("{id}/stats")]
     public async Task<ApiResponse> GetStats(int id)
     {
+        if (_currentUser.Role == UserRole.BranchSecretary &&
+            !await _dataPermission.CanAccessOrgAsync(id, (int)_currentUser.Role, _currentUser.OrganizationId))
+            return ApiResponse.Fail("无权访问该组织数据");
         var stats = await _service.GetStatsAsync(id);
         return ApiResponse.Success(stats);
     }

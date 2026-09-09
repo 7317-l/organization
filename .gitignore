@@ -21,3 +21,27 @@ frontend/*/dist/
 .recon/
 *.tmp
 _temp/
+
+# 测试文件（不上传AI读取的测试文件）
+*.test.cs
+*Tests.cs
+/tests/
+test_*.py
+*_test.py
+*.spec.js
+
+# 临时截图和调试文件
+check*.png
+check*.jpg
+login_screenshot.png
+screenshot*.png
+debug*.png
+*.png
+!docs/**/*.png
+!frontend/**/assets/**/*.png
+!frontend/**/public/**/*.png
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini

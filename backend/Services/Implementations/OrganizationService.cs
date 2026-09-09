@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Middleware;
@@ -21,12 +21,40 @@ public class OrganizationService : IOrganizationService
 
     public async Task<List<OrganizationTreeDto>> GetTreeAsync()
     {
-        var allOrgs = await _context.Organizations
-            .Include(o => o.Children)
-            .ToListAsync();
+        var allOrgs = await _context.Organizations.AsNoTracking().ToListAsync();
+        return BuildTree(allOrgs, null);
+    }
 
-        var rootOrgs = allOrgs.Where(o => o.ParentId == null).ToList();
-        return _mapper.Map<List<OrganizationTreeDto>>(rootOrgs);
+    /// <summary>按可访问组织ID列表过滤组织树（数据权限用）</summary>
+    public async Task<List<OrganizationTreeDto>> GetTreeAsync(List<int> orgIds)
+    {
+        var allOrgs = await _context.Organizations.AsNoTracking().ToListAsync();
+        var filtered = allOrgs.Where(o => orgIds.Contains(o.Id)).ToList();
+        var filteredIds = filtered.Select(o => o.Id).ToHashSet();
+        var rootOrgs = filtered.Where(o => o.ParentId == null || !filteredIds.Contains(o.ParentId.Value)).ToList();
+        return rootOrgs.Select(o => BuildNode(filtered, o)).ToList();
+    }
+
+    /// <summary>递归构建组织树（从根节点开始）</summary>
+    private List<OrganizationTreeDto> BuildTree(List<Organization> allOrgs, int? parentId)
+    {
+        return allOrgs
+            .Where(o => o.ParentId == parentId)
+            .Select(o => BuildNode(allOrgs, o))
+            .ToList();
+    }
+
+    /// <summary>构建单个节点及其子树</summary>
+    private OrganizationTreeDto BuildNode(List<Organization> allOrgs, Organization org)
+    {
+        return new OrganizationTreeDto
+        {
+            Id = org.Id,
+            Name = org.Name,
+            ParentId = org.ParentId,
+            CreatedAt = org.CreatedAt,
+            Children = BuildTree(allOrgs, org.Id)
+        };
     }
 
     public async Task<OrganizationTreeDto> CreateAsync(CreateOrganizationRequest request)
@@ -86,7 +114,6 @@ public class OrganizationService : IOrganizationService
         if (org == null)
             throw new BusinessException("组织不存在", 404);
 
-        // 获取该组织及所有子组织的Id
         var orgIds = await GetAllChildOrgIdsAsync(orgId);
         orgIds.Add(orgId);
 
@@ -98,7 +125,6 @@ public class OrganizationService : IOrganizationService
             .Where(p => orgIds.Contains(p.Member.OrganizationId) && p.UpdatedAt >= today)
             .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
 
-        // 任务完成率
         var tasks = await _context.LearningTasks
             .Where(t => orgIds.Contains(t.TargetOrgId))
             .Include(t => t.TaskContents)
