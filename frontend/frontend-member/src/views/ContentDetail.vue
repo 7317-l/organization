@@ -285,9 +285,11 @@ async function openAntiCheatDialog() {
   try {
     const res = await getAntiCheatChallenge(contentId.value)
     const data = res.data || res
-    antiCheatQuestion.value = data.question || data.stem || ''
-    antiCheatOptions.value = data.options || []
-    antiCheatRecordId.value = data.recordId || data.id
+    // 后端返回嵌套结构：{ challengeId, question: { questionId, stem, options, questionType } }
+    const q = data.question && typeof data.question === 'object' ? data.question : data
+    antiCheatQuestion.value = q.stem || q.question || ''
+    antiCheatOptions.value = q.options || []
+    antiCheatRecordId.value = data.challengeId || data.recordId || data.id || q.questionId
     antiCheatVisible.value = true
     startAntiCheatCountdown()
   } catch (e) {
@@ -318,11 +320,12 @@ async function submitAntiCheatAnswer() {
   antiCheatLoading.value = true
   try {
     const res = await verifyAntiCheat({
-      recordId: antiCheatRecordId.value,
-      answer: String(antiCheatSelected.value)
+      challengeId: antiCheatRecordId.value,
+      answer: String(antiCheatSelected.value),
+      contentId: contentId.value
     })
     const data = res.data || res
-    if (data.isPass || data.passed || data.success) {
+    if (data.isValid || data.correct || data.isPass || data.passed || data.success) {
       ElMessage.success('验证通过')
       antiCheatVisible.value = false
       if (antiCheatTimer) clearInterval(antiCheatTimer)
