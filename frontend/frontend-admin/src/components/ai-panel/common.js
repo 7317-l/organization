@@ -33,15 +33,18 @@ export async function apiPost(path, body = {}) {
   throw new Error(data?.message || '请求失败')
 }
 
-// 组织树 → 扁平列表（供选择支部）
+// 组织树 → 扁平列表（只返回叶子节点=支部）
 export async function loadOrgList() {
   try {
     const tree = await apiGet('/organizations/tree')
     const flat = []
     const flatten = (nodes) => {
       (nodes || []).forEach(n => {
-        flat.push({ id: n.id, name: n.name })
-        if (n.children && n.children.length) flatten(n.children)
+        if (n.children && n.children.length) {
+          flatten(n.children)
+        } else {
+          flat.push({ id: n.id, name: n.name })
+        }
       })
     }
     flatten(Array.isArray(tree) ? tree : [tree])
