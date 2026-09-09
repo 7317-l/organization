@@ -418,10 +418,12 @@ onMounted(() => {
   border-right: 1px solid #eee;
 }
 .mobile-view .top-header {
-  max-width: 375px;
+  width: 375px !important;
+  max-width: 375px !important;
   left: 50% !important;
   right: auto !important;
   transform: translateX(-50%) !important;
+  padding: 0 16px !important;
 }
 .mobile-view .sidebar {
   display: none;
@@ -455,6 +457,28 @@ onMounted(() => {
 }
 .mobile-view :deep(.el-col) {
   width: 100% !important;
+}
+/* AI悬浮按钮：限制在手机框内，缩小 */
+.mobile-view :deep(.ai-floating-button) {
+  right: calc(50% - 187.5px + 12px) !important;
+  bottom: 72px !important;
+  width: 52px !important;
+  height: 52px !important;
+}
+.mobile-view :deep(.ai-floating-button .ai-glow) {
+  width: 52px !important;
+  height: 52px !important;
+}
+.mobile-view :deep(.ai-floating-button .ai-ring) {
+  width: 52px !important;
+  height: 52px !important;
+}
+.mobile-view :deep(.ai-floating-button .ai-button-core) {
+  width: 46px !important;
+  height: 46px !important;
+}
+.mobile-view :deep(.ai-floating-button .ai-text) {
+  font-size: 14px !important;
 }
 .arrow-icon {
   color: #fff;
