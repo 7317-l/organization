@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="rectification-page">
     <el-card>
       <template #header>
@@ -92,7 +92,6 @@ onMounted(loadData)
 
 async function loadData() {
   const res = await getRectifications({
-    organizationId: 1,
     quarter: query.quarter || undefined,
     status: query.status,
     page: page.value,

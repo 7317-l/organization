@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Middleware;
 using PartySchoolApi.Models.DTOs;
@@ -16,9 +16,10 @@ public class RectificationService : IRectificationService
         _db = db;
     }
 
-    public async Task<(List<RectificationDto> items, long total)> GetRectificationsAsync(int organizationId, string? quarter, int? status, int page, int size)
+    public async Task<(List<RectificationDto> items, long total)> GetRectificationsAsync(int? organizationId, string? quarter, int? status, int page, int size)
     {
-        var q = _db.OrgRectifications.Where(r => r.OrganizationId == organizationId);
+        var q = _db.OrgRectifications.AsQueryable();
+        if (organizationId.HasValue) q = q.Where(r => r.OrganizationId == organizationId.Value);
         if (!string.IsNullOrEmpty(quarter)) q = q.Where(r => r.Quarter == quarter);
         if (status.HasValue) q = q.Where(r => r.Status == status.Value);
 

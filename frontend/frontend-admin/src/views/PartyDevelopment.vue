@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="party-development-page">
     <div class="page-header">
       <h2>党员发展台账</h2>
@@ -111,10 +111,10 @@
         <el-descriptions-item label="所属支部">{{ currentRow.organizationName }}</el-descriptions-item>
         <el-descriptions-item label="发展阶段">{{ currentRow.stageName }}</el-descriptions-item>
         <el-descriptions-item label="状态">{{ currentRow.statusName }}</el-descriptions-item>
-        <el-descriptions-item label="提交时间">{{ currentRow.submitDate }}</el-descriptions-item>
+        <el-descriptions-item label="提交时间">{{ currentRow.submittedAt }}</el-descriptions-item>
         <el-descriptions-item label="审核人">{{ currentRow.reviewerName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="审核意见" :span="2">{{ currentRow.reviewComment || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{ currentRow.remark || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="思想汇报" :span="2">{{ currentRow.reportContent || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
 

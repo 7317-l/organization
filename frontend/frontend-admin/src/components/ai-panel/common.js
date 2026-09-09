@@ -1,4 +1,4 @@
-// AI 悬浮面板公共模块：API 封装、token、组织/党员加载、脱敏、语音识别
+﻿// AI 悬浮面板公共模块：API 封装、token、组织/党员加载、脱敏、语音识别
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 

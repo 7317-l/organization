@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Helpers;
@@ -74,8 +74,8 @@ public class PartyDevelopmentService : IPartyDevelopmentService
             PartyMemberId = p.PartyMemberId,
             MemberName = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
             OrganizationName = p.PartyMember?.Organization?.Name,
-            StageName = p.Stage.ToString(),
-            StatusName = p.Status.ToString(),
+            StageName = GetStageName(p.Stage),
+            StatusName = GetStatusName(p.Status),
             SubmittedAt = p.SubmittedAt,
             ReviewedAt = p.ReviewedAt,
             ReviewerName = p.ReviewerId.HasValue && reviewerNames.TryGetValue(p.ReviewerId.Value, out var rname) ? rname : null,
@@ -109,9 +109,9 @@ public class PartyDevelopmentService : IPartyDevelopmentService
             MemberName = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
             OrganizationName = p.PartyMember?.Organization?.Name,
             Stage = p.Stage,
-            StageName = p.Stage.ToString(),
+            StageName = GetStageName(p.Stage),
             Status = p.Status,
-            StatusName = p.Status.ToString(),
+            StatusName = GetStatusName(p.Status),
             Materials = string.IsNullOrEmpty(p.MaterialsJson) ? null : JsonMappingHelper.ToStringList(p.MaterialsJson),
             ReportContent = p.ReportContent,
             SubmittedAt = p.SubmittedAt,
@@ -212,8 +212,8 @@ public class PartyDevelopmentService : IPartyDevelopmentService
             PartyMemberId = p.PartyMemberId,
             MemberName = p.PartyMember != null ? p.PartyMember.Name : string.Empty,
             OrganizationName = p.PartyMember?.Organization?.Name,
-            StageName = p.Stage.ToString(),
-            StatusName = p.Status.ToString(),
+            StageName = GetStageName(p.Stage),
+            StatusName = GetStatusName(p.Status),
             SubmittedAt = p.SubmittedAt,
             ReviewedAt = p.ReviewedAt,
             IsReminderSent = p.IsReminderSent
@@ -337,7 +337,7 @@ public class PartyDevelopmentService : IPartyDevelopmentService
                         {
                             ProcessId = id,
                             Stage = stage,
-                            StageName = stageEnum.ToString(),
+                            StageName = GetStageName(stageEnum),
                             IsComplete = v.MissingMaterials.Count == 0,
                             RequiredMaterials = required,
                             MissingMaterials = v.MissingMaterials,
@@ -371,7 +371,7 @@ public class PartyDevelopmentService : IPartyDevelopmentService
         {
             ProcessId = id,
             Stage = stage,
-            StageName = stageEnum.ToString(),
+            StageName = GetStageName(stageEnum),
             IsComplete = isComplete,
             RequiredMaterials = required,
             MissingMaterials = missing,
@@ -621,4 +621,22 @@ public class PartyDevelopmentService : IPartyDevelopmentService
         }
         catch { return null; }
     }
+
+    private static string GetStageName(PartyDevelopmentStage stage) => stage switch
+    {
+        PartyDevelopmentStage.Activist => "积极分子",
+        PartyDevelopmentStage.DevelopmentTarget => "发展对象",
+        PartyDevelopmentStage.ProbationaryMember => "预备党员",
+        PartyDevelopmentStage.FullMember => "正式党员",
+        _ => "未知"
+    };
+
+    private static string GetStatusName(ProcessStatus status) => status switch
+    {
+        ProcessStatus.PendingSubmit => "待提交",
+        ProcessStatus.UnderReview => "审核中",
+        ProcessStatus.Approved => "已通过",
+        ProcessStatus.Rejected => "已驳回",
+        _ => "未知"
+    };
 }

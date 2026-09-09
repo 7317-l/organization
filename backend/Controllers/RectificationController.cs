@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PartySchoolApi.Helpers;
 using PartySchoolApi.Models.Common;
@@ -22,10 +22,11 @@ public class RectificationController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<PagedResponse> GetList([FromQuery] int organizationId, [FromQuery] string? quarter,
+    public async Task<PagedResponse> GetList([FromQuery] int? organizationId, [FromQuery] string? quarter,
         [FromQuery] int? status, [FromQuery] int page = 1, [FromQuery] int size = 20)
     {
-        var (items, total) = await _service.GetRectificationsAsync(organizationId, quarter, status, page, size);
+        var orgId = organizationId ?? (_currentUser.Role == 0 ? _currentUser.OrganizationId : (int?)null);
+        var (items, total) = await _service.GetRectificationsAsync(orgId, quarter, status, page, size);
         return PagedResponse.Ok(items, page, size, total);
     }
 
