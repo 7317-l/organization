@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Middleware;
@@ -37,19 +37,22 @@ public class PairHelpService : IPairHelpService
         foreach (var c in candidates)
         {
             var cTags = await GetMemberWeaknessTagsAsync(c.Id);
-            var strongTags = cTags.Count > 0 ? new List<string> { "综合能力" } : new List<string>();
+            var strongTags = await GetMemberStrongTagsAsync(c.Id);
+            var complement = myTags.Intersect(strongTags).Count();
             var overlap = myTags.Intersect(cTags).Count();
-            var score = 100 - overlap * 10 + (c.PointTotal / 10.0);
+            var score = complement * 25 - overlap * 5 + (c.PointTotal / 20.0);
             if (score > 0)
             {
+                var reason = strongTags.Count > 0 ? "基于薄弱点互补分析，" + c.Name + "在" + string.Join("、", strongTags.Take(2)) + "等领域表现较强" : c.Name + "综合表现较好";
                 recommendations.Add(new PairHelpRecommendationDto
                 {
                     MemberId = c.Id,
                     MemberName = c.Name,
                     OrganizationName = (await _db.Organizations.FindAsync(c.OrganizationId))?.Name ?? "",
                     WeaknessTags = cTags,
+                    StrongTags = strongTags,
                     Score = Math.Round(score, 1),
-                    MatchReason = $"基于薄弱点互补分析，{c.Name}在相关领域表现较强，可提供帮扶"
+                    MatchReason = reason
                 });
             }
         }
@@ -220,5 +223,45 @@ public class PairHelpService : IPairHelpService
             catch { }
         }
         return tags.Take(5).ToList();
+    }
+
+    private async Task<List<string>> GetMemberStrongTagsAsync(int memberId)
+    {
+        var records = await _db.MemberTestRecords
+            .Where(r => r.MemberId == memberId)
+            .OrderByDescending(r => r.SubmittedAt)
+            .Take(10)
+            .ToListAsync();
+
+        var correctByTag = new Dictionary<string, int>();
+        var totalByTag = new Dictionary<string, int>();
+
+        foreach (var rec in records)
+        {
+            try
+            {
+                var answers = JsonSerializer.Deserialize<List<JsonElement>>(rec.Answers) ?? new();
+                foreach (var a in answers)
+                {
+                    if (!a.TryGetProperty("questionId", out var qidEl)) continue;
+                    var qid = qidEl.GetInt32();
+                    var q = await _db.Questions.FindAsync(qid);
+                    if (q == null || !q.CategoryId.HasValue) continue;
+                    var cat = await _db.QuestionCategories.FindAsync(q.CategoryId.Value);
+                    if (cat == null) continue;
+                    var tag = cat.Name;
+                    if (!totalByTag.ContainsKey(tag)) { totalByTag[tag] = 0; correctByTag[tag] = 0; }
+                    totalByTag[tag]++;
+                    var userAns = a.TryGetProperty("answer", out var ansEl) ? ansEl.GetString() ?? "" : "";
+                    if (userAns == q.CorrectAnswer) correctByTag[tag]++;
+                }
+            }
+            catch { }
+        }
+
+        return totalByTag.Where(kv => kv.Value >= 2 && (double)correctByTag[kv.Key] / kv.Value >= 0.7)
+            .Select(kv => kv.Key)
+            .Take(5)
+            .ToList();
     }
 }

@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Models.Common;
@@ -52,29 +52,49 @@ public class PointService : IPointService
         return PagedResponse.Ok(dtos, query.Page, query.Size, total);
     }
 
-    public async Task<List<PointRankingDto>> GetRankingAsync(int? orgId)
+    public async Task<List<PointRankingDto>> GetRankingAsync(int? orgId, string period = "all")
     {
         var q = _context.PartyMembers
             .Include(m => m.Organization)
-            .Where(m => m.IsEnabled && m.Role != UserRole.SystemAdmin) // 排除系统管理员
+            .Where(m => m.IsEnabled && m.Role != UserRole.SystemAdmin)
             .AsQueryable();
 
         if (orgId.HasValue)
             q = q.Where(m => m.OrganizationId == orgId.Value);
 
-        var members = await q
-            .OrderByDescending(m => m.PointTotal)
+        var members = await q.ToListAsync();
+        var memberIds = members.Select(m => m.Id).ToList();
+
+        DateTime? startTime = null;
+        if (period == "week")
+            startTime = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+        else if (period == "month")
+            startTime = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+        var pointQuery = _context.LearningPoints.Where(p => memberIds.Contains(p.PartyMemberId));
+        if (startTime.HasValue)
+            pointQuery = pointQuery.Where(p => p.EarnedAt >= startTime.Value);
+
+        var pointSums = await pointQuery
+            .GroupBy(p => p.PartyMemberId)
+            .Select(g => new { MemberId = g.Key, Points = g.Sum(p => p.Points) })
             .ToListAsync();
 
-        return members.Select((m, index) => new PointRankingDto
-        {
-            MemberId = m.Id,
-            MemberName = m.Name,
-            OrganizationId = m.OrganizationId,
-            OrganizationName = m.Organization != null ? m.Organization.Name : string.Empty,
-            TotalPoints = m.PointTotal,
-            Rank = index + 1
-        }).ToList();
+        var pointDict = pointSums.ToDictionary(x => x.MemberId, x => x.Points);
+
+        return members
+            .Select(m => new PointRankingDto
+            {
+                MemberId = m.Id,
+                MemberName = m.Name,
+                OrganizationId = m.OrganizationId,
+                OrganizationName = m.Organization != null ? m.Organization.Name : string.Empty,
+                TotalPoints = period == "all" ? m.PointTotal : (pointDict.TryGetValue(m.Id, out var pts) ? pts : 0),
+                Rank = 0
+            })
+            .OrderByDescending(r => r.TotalPoints)
+            .Select((r, i) => { r.Rank = i + 1; return r; })
+            .ToList();
     }
 
     public async Task AddPointsAsync(int memberId, int points, PointSourceType sourceType, int? sourceId)

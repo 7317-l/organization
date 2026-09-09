@@ -315,6 +315,7 @@ public class PairHelpRecommendationDto
     public string MemberName { get; set; } = string.Empty;
     public string OrganizationName { get; set; } = string.Empty;
     public List<string> WeaknessTags { get; set; } = new();
+    public List<string> StrongTags { get; set; } = new();
     public double Score { get; set; }
     public string MatchReason { get; set; } = string.Empty;
 }

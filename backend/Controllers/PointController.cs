@@ -32,13 +32,13 @@ public class PointController : ControllerBase
     }
 
     [HttpGet("ranking")]
-    public async Task<ApiResponse> GetRanking([FromQuery] int? orgId = null)
+    public async Task<ApiResponse> GetRanking([FromQuery] int? orgId = null, [FromQuery] string period = "all")
     {
         if (_currentUser.Role == UserRole.BranchSecretary)
         {
             orgId = _currentUser.OrganizationId;
         }
-        return ApiResponse.Success(await _service.GetRankingAsync(orgId));
+        return ApiResponse.Success(await _service.GetRankingAsync(orgId, period));
     }
 
     [HttpGet("my")]
