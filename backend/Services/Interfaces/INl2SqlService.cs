@@ -4,6 +4,6 @@ namespace PartySchoolApi.Services.Interfaces;
 
 public interface INl2SqlService
 {
-    Task<Nl2SqlResponse> QueryAsync(Nl2SqlRequest request, int memberId);
+    Task<Nl2SqlResponse> QueryAsync(Nl2SqlRequest request, int memberId, int role, int? orgId);
     Task<List<Nl2SqlHistoryItem>> GetHistoryAsync(string sessionId, int memberId, int limit = 5);
 }

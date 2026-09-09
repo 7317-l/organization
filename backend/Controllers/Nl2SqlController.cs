@@ -24,7 +24,7 @@ public class Nl2SqlController : ControllerBase
     [HttpPost("query")]
     public async Task<ApiResponse> Query([FromBody] Nl2SqlRequest request)
     {
-        return ApiResponse.Success(await _service.QueryAsync(request, _currentUser.UserId));
+        return ApiResponse.Success(await _service.QueryAsync(request, _currentUser.UserId, (int)_currentUser.Role, _currentUser.OrganizationId));
     }
 
     [HttpGet("history")]

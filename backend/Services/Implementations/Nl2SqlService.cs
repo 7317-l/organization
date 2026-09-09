@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PartySchoolApi.Data;
 using PartySchoolApi.Models.DTOs;
 using PartySchoolApi.Models.Entities;
@@ -91,7 +91,7 @@ public class Nl2SqlService : INl2SqlService
         _context = context;
     }
 
-    public async Task<Nl2SqlResponse> QueryAsync(Nl2SqlRequest request, int memberId)
+    public async Task<Nl2SqlResponse> QueryAsync(Nl2SqlRequest request, int memberId, int role, int? orgId)
     {
         var corrections = new List<string>();
         var nl = request.NaturalLanguage ?? string.Empty;
@@ -127,7 +127,7 @@ public class Nl2SqlService : INl2SqlService
         if (intent != "general_query")
         {
             var ruleSql = GenerateSql(intent, rewritten);
-            var ruleData = await ExecuteRuleQueryAsync(intent);
+            var ruleData = await ApplyOrgFilterAsync(await ExecuteRuleQueryAsync(intent), role, orgId);
             if (ruleData.Count > 0)
             {
                 var masked = MaskSensitiveData(ruleData);
@@ -148,12 +148,13 @@ public class Nl2SqlService : INl2SqlService
                     ? "\n\n【历史对话】\n" + string.Join("\n", history.Take(3).Select(h => $"问：{h.Question}\n答：{h.Explanation}"))
                     : "";
 
+                var orgScope = role == 1 && orgId.HasValue ? $"\n组织权限限制：当前用户是支部书记(orgId={orgId.Value})，只能查询组织ID为{orgId.Value}及其下级组织的数据。查询partymembers表必须加WHERE OrganizationId={orgId.Value}，查询learning_tasks必须加WHERE target_org_id={orgId.Value}，查询examtests必须加WHERE TargetOrgId={orgId.Value}。" : "";
                 var system =
                     "你是 MySQL 专家，把自然语言转成安全的只读 SQL。只输出 JSON：\n" +
                     "{\"intent\":\"意图\",\"sql\":\"SELECT语句\",\"explanation\":\"中文说明\"}\n" +
                     "约束：只允许 SELECT；只能用白名单表；禁止危险语句；禁止分号拼接；加 LIMIT 100。" +
-                    "注意：partymembers 表禁止查询 Phone、PasswordHash、RefreshToken、RefreshTokenExpiry 字段。";
-
+                    "注意：partymembers 表禁止查询 Phone、PasswordHash、RefreshToken、RefreshTokenExpiry 字段。" +
+                    orgScope;
                 var user = SchemaDescription + contextPrompt + "\n\n【用户问题】\n" + rewritten;
                 var raw = await _qwen.ChatAsync(system, user, temperature: 0.2, jsonMode: true);
                 var parsed = ParseRaw(raw);
@@ -177,7 +178,7 @@ public class Nl2SqlService : INl2SqlService
                             $"字段级白名单校验未通过：{colCheck.Reason}", null, null, intent, rewritten, isResolved, conversation);
                     }
 
-                    var data = await ExecuteReadOnlyAsync(sql);
+                    var data = await ApplyOrgFilterAsync(await ExecuteReadOnlyAsync(sql), role, orgId);
                     var masked = MaskSensitiveData(data);
                     if (masked.Count > 0)
                     {
@@ -201,7 +202,7 @@ public class Nl2SqlService : INl2SqlService
             return BuildResultV2(sessionId, corrections, fbSql, false,
                 $"SQL安全校验未通过：{fbSafety.Reason}", null, null, fbIntent, rewritten, isResolved, conversation);
         }
-        var fbData = await ExecuteReadOnlyAsync(fbSql);
+        var fbData = await ApplyOrgFilterAsync(await ExecuteReadOnlyAsync(fbSql), role, orgId);
         var fbMasked = MaskSensitiveData(fbData);
         await SaveSessionAsync(sessionId, effectiveMemberId, nl, rewritten, fbSql,
             $"已识别意图「{fbIntent}」，查询结果如下。", BuildResultSummary(fbMasked));
@@ -606,5 +607,48 @@ public class Nl2SqlService : INl2SqlService
         public string? Intent { get; set; }
         public string? Sql { get; set; }
         public string? Explanation { get; set; }
+    }
+
+    private async Task<List<Dictionary<string, object>>> ApplyOrgFilterAsync(List<Dictionary<string, object>> data, int role, int? orgId)
+    {
+        if (role != 1 || !orgId.HasValue || data.Count == 0) return data;
+
+        // 获取可访问的组织ID列表（本组织及下级）
+        var allOrgs = await _context.Organizations.ToListAsync();
+        var accessibleIds = new HashSet<int> { orgId.Value };
+        bool changed = true;
+        while (changed)
+        {
+            changed = false;
+            foreach (var o in allOrgs)
+            {
+                if (o.ParentId.HasValue && accessibleIds.Contains(o.ParentId.Value) && !accessibleIds.Contains(o.Id))
+                {
+                    accessibleIds.Add(o.Id);
+                    changed = true;
+                }
+            }
+        }
+
+        // 过滤结果：如果行包含组织ID字段，则只保留可访问的组织
+        var orgFields = new[] { "organizationid", "org_id", "orgid", "target_org_id", "targetorgid" };
+        var filtered = new List<Dictionary<string, object>>();
+        foreach (var row in data)
+        {
+            bool keep = true;
+            foreach (var field in orgFields)
+            {
+                if (row.TryGetValue(field, out var val) && val != null && int.TryParse(val.ToString(), out var rowOrgId))
+                {
+                    if (!accessibleIds.Contains(rowOrgId))
+                    {
+                        keep = false;
+                        break;
+                    }
+                }
+            }
+            if (keep) filtered.Add(row);
+        }
+        return filtered;
     }
 }
