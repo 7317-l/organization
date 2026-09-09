@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="ai-chat-overlay" @click.self="closeAI">
     <div class="ai-chat">
       <!-- ========================================

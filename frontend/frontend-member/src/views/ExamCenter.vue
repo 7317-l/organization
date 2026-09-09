@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="exam-center">
     <div class="page-header">
       <div class="page-title">考试中心</div>
@@ -286,7 +286,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted , inject } from 'vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Document, DataAnalysis, MagicStick } from '@element-plus/icons-vue'

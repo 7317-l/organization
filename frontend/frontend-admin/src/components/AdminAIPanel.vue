@@ -127,6 +127,20 @@ const componentMap = {
 }
 
 const currentComponent = computed(() => componentMap[activeNav.value] || KnowledgeQa)
+
+/** 外部调用：打开AI面板并定位到指定功能 */
+function open(panelKey) {
+  if (panelKey && componentMap[panelKey]) {
+    activeNav.value = panelKey
+  }
+  visible.value = true
+}
+
+function close() {
+  visible.value = false
+}
+
+defineExpose({ open, close })
 </script>
 
 <style scoped>

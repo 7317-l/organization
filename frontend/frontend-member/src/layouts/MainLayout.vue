@@ -98,7 +98,7 @@
     </div>
     <!-- AI 悬浮球 + AI 功能中心面板 -->
     <AIFloatingButton @click="aiVisible = true" />
-    <AIChatPanel v-if="aiVisible" @close="aiVisible = false" />
+    <AIChatPanel v-show="aiVisible" ref="aiPanelRef" @close="aiVisible = false" />
   </el-container>
 </template>
 
@@ -116,6 +116,15 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const aiVisible = ref(false)
+const aiPanelRef = ref(null)
+
+// 全局提供打开AI面板的方法
+provide('openAIPanel', (panelKey) => {
+  aiVisible.value = true
+  nextTick(() => {
+    aiPanelRef.value?.open(panelKey)
+  })
+})
 const isMobileView = ref(localStorage.getItem('memberViewMode') === 'mobile')
 
 function toggleView() {

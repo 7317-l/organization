@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 
   <button
     class="ai-floating-button"

@@ -2,9 +2,12 @@
   <div class="party-development-page">
     <div class="page-header">
       <h2>党员发展台账</h2>
-      <el-button type="primary" @click="openCreateDialog">
-        <el-icon><Plus /></el-icon>新建发展记录
-      </el-button>
+      <div>
+        <el-button type="danger" plain @click="openAI('develop')" :icon="MagicStick">AI助手</el-button>
+        <el-button type="primary" @click="openCreateDialog">
+          <el-icon><Plus /></el-icon>新建发展记录
+        </el-button>
+      </div>
     </div>
 
     <!-- 筛选栏 -->
@@ -128,7 +131,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, inject } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import {

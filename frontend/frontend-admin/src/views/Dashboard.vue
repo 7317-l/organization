@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="dashboard">
     <!-- 5张KPI卡片（flex均分） -->
     <div class="kpi-row" v-loading="loading">
@@ -100,7 +100,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, inject } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import { getDashboard } from '@/api/statistics'

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="report-page">
     <div class="page-header">
       <div class="page-title">AI 学习报告</div>
@@ -98,10 +98,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+import { ref, computed, onMounted, nextTick, watch , inject } from 'vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { MagicStick } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import { getAiAssessment, getRecommendations, getOverview } from '@/api/mobile'
 import { useUserStore } from '@/stores/user'

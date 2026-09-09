@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-container class="main-layout">
     <el-header class="app-header">
       <div class="header-left">
@@ -85,12 +85,12 @@
     </el-container>
 
     <!-- 管理端 AI 悬浮助手 -->
-    <AdminAIPanel />
+    <AdminAIPanel ref="aiPanelRef" />
   </el-container>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, provide } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import AdminAIPanel from '@/components/AdminAIPanel.vue'
@@ -99,6 +99,12 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const aiPanelRef = ref(null)
+
+// 全局提供打开AI面板的方法
+provide('openAIPanel', (panelKey) => {
+  aiPanelRef.value?.open(panelKey)
+})
 
 const activeMenu = computed(() => route.path)
 

@@ -1,10 +1,13 @@
-<template>
+﻿<template>
   <div class="star-members-page">
     <el-card>
       <template #header>
         <div class="card-header">
           <span>AI 学习标兵评选</span>
-          <el-button type="primary" @click="generate" :loading="loading">生成标兵榜单</el-button>
+          <div>
+            <el-button type="danger" plain @click="openAI('stars')" :icon="MagicStick">AI助手</el-button>
+            <el-button type="primary" @click="generate" :loading="loading">生成标兵榜单</el-button>
+          </div>
         </div>
       </template>
 
@@ -51,7 +54,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick, watch } from 'vue'
+import { ref, reactive, onMounted, nextTick, watch, inject } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 import { generateStarMembers } from '@/api/feature15'

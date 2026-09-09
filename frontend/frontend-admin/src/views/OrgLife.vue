@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="org-life-page">
     <el-card shadow="never">
       <el-tabs v-model="activeTab" @tab-change="handleTabChange">
@@ -244,7 +244,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, inject } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   getMeetingActivities, createMeetingActivity, deleteMeetingActivity,

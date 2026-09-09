@@ -1,6 +1,9 @@
-<template>
+﻿<template>
   <div class="roadmap-page">
-    <h2>我的学习路线图</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="margin:0;">我的学习路线图</h2>
+      <el-button type="danger" plain size="small" @click="openAI('roadmap')" :icon="MagicStick">AI助手</el-button>
+    </div>
 
     <el-card>
       <el-form :inline="true" :model="form">
@@ -55,7 +58,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, inject } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { ElMessage } from 'element-plus'
 import { generateRoadmap } from '@/api/feature15'
 

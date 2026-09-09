@@ -1,6 +1,9 @@
-<template>
+﻿<template>
   <div class="pair-help-page">
-    <h2>薄弱点互助</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="margin:0;">薄弱点互助</h2>
+      <el-button type="danger" plain size="small" @click="openAI('pairhelp')" :icon="MagicStick">AI助手</el-button>
+    </div>
 
     <el-tabs v-model="activeTab">
       <el-tab-pane label="推荐帮扶" name="recommend">
@@ -40,7 +43,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, inject } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { ElMessage } from 'element-plus'
 import { recommendPairHelp, requestPairHelp, getMyPairHelp, logPairHelp, completePairHelp } from '@/api/feature15'
 

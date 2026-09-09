@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="data-analysis-page">
     <!-- 上部分：左右分栏 NL2SQL + 实时图 -->
     <el-row :gutter="16">
@@ -120,7 +120,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, inject } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 import { aiQuery, generateOrganizationReport } from '@/api/ai'

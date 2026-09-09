@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="exam-management-page">
     <el-card shadow="never">
       <el-tabs v-model="activeTab" @tab-change="handleTabChange">
@@ -308,7 +308,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, inject } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+const openAIPanel = inject('openAIPanel')
+function openAI(key) { openAIPanel?.(key) }
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   getQuestions, createQuestion, updateQuestion, deleteQuestion,
