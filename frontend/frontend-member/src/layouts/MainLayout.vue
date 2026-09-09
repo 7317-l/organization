@@ -441,6 +441,21 @@ onMounted(() => {
 .mobile-view .user-name {
   display: none;
 }
+/* 手机视图下通用：多列grid/flex变单列，避免溢出 */
+.mobile-view :deep(.top-row),
+.mobile-view :deep(.stats-row),
+.mobile-view :deep(.bottom-row),
+.mobile-view :deep(.ai-cards),
+.mobile-view :deep(.card-grid),
+.mobile-view :deep(.content-grid) {
+  grid-template-columns: 1fr !important;
+}
+.mobile-view :deep(.flex-row) {
+  flex-direction: column !important;
+}
+.mobile-view :deep(.el-col) {
+  width: 100% !important;
+}
 .arrow-icon {
   color: #fff;
   font-size: 14px;
