@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
 using PartySchoolApi.Models.Common;
 
@@ -34,12 +34,29 @@ public class ExceptionMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        var response = ApiResponse.Fail(
-            message: ex.InnerException != null ? ex.InnerException.Message : ex.Message,
-            code: 500
-        );
+        int statusCode;
+        int code;
+        string message;
+
+        if (ex is BusinessException bizEx)
+        {
+            // 业务异常：使用自定义状态码
+            statusCode = bizEx.Code;
+            code = bizEx.Code;
+            message = bizEx.Message;
+        }
+        else
+        {
+            // 未处理异常：500
+            statusCode = (int)HttpStatusCode.InternalServerError;
+            code = 500;
+            message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+        }
+
+        context.Response.StatusCode = statusCode;
+
+        var response = ApiResponse.Fail(message: message, code: code);
 
         var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
         {
