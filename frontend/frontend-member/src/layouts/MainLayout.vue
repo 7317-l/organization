@@ -415,9 +415,8 @@ onMounted(() => {
   margin: 56px auto 0 auto !important;
   height: calc(100vh - 56px) !important;
   min-height: calc(100vh - 56px) !important;
-  box-shadow: 0 0 30px rgba(0,0,0,0.12);
-  border-left: 1px solid #eee;
-  border-right: 1px solid #eee;
+  box-shadow: none;
+  border: none;
 }
 .mobile-view .top-header {
   width: 375px !important;
