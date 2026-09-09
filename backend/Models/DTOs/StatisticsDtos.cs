@@ -86,10 +86,25 @@ public class BranchStatisticsDto
     public string OrgName { get; set; } = string.Empty;
     public int MemberCount { get; set; }
     public double AverageLearningMinutes { get; set; }
+    public double TotalLearningHours { get; set; }
     public double TaskCompletionRate { get; set; }
     public double AverageExamScore { get; set; }
     public double ExamPassRate { get; set; }
+    public int IdleCount { get; set; }
     public List<MemberRankingItem> TopLearners { get; set; } = new();
+    public List<BranchMemberDetailDto> Members { get; set; } = new();
+}
+
+/// <summary>支部党员学习明细</summary>
+public class BranchMemberDetailDto
+{
+    public int MemberId { get; set; }
+    public string MemberName { get; set; } = string.Empty;
+    public double LearningHours { get; set; }
+    public int CompletedTasks { get; set; }
+    public int ExamCount { get; set; }
+    public double AvgScore { get; set; }
+    public int IdleCount { get; set; }
 }
 
 /// <summary>党员学习排行</summary>

@@ -628,16 +628,53 @@ public class StatisticsService : IStatisticsService
         }
             
 
+        // 挂机人次统计
+        var idleCount = await _context.AntiCheatRecords
+            .Where(r => memberIds.Contains(r.PartyMemberId) && !r.IsPass)
+            .CountAsync();
+
+        // 党员明细
+        var memberDetails = new List<BranchMemberDetailDto>();
+        foreach (var member in members)
+        {
+            var mSeconds = await _context.MemberLearningProgress
+                .Where(p => p.MemberId == member.Id)
+                .SumAsync(p => (int?)p.DurationSeconds) ?? 0;
+
+            var mCompleted = await _context.MemberLearningProgress
+                .Where(p => p.MemberId == member.Id && p.IsCompleted && p.TaskId.HasValue)
+                .CountAsync();
+
+            var mExamRecords = examRecords.Where(r => r.MemberId == member.Id).ToList();
+            var mIdleCount = await _context.AntiCheatRecords
+                .Where(r => r.PartyMemberId == member.Id && !r.IsPass)
+                .CountAsync();
+
+            memberDetails.Add(new BranchMemberDetailDto
+            {
+                MemberId = member.Id,
+                MemberName = member.Name,
+                LearningHours = Math.Round(mSeconds / 3600.0, 2),
+                CompletedTasks = mCompleted,
+                ExamCount = mExamRecords.Count,
+                AvgScore = mExamRecords.Any() ? Math.Round(mExamRecords.Average(r => r.Score), 2) : 0,
+                IdleCount = mIdleCount
+            });
+        }
+
         return new BranchStatisticsDto
         {
             OrgId = orgId,
             OrgName = org.Name,
             MemberCount = members.Count,
             AverageLearningMinutes = avgMinutes,
+            TotalLearningHours = Math.Round(totalSeconds / 3600.0, 2),
             TaskCompletionRate = taskCompletionRate,
             AverageExamScore = avgExamScore,
             ExamPassRate = examPassRate,
-            TopLearners = topLearners.OrderByDescending(t => t.LearningMinutes).Take(10).ToList()
+            IdleCount = idleCount,
+            TopLearners = topLearners.OrderByDescending(t => t.LearningMinutes).Take(10).ToList(),
+            Members = memberDetails
         };
     }
 
