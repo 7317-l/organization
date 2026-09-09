@@ -183,3 +183,11 @@ const currentComponent = computed(() => componentMap[activeNav.value] || Knowled
 .nav-item.active { background: #fff; border-left-color: #C8161D; color: #C8161D; font-weight: 600; }
 .ai-content { flex: 1; overflow-y: auto; padding: 20px; }
 </style>
+
+<style>
+/* AI面板内的下拉框需要更高z-index，避免被面板遮罩层遮挡 */
+.el-select-dropdown,
+.el-popper {
+  z-index: 10000 !important;
+}
+</style>
