@@ -411,8 +411,10 @@ onMounted(() => {
 /* ========== 手动手机视图 ========== */
 .mobile-view .body-container {
   max-width: 375px;
+  width: 375px;
   margin: 56px auto 0 auto !important;
-  height: calc(100vh - 56px);
+  height: calc(100vh - 56px) !important;
+  min-height: calc(100vh - 56px) !important;
   box-shadow: 0 0 30px rgba(0,0,0,0.12);
   border-left: 1px solid #eee;
   border-right: 1px solid #eee;
@@ -427,16 +429,14 @@ onMounted(() => {
   box-shadow: none !important;
   border-bottom: none !important;
 }
-.mobile-view .body-container {
-  margin-top: 56px !important;
-}
 .mobile-view .sidebar {
   display: none;
 }
 .mobile-view .content-area {
   margin-left: 0 !important;
   padding: 12px 14px 80px 14px !important;
-  min-height: calc(100vh - 56px);
+  min-height: calc(100vh - 56px) !important;
+  height: 100% !important;
 }
 .mobile-view .mobile-bottom-nav {
   display: flex !important;
