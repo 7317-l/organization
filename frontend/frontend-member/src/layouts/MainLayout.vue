@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, provide, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { House, Reading, Document, User, Trophy, Connection, Guide, ArrowDown } from '@element-plus/icons-vue'
