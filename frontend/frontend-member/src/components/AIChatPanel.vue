@@ -62,6 +62,7 @@ import RecommendPanel from './ai-panel/RecommendPanel.vue'
 import ReportPanel from './ai-panel/ReportPanel.vue'
 import RoadmapPanel from './ai-panel/RoadmapPanel.vue'
 import ClusterPanel from './ai-panel/ClusterPanel.vue'
+import WrongAnalysisPanel from './ai-panel/WrongAnalysisPanel.vue'
 import PairHelpPanel from './ai-panel/PairHelpPanel.vue'
 import './ai-panel/panel-style.css'
 
@@ -87,7 +88,8 @@ const navGroups = [
   {
     title: '错题提升',
     items: [
-      { key: 'cluster', label: '错题知识点聚类', icon: PieChart }
+      { key: 'cluster', label: '错题知识点聚类', icon: PieChart },
+      { key: 'wronganalysis', label: '错题分析', icon: PieChart }
     ]
   },
   {
@@ -104,6 +106,7 @@ const componentMap = {
   report: ReportPanel,
   roadmap: RoadmapPanel,
   cluster: ClusterPanel,
+  wronganalysis: WrongAnalysisPanel,
   pairhelp: PairHelpPanel
 }
 
