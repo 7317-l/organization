@@ -50,4 +50,11 @@ public interface IQwenService
         double temperature = 0.3,
         int maxTokens = 4096,
         CancellationToken cancellationToken = default) where T : class;
+
+    /// <summary>发起流式多轮对话（SSE），逐块产出模型文本增量，用于打字机式输出</summary>
+    IAsyncEnumerable<string> ChatStreamAsync(
+        IEnumerable<QwenChatMessage> messages,
+        double temperature = 0.7,
+        int maxTokens = 4096,
+        CancellationToken cancellationToken = default);
 }
