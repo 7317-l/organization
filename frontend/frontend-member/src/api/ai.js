@@ -1,5 +1,10 @@
 import request from './request'
 
+
+/** 巩固练习：按知识点随机抽题生成练习卷 */
+export function practiceExam(category, count = 20) {
+  return request.get('/exam-tests/practice', { params: { category: category || undefined, count } })
+}
 /** AI 党建问答 */
 export function aiQuery(question) {
   return request.post('/ai-knowledge/query', { question })
