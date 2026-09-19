@@ -33,6 +33,104 @@ export async function apiPost(path, body = {}) {
   throw new Error(data?.message || '请求失败')
 }
 
+// ========== SSE 流式请求（用于 AI 打字机式回答） ==========
+function parseSseEvent(raw) {
+  let event = 'message'
+  let data = ''
+  raw.split('\n').forEach(line => {
+    if (line.startsWith('event:')) event = line.slice(6).trim()
+    else if (line.startsWith('data:')) data += line.slice(5).trim() + '\n'
+  })
+  data = data.trim()
+  if (!data) return null
+  return { event, data }
+}
+
+/**
+ * POST 一个流式接口（SSE），边接收边回调。
+ * handlers: { onMeta(meta), onDelta(text), onDone(data), onError(message) }
+ */
+export async function apiPostStream(path, body = {}, handlers = {}) {
+  const controller = new AbortController()
+  // 整体超时 90 秒，避免网络/服务挂起时前端无限等待
+  const overallTimer = setTimeout(() => controller.abort(), 90000)
+  let res
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    })
+  } catch (e) {
+    clearTimeout(overallTimer)
+    if (e?.name === 'AbortError') throw new Error('回答超时（90秒），请检查网络后重试')
+    throw new Error('无法连接后端服务（端口5091），请确认已启动')
+  }
+  if (res.status === 401) {
+    clearTimeout(overallTimer)
+    throw new Error('登录已过期，请重新登录后再提问')
+  }
+  if (!res.ok || !res.body) {
+    clearTimeout(overallTimer)
+    const text = await res.text()
+    let msg = '请求失败'
+    try { msg = JSON.parse(text)?.message || msg } catch {}
+    throw new Error(msg)
+  }
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder('utf-8')
+  let buffer = ''
+  // 断流兜底：20 秒未收到任何数据帧视为连接中断
+  let idleTimer = setTimeout(() => controller.abort(), 8000)
+  function kickIdle() {
+    clearTimeout(idleTimer)
+    idleTimer = setTimeout(() => controller.abort(), 8000)
+  }
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      kickIdle()
+      buffer += decoder.decode(value, { stream: true })
+      let idx
+      while ((idx = buffer.indexOf('\n\n')) >= 0) {
+        const raw = buffer.slice(0, idx)
+        buffer = buffer.slice(idx + 2)
+        const evt = parseSseEvent(raw)
+        if (!evt) continue
+        if (evt.event === 'meta' && handlers.onMeta) {
+          try { handlers.onMeta(JSON.parse(evt.data)) } catch {}
+        } else if (evt.event === 'delta' && handlers.onDelta) {
+          try {
+            const text = JSON.parse(evt.data)?.text || ''
+            if (text) handlers.onDelta(text)
+          } catch {}
+        } else if (evt.event === 'done' && handlers.onDone) {
+          let d = {}
+          try { d = JSON.parse(evt.data) } catch {}
+          handlers.onDone(d)
+        } else if (evt.event === 'error' && handlers.onError) {
+          let d = {}
+          try { d = JSON.parse(evt.data) } catch {}
+          handlers.onError(d?.message || '回答生成失败')
+        }
+      }
+    }
+  } catch (e) {
+    clearTimeout(overallTimer)
+    clearTimeout(idleTimer)
+    if (e?.name === 'AbortError') {
+      throw new Error('回答中断（网络不稳定或服务无响应），请重试')
+    }
+    throw e
+  } finally {
+    clearTimeout(overallTimer)
+    clearTimeout(idleTimer)
+    reader.releaseLock()
+  }
+}
+
 // 手机号等敏感信息脱敏
 export function maskPhone(v) {
   if (typeof v !== 'string') return v
