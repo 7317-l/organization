@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
@@ -195,6 +196,127 @@ public class QwenService : IQwenService
     {
         var raw = await ChatAsync(systemPrompt, userPrompt, temperature, jsonMode: true, maxTokens, cancellationToken);
         return TryParseJson<T>(raw);
+    }
+
+    /// <summary>
+    /// 流式对话：请求 stream=true，逐块读取 DashScope SSE 返回，产出 content 增量。
+    /// </summary>
+    public async IAsyncEnumerable<string> ChatStreamAsync(
+        IEnumerable<QwenChatMessage> messages,
+        double temperature = 0.7,
+        int maxTokens = 4096,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        if (!IsConfigured)
+        {
+            throw new InvalidOperationException("尚未配置千问 API Key，请在 appsettings.json 或环境变量 DASHSCOPE_API_KEY 中填写。");
+        }
+
+        var client = _httpClientFactory.CreateClient("Qwen");
+        // 流式请求整体不设固定超时（避免截断长回答），但用分阶段超时兜底断流：
+        // ① 等待响应头（首帧）最多 60 秒；② 后续每行数据最多 45 秒无新内容视为断流
+        client.Timeout = Timeout.InfiniteTimeSpan;
+
+        var payload = new Dictionary<string, object>
+        {
+            ["model"] = _model,
+            ["messages"] = messages.Select(m => new { role = m.Role, content = m.Content }),
+            ["temperature"] = temperature,
+            ["max_tokens"] = maxTokens,
+            ["stream"] = true
+        };
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/chat/completions");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        request.Content = new StringContent(
+            JsonSerializer.Serialize(payload, JsonOpts),
+            Encoding.UTF8,
+            "application/json");
+
+        using var headCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        headCts.CancelAfter(TimeSpan.FromSeconds(60));
+        using var response = await SafeSendWithTimeoutAsync(client, request, headCts.Token);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogError("千问流式调用失败：{Status} {Body}", (int)response.StatusCode, errorBody);
+            throw new InvalidOperationException($"千问 API 调用失败（{(int)response.StatusCode}）：{Truncate(errorBody, 300)}");
+        }
+
+        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+
+        while (!reader.EndOfStream)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // 45 秒未收到任何新数据视为断流（网络中断/千问侧挂起），及时让前端感知
+            using var readCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            readCts.CancelAfter(TimeSpan.FromSeconds(45));
+            string line;
+            try
+            {
+                line = await reader.ReadLineAsync(readCts.Token);
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                throw new TimeoutException("千问流式响应超时（45秒无数据），请检查网络后重试");
+            }
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            if (!line.StartsWith("data:", StringComparison.OrdinalIgnoreCase)) continue;
+
+            var data = line.Substring(5).Trim();
+            if (data == "[DONE]") break;
+
+            if (TryGetDeltaPiece(data, out var piece) && !string.IsNullOrWhiteSpace(piece))
+                yield return piece;
+        }
+    }
+
+    /// <summary>带首帧超时的 SendAsync，超时时抛出可读错误而非无限挂起</summary>
+    private static async Task<HttpResponseMessage> SafeSendWithTimeoutAsync(
+        HttpClient client, HttpRequestMessage request, CancellationToken token)
+    {
+        try
+        {
+            return await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+        }
+        catch (OperationCanceledException) when (!token.IsCancellationRequested)
+        {
+            throw new TimeoutException("千问服务响应超时（60秒未返回），请检查网络后重试");
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            throw;
+        }
+    }
+
+    /// <summary>从 DashScope SSE data 帧中提取 content 增量；无法解析时返回 false</summary>
+    private static bool TryGetDeltaPiece(string data, out string? piece)
+    {
+        piece = null;
+        try
+        {
+            using var doc = JsonDocument.Parse(data);
+            if (!doc.RootElement.TryGetProperty("choices", out var choices)
+                || choices.ValueKind != JsonValueKind.Array
+                || choices.GetArrayLength() == 0)
+                return false;
+
+            if (!choices[0].TryGetProperty("delta", out var delta)) return false;
+            if (!delta.TryGetProperty("content", out var contentPiece)
+                || contentPiece.ValueKind != JsonValueKind.String)
+                return false;
+
+            piece = contentPiece.GetString();
+            return !string.IsNullOrWhiteSpace(piece);
+        }
+        catch (JsonException)
+        {
+            // 忽略无法解析的中间帧（如 usage 统计帧）
+            return false;
+        }
     }
 
     private static T? TryParseJson<T>(string raw) where T : class
