@@ -245,7 +245,7 @@
             预计用时：<span class="highlight">约{{ Math.round(practiceConfig.count * 0.5) }}分钟</span>
           </div>
           <div class="practice-actions">
-            <el-button type="primary" size="large" @click="startPractice">
+            <el-button type="primary" size="large" :loading="practiceLoading" @click="startPractice">
               开始巩固练习
             </el-button>
           </div>
@@ -293,7 +293,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Document, DataAnalysis, MagicStick } from '@element-plus/icons-vue'
 import { getExams, getExamResult } from '@/api/exam'
-import { kmeansCluster } from '@/api/ai'
+import { kmeansCluster, practiceExam } from '@/api/ai'
 import { useUserStore } from '@/stores/user'
 import { formatDate, formatDateTime, questionTypeMap } from '@/utils/format'
 
@@ -325,6 +325,7 @@ const clusterLoading = ref(false)
 
 // 练习配置
 const practiceConfig = reactive({ count: 20, type: 'all', knowledge: '', difficulty: 'smart' })
+const practiceLoading = ref(false)
 
 // 结果弹窗
 const resultDialogVisible = ref(false)
@@ -524,11 +525,25 @@ function addToPractice(w) {
   ElMessage.success('已加入巩固练习')
 }
 
-function startPractice() {
-  // 巩固练习使用测验流程，传入配置参数
-  ElMessage.info('正在生成巩固练习试卷...')
-  // 这里可以调用后端生成练习的接口，如果没有则跳转到一个已有测验
-  router.push('/exam')
+async function startPractice() {
+  if (practiceLoading.value) return
+  practiceLoading.value = true
+  try {
+    ElMessage.info('正在生成巩固练习试卷...')
+    const data = await practiceExam(practiceConfig.knowledge || undefined, practiceConfig.count)
+    if (!data || !data.questions || data.questions.length === 0) {
+      ElMessage.warning('题库暂无匹配题目，请调整练习配置后重试')
+      return
+    }
+    // 题目数据存入 sessionStorage，由 Quiz 做题页读取（巩固练习不走考试记录，本地判分）
+    sessionStorage.setItem('consolidation_practice', JSON.stringify({ title: data.title, questions: data.questions }))
+    ElMessage.success(`已生成 ${data.questionCount} 道巩固练习`)
+    router.push('/quiz/consolidation')
+  } catch (e) {
+    ElMessage.error(e?.message || '生成巩固练习失败，请确认题库中有题目')
+  } finally {
+    practiceLoading.value = false
+  }
 }
 
 onMounted(() => {
