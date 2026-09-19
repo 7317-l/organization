@@ -111,6 +111,21 @@ public class KMeansService : IKMeansService
         var clusterCount = Math.Min(request.ClusterCount > 0 ? request.ClusterCount : 3, featureVectors.Count);
         if (clusterCount < 1) clusterCount = 1;
 
+        // 没有任何可聚类的知识点数据（无答题记录或全部答对）时，直接返回友好兜底，避免 KMeans 空数据崩溃
+        if (featureVectors.Count == 0)
+        {
+            return new KMeansClusteringResponse
+            {
+                PartyMemberId = request.PartyMemberId,
+                MemberName = member.Name,
+                Clusters = new List<KMeansClusterDto>(),
+                TopWeaknessTags = new List<string>(),
+                Suggestion = totalAnswered == 0
+                    ? "您还没有考试记录，完成测验后可获得AI薄弱知识点分析。"
+                    : "您最近测验作答全部正确，暂无明显薄弱知识点，继续保持！"
+            };
+        }
+
         // 真正的KMeans聚类
         var (labels, centroids, iterations) = RunKMeans(featureVectors.Select(f => f.Features).ToArray(), clusterCount, maxIterations: 50);
 
